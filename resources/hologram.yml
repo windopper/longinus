@@ -1,0 +1,13 @@
+Holograms:
+ tutorialfinish:
+  name: §c재시험 보러가기§c
+  world: world
+  x: -70.5
+  y: 52
+  z: 89
+ tutorialfinish2:
+  name: §a클래스 선택하러 가기§a
+  world: world
+  x: -70.5
+  y: 52
+  z: 89

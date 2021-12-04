@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="spellinteract:jar">
+    <output-path>$USER_HOME$/Desktop/java.bukkit.project/BUKKIT/spellinteractbukkit_V2.01.paperbukkit/plugins</output-path>
+    <root id="archive" name="spellinteracttestV4.jar">
+      <element id="module-output" name="spellinteracttestV4" />
+      <element id="dir-copy" path="$PROJECT_DIR$/resources" />
+    </root>
+  </artifact>
+</component>

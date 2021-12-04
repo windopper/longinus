@@ -1,0 +1,195 @@
+test: hihi
+
+STANDARD:
+ Name:
+ Type:
+ Grade:
+ LvRequire:
+ Damage:
+ MinVitality:
+ MaxVitality:
+ MinSpellDamage:
+ MaxSpellDamage:
+ MinShield:
+ MaxShield:
+ WalkSpeed:
+
+검:
+ Name: 훈련용 검
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 없음
+ 무기강화최소: 
+ 감각강화최소: 
+ 외피강화최소: 
+ 기동강화최소: 
+ 레벨제한: 10
+ 데미지: 1-1
+ 생명력: 
+ 보호막: 
+ 스킬데미지: 
+ 이동속도: 
+ 에너지충전: 
+ custommodeldata: 3
+ 
+YEEE:
+ Name: YEEE
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 아이테르
+ 무기강화최소: 
+ 감각강화최소: 
+ 외피강화최소: 
+ 기동강화최소: 
+ 레벨제한: 15
+ 데미지: 500-1000
+ 생명력: 1000~1500
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ 
+이유진:
+ Name: 이유진
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 얍얍얍
+ 무기강화최소: 
+ 감각강화최소: 
+ 외피강화최소: 
+ 기동강화최소: 
+ 레벨제한: 15
+ 데미지: 500-13000
+ 생명력: -5900~-1000
+ 보호막: 20%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 30%~1000%
+ 
+GOOD:
+ Name: GOOD
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 아이테르
+ 무기강화최소: 32
+ 감각강화최소: 23
+ 외피강화최소: 13
+ 기동강화최소: 13
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 1
+ 
+NICE:
+ Name: NICE
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 아이테르
+ 무기강화최소: 32
+ 감각강화최소: 23
+ 외피강화최소: 13
+ 기동강화최소: 13
+ 레벨제한: 15
+ 데미지: 1000-1200
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 2
+ 
+EX:
+ Name: EX
+ Type: Material.DIAMOND_HOE
+ Grade: Legendary
+ 클래스제한: 엑셀러레이터
+ 무기강화최소: 32
+ 감각강화최소: 23
+ 외피강화최소: 13
+ 기동강화최소: 13
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 1
+ 
+EX2:
+ Name: EX2
+ Type: Material.DIAMOND_HOE
+ Grade: Legendary
+ 클래스제한: 엑셀러레이터
+ 무기강화최소: 32
+ 감각강화최소: 23
+ 외피강화최소: 13
+ 기동강화최소: 13
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 2
+ 
+Phlox1:
+ Name: Phlox1
+ Type: Material.DIAMOND_PICKAXE
+ Grade: Legendary
+ 클래스제한: 플록스
+ 무기강화최소: 32
+ 감각강화최소: 23
+ 외피강화최소: 13
+ 기동강화최소: 13
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 1
+ 
+Blaster1:
+ Name: Blaster1
+ Type: Material.DIAMOND_SHOVEL
+ Grade: Legendary
+ 클래스제한: 블래스터
+ 무기강화최소: 1
+ 감각강화최소: 1
+ 외피강화최소: 1
+ 기동강화최소: 1
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 1
+ 
+ByV1:
+ Name: ByV1
+ Type: Material.DIAMOND_AXE
+ Grade: Legendary
+ 클래스제한: 바이V
+ 무기강화최소: 1
+ 감각강화최소: 1
+ 외피강화최소: 1
+ 기동강화최소: 1
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: 20%~30%
+ 에너지충전: 
+ custommodeldata: 1
+
+ 
