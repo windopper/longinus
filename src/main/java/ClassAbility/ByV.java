@@ -1,5 +1,6 @@
 package ClassAbility;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,39 +66,16 @@ public class ByV {
 	}
 	
 	public void melee(final Player p) {
-		
-		p.getWorld().playSound(p.getLocation(), Sound.BLOCK_STONE_BREAK, 1, 1);
-		List<LivingEntity> meleehit = new ArrayList<>();
-		Location ploc = p.getEyeLocation();
-		Vector pvec = ploc.getDirection();
-		pvec.normalize();
-		pvec.multiply(0.2);
-		
-		for(int i=0; i<10; i++) {
-			
-			p.getWorld().spawnParticle(Particle.SMOKE_NORMAL, ploc, 4, 0.2, 0.2, 0.2, 0, null);
-			
-			for(LivingEntity e : p.getWorld().getLivingEntities()) {
-				if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && p != e && !meleehit.contains(e)) {
-					Location eloc = e.getBoundingBox().getCenter().toLocation(p.getWorld());
-					BoundingBox ebox = e.getBoundingBox();
-					if(eloc.distance(ploc)<1.5	|| ebox.contains(ploc.getX(), ploc.getY(), ploc.getZ())) {
-						
-						
-						p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-						meleehit.add(e);
-						int dmg = userdata.UserManager.getinstance(p).meleedmgcalculate(p, 1);
-						Damage.getinstance().taken(dmg, e, p);
-						EntityStatus.getinstance(e).KnockBack(p, 0.5);
-					}
-					
 
-				}
-			}
-			
-			ploc.add(pvec);
-			
-		}
+		SpellManager Spell = new SpellManager(p, 0.2);
+		Spell.addDepartSound(Sound.BLOCK_STONE_BREAK, 1, 1);
+		Spell.addTrailParticle(Particle.SMOKE_NORMAL, 4, 0.2, 0.2, 0.2, 0, null);
+		Spell.setMaximumRange(2);
+		Spell.setEntityPassable(true);
+		Spell.setHitBoxRange(1.5);
+		Spell.setDamageRate(1);
+		Spell.setKnockBack(p, 0.5);
+		Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 		
 		PlayerFunction.getinstance(p).setMeleeDelay(20);
 
@@ -125,11 +103,7 @@ public class ByV {
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
 		if(!whiletakedown.contains(p)) {
-			
-			
 			whiletakedown.add(p);
-			
-			
 			new BukkitRunnable() {
 				
 				int i = 0;
@@ -180,7 +154,6 @@ public class ByV {
 									e.setVelocity(etop);
 								}
 
-								
 								int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 								
@@ -192,9 +165,6 @@ public class ByV {
 						takedownparticles(p);
 						//riptideoffpacket(p);
 						
-						
-						
-						
 						whiletakedown.remove(p);
 						cancel();
 					}
@@ -205,7 +175,6 @@ public class ByV {
 		}
 		
 		else {
-			
 			
 			new BukkitRunnable() {
 				
@@ -234,16 +203,7 @@ public class ByV {
 				}
 			}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 		}
-		
 
-		
-		
-		
-		
-
-
-		
-		
 	}
 	public void chain(final Player p, int mana) {
 		
@@ -280,10 +240,7 @@ public class ByV {
 						essence.replace(p, essence.get(p)+1);
 						return;
 					}
-					
-					
 				}
-				
 			}
 			ploc.add(pvec);
 			
@@ -297,8 +254,7 @@ public class ByV {
 	public void punch(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		essence.replace(p, essence.get(p)-1);
-		
-		
+
 		Location ploc = p.getEyeLocation();
 		Vector pvec = ploc.getDirection();
 		pvec.normalize();
@@ -307,22 +263,16 @@ public class ByV {
 		
 		p.getWorld().playSound(ploc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 1f);
 		p.getWorld().playSound(ploc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-		
-		
+
+		SpellManager Spell = new SpellManager(p);
+		Spell.setHitBoxRange(3);
+		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0);
+		Spell.setDamageRate(1.5);
+		Spell.setKnockBack(p, 2);
+		Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, ploc);
+
 		punchparticle(p, ploc);
-		
-		for(Entity e : p.getWorld().getNearbyEntities(ploc, 3, 3, 3)) {
-			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && p!=e) {
-				p.getWorld().playSound(ploc, Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0f);
-				EntityStatus.getinstance((LivingEntity)e).KnockBack(p, 2);
-				int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
-				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
-			}
-		}
-		
-		
-		
-		
+
 	}
 	public void shockwave(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
@@ -330,8 +280,7 @@ public class ByV {
 		
 		p.getLocation().getWorld().playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1, 0);
 		p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-		
-		
+
 		int rate = 1;
 		if(essence.get(p)>8) {
 			rate = 8;
@@ -341,16 +290,27 @@ public class ByV {
 		}
 		
 		essence.replace(p, essence.get(p)-rate);
-		
-		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
-			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
-				p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2, 0);
-				p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-				int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, rate);
-				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
-				e.setVelocity(new Vector(0, 1, 0));
-			}
+
+		SpellManager Spell = new SpellManager(p);
+		Spell.setHitBoxRange(3);
+		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 2f, 0);
+		Spell.setDamageRate(rate);
+		Spell.setKnockBack(p, 2);
+		Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, p.getLocation());
+
+		for(Entity e : Spell.getHitEntityList()) {
+			e.setVelocity(new Vector(0, 1, 0));
 		}
+		
+//		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
+//			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
+//				p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2, 0);
+//				p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+//				int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, rate);
+//				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
+//				e.setVelocity(new Vector(0, 1, 0));
+//			}
+//		}
 		
 	    for (int d = 0; d <= 45; d += 1) {
 	        Location particleLoc = new Location(p.getLocation().getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
@@ -563,8 +523,38 @@ public class ByV {
 					
 					 // 끌고 오기
 					
-					if(EntityStatus.getinstance(target).canKnockback() == true) { 
-						p.setVelocity(p.getLocation().getDirection().normalize().multiply(3));
+					if(EntityStatus.getinstance(target).canKnockback() == false) {
+
+
+						new BukkitRunnable() {
+
+							int i=0;
+
+							@Override
+							public void run() {
+
+								Vector pp = target.getLocation().toVector();
+								Vector ee = p.getLocation().toVector();
+								Vector ppee = pp.subtract(ee);
+								ppee.normalize();
+
+								ppee.multiply(1.5);
+
+								target.setVelocity(ppee);
+
+								if(p.getWorld().getName().equals(target.getWorld().getName())) {
+									if(p.getLocation().distance(target.getLocation())<3) {
+										p.setVelocity(new Vector(0, 0, 0));
+										cancel();
+									}
+								}
+
+								if(i>60) cancel();
+								i++;
+							}
+						}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
+
 					}
 					else {
 						
@@ -590,21 +580,12 @@ public class ByV {
 										cancel();
 									}
 								}	
-								
-								
-								
+
 								if(i>60) cancel();
 								i++;
 							}
 						}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-						
-
-						
-						
 					}
-					
-					
-					
 					e.remove();
 					cancel();
 				}
@@ -660,12 +641,8 @@ public class ByV {
 			chainpieceparticle(loc, upvec.clone().multiply(0.25), j);
 			chainpieceparticle(loc, downvec.clone().multiply(0.25), j);
 		}
-		
-		
-	
 	}
-	
-	
+
 	public void chainpieceparticle(Location loc, Vector vec, int j) {
 			
 		loc.getWorld().spawnParticle(Particle.REDSTONE, loc.clone().add(vec), 1, 0, 0, 0, 0, new Particle.DustOptions(Color.PURPLE, 1));
@@ -691,14 +668,9 @@ public class ByV {
 					Damage.getinstance().taken(dmg, e, p);
 					return true;
 				}
-				
-				
 			}
-			
 		}
-		
 		return false;
-		
 	}
 	
 	public void chainvectorzerocc(Entity e) {

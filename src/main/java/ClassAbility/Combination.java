@@ -711,7 +711,7 @@ public class Combination {
 		int lvl = UserStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int CurrentRobot = ClassAbility.Phlox.nanorobot.get(p);
+		int CurrentRobot = PlayerFunction.getinstance(p).nanorobot;
 		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
 		
 		int RLrobot = ClassAbility.Phlox.healrobot;

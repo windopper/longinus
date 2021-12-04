@@ -40,10 +40,6 @@ public class Phlox {
 	public static final int escaperobot = 10;
 	public static final int interruptrobot = 20;
 	
-	public final static HashMap<Player, Integer> nanorobot = new HashMap<>();
-	public final static HashMap<Player, ShulkerBullet> meleerobot = new HashMap<>();
-	public final static HashMap<Player, Integer> meleerobotcount = new HashMap<>();
-	
 	
 	private Phlox() {
 		
@@ -52,13 +48,6 @@ public class Phlox {
 	public static Phlox getinstance() {
 		if(Phlox == null) Phlox = new Phlox();
 		return Phlox;
-	}
-	
-	
-	public void removemaps(Player p) {
-		nanorobot.remove(p);
-		meleerobot.remove(p);
-		meleerobotcount.remove(p);
 	}
 	
 	public void melee(final Player p) {
@@ -126,17 +115,18 @@ public class Phlox {
 			meleelasernontarget(p, loc);
 		}
 
-		
-		if(!meleerobot.containsKey(p)) {
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+
+		if(PF.meleerobot != null) {
 			ShulkerBullet e = (ShulkerBullet) p.getWorld().spawnEntity(tmp, EntityType.SHULKER_BULLET);
 			e.setGravity(false);
 			e.setSilent(true);
 			e.setInvulnerable(true);
-			meleerobot.put(p, e);
-			meleerobotcount.put(p, 0);
+			PF.meleerobot = e;
+			PF.meleerobotcount = 0;
 		}
 		else {
-			meleerobotcount.replace(p, 0);
+			PF.meleerobotcount = 0;
 		}
 		
 		
@@ -153,10 +143,7 @@ public class Phlox {
 		for(Player pl : Bukkit.getOnlinePlayers()) {
 			pl.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
 		}
-		
-		
-		
-		
+
 		new BukkitRunnable() {
 			
 			int i=0;
@@ -243,13 +230,8 @@ public class Phlox {
 		nanorobotoverload(annihilationrobot, 80, p);
 
 		annihilationlaser(p);
-		
-		
-		
-
-		
-		
 	}
+
 	public void escape(final Player p, final int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		nanorobotoverload(escaperobot, 80, p);
@@ -287,15 +269,7 @@ public class Phlox {
 			@Override
 			public void run() {
 				p.setFallDistance(0);
-				
-				
-//				if(p.isSneaking()) {
-//					p.removePotionEffect(PotionEffectType.SLOW_FALLING);
-//				}
-//				else {
-//					p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 20, 0), true);
-//				}
-//				
+
 				if(p.isOnGround() && i>3) {
 					cancel();
 				}
@@ -307,10 +281,6 @@ public class Phlox {
 					}
 					summonCircle(ploc, 0.3 * i);
 				}
-
-
-				
-				
 				i++;
 				
 			}
@@ -342,7 +312,6 @@ public class Phlox {
                 double z = r * Math.sin(theta) * Math.sin(phi);
 
                 loc.add(x, y, z);
-                //loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0F, 0F, 0F, 0.001, new Particle.DustOptions(Color.fromRGB(255,255,255), 2));
                 loc.getWorld().spawnParticle(Particle.DRIP_LAVA, loc, 2, 0F, 0F, 0F, 0.5, null);
                 loc.subtract(x, y, z);
             }
@@ -365,19 +334,6 @@ public class Phlox {
         
         
         summonCircle2(loc.add(0, 1, 0), 6);
-				
-
-
-        
-
-        
-        
-		
-		
-		
-		
-		
-		
 	}
 	public void robot(final Player p, final int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
@@ -389,10 +345,10 @@ public class Phlox {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			if(UserManager.getinstance(p).CurrentClass.equals("플록스")) {
-				if(!nanorobot.containsKey(p)) nanorobot.put(p, 100);
+				if(PlayerFunction.getinstance(p).nanorobot == -1) PlayerFunction.getinstance(p).nanorobot = 100;
 			}
 			else {
-				if(nanorobot.containsKey(p)) nanorobot.remove(p);
+				if(PlayerFunction.getinstance(p).nanorobot != -1) PlayerFunction.getinstance(p).nanorobot = -1;
 			}
 		}
 		
@@ -423,22 +379,20 @@ public class Phlox {
 	}
 	
 	public void nanorobotadd(int robotamount, final Player p) {
+
+		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
-		if(nanorobot.containsKey(p)) {
-			if(nanorobot.get(p)+robotamount>100) nanorobot.replace(p, 100);
+		if(PF.nanorobot != -1) {
+			if(PF.nanorobot+robotamount>100) PF.nanorobot = 100;
 			else {
-				nanorobot.replace(p, nanorobot.get(p)+robotamount);
+				PF.nanorobot += robotamount;
 			}
 		}
 		
 	}
 	
-	public int nanorobotget(int robotamount, final Player p) {
-		return nanorobot.get(p);
-	}
-	
 	public void nanorobotuse(int robotamount, final Player p) {
-		nanorobot.replace(p, nanorobot.get(p)-robotamount);
+		PlayerFunction.getinstance(p).nanorobot -= robotamount;
 	}
 	
 	
@@ -851,8 +805,10 @@ public class Phlox {
 	public void meleerobotcountloop() {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
+
+			PlayerFunction PF = PlayerFunction.getinstance(p);
 			
-			if(meleerobotcount.containsKey(p)) {
+			if(PF.meleerobotcount != 0) {
 				
 				Location loc = p.getEyeLocation();
 				
@@ -877,15 +833,15 @@ public class Phlox {
 				}
 				
 				
-				if(meleerobotcount.get(p)>40) {
-					meleerobot.get(p).remove();
-					meleerobotcount.remove(p);
-					meleerobot.remove(p);
+				if(PF.meleerobotcount>40) {
+					PF.meleerobot.remove();
+					PF.meleerobotcount = 0;
+					PF.meleerobot = null;
 					continue;
 				}
 				
-				meleerobot.get(p).teleport(loc);
-				meleerobotcount.replace(p, meleerobotcount.get(p)+1);
+				PF.meleerobot.teleport(loc);
+				PF.meleerobotcount++;
 				
 			}
 			

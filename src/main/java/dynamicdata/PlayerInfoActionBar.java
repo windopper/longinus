@@ -22,6 +22,10 @@ public class PlayerInfoActionBar {
 
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
+
+			PlayerFunction PF = PlayerFunction.getinstance(player);
+
+
 			
 			int CurrentHealth = PlayerHealth.getinstance(player).getCurrentHealth();
 			int CurrentShield = PlayerHealth.getinstance(player).getCurrentShield();
@@ -34,7 +38,7 @@ public class PlayerInfoActionBar {
 					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 플록스 전용
-			String f = "§9§l◈ §l§9"+Phlox.nanorobot.get(player)+"/100  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
+			String f = "§9§l◈ §l§9"+PF.nanorobot+"/100  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
 					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 바이V 전용

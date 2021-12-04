@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.mojang.datafixers.FunctionType.Instance;
+import org.bukkit.entity.ShulkerBullet;
 
 public class PlayerFunction {
 	
@@ -15,6 +16,24 @@ public class PlayerFunction {
 	private int melee = 0;
 	private int meleedelay = 0;
 	private int meleemode = 0;
+
+	/*
+	Phlox Functions
+	 */
+	public int nanorobot = -1;
+	public ShulkerBullet meleerobot;
+	public int meleerobotcount = 0;
+
+	/*
+	Aether Functions
+	 */
+
+	/*
+	ByV Functions
+	 */
+
+
+
 	
 	
 	
@@ -50,6 +69,8 @@ public class PlayerFunction {
 	public void setMeleemode(int meleemode) {
 		this.meleemode = meleemode;
 	}
+
+
 	
 	
 	public void MeleeDelayControlLoop() {

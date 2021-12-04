@@ -89,12 +89,14 @@ public class SpellManager {
     private enum ParticleType {
         DepartureParticle,
         TrailParticle,
-        DestinationParticle
+        DestinationParticle,
+        WallParticle
     }
 
     private enum SoundType {
         DepartureSound,
-        DestinationSound
+        DestinationSound,
+        WallSound
     }
 
     public SpellManager(Player player, double multiply) {
@@ -261,7 +263,7 @@ public class SpellManager {
         return loc;
     }
 
-    public boolean RunLinearSpell(MeleeOrSpell meleeorspell) {
+    public boolean RunRayCast(MeleeOrSpell meleeorspell) {
 
 
 
@@ -323,7 +325,7 @@ public class SpellManager {
         return false;
     }
 
-    public boolean RunCircleSpell(MeleeOrSpell meleeorspell, Location CurrentLoc) {
+    public boolean RunRadiusRange(MeleeOrSpell meleeorspell, Location CurrentLoc) {
 
         RunParticles(ParticleType.TrailParticle);
         // 벽 체크
@@ -372,6 +374,12 @@ public class SpellManager {
 
         return false;
     }
+
+    public boolean RunVectorCast() {
+
+        return false;
+    }
+
 
     private void RunParticles(ParticleType Type) {
 
@@ -509,11 +517,8 @@ public class SpellManager {
 
         int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? UserManager.getinstance(player).meleedmgcalculate(player, DamageRate)
                 : UserManager.getinstance(player).spelldmgcalculate(player, DamageRate);
-        Bukkit.broadcastMessage(Integer.toString(dmg));
         dmg = (int)(dmg * multiplyDamage);
-        Bukkit.broadcastMessage(Integer.toString(dmg));
         dmg += (int)addDamage;
-        Bukkit.broadcastMessage(Integer.toString(dmg));
         return dmg;
     }
 

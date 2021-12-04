@@ -66,7 +66,7 @@ public class Accelerator {
 		Spell.setDamageRate(1);
 		Spell.addTrailParticle(Particle.CRIT);
 		Spell.addTrailParticle(Particle.CRIT_MAGIC);
-		Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Melee);
+		Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 
 		PlayerFunction.getinstance(p).setMeleeDelay(8);
 		
@@ -102,7 +102,7 @@ public class Accelerator {
 				Spell.setKnockBack(p, 0.4);
 				Spell.addDestinationParticle(Particle.BLOCK_CRACK, 20, 0.5d, 0.5d, 0.5d, 0d, Material.REDSTONE_BLOCK.createBlockData());
 
-				Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Spell);
+				Spell.RunRayCast(SpellManager.MeleeOrSpell.Spell);
 				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 2);
@@ -211,7 +211,7 @@ public class Accelerator {
 				Spell.addDestinationParticle(Particle.LANDING_OBSIDIAN_TEAR, 40, 0.5, 0.5, 0.5, 0, null);
 				Spell.addDestinationParticle(Particle.EXPLOSION_LARGE, 2, 0, 0, 0, 0, null);
 
-				if(Spell.RunCircleSpell(SpellManager.MeleeOrSpell.Spell, loc)) {
+				if(Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, loc)) {
 					for(Player pl : Bukkit.getOnlinePlayers()) {
 						for(int i=0; i<10; i++) {
 

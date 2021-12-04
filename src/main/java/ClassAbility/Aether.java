@@ -13,15 +13,12 @@ import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import Interact.Damage;
-import dynamicdata.EntityStatus;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;
 import dynamicdata.PlayerHealth;
@@ -71,7 +68,7 @@ public class Aether {
 		Spell.setMaximumRange(3);
 		Spell.setDamageRate(1);
 
-		Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Melee);
+		Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 		
 		for(int i=0; i<15; i++) {
 			
@@ -172,7 +169,7 @@ public class Aether {
 						}
 						asloc.add(asdir);
 
-						Spell.RunCircleSpell(SpellManager.MeleeOrSpell.Melee, asloc);
+						Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Melee, asloc);
 
 					}
 					as.remove();
@@ -353,7 +350,7 @@ public class Aether {
 					
 				}
 
-				if(Spell.RunCircleSpell(SpellManager.MeleeOrSpell.Spell, p.getLocation())) {
+				if(Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, p.getLocation())) {
 
 					Vector vect = new Vector(0, 0, 0);
 					p.setVelocity(vect);
@@ -457,7 +454,7 @@ public class Aether {
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.3, 0.3, 0.3, 100, new Particle.DustOptions(Color.BLACK, particlesize));
 		}
 
-		if(Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Spell)) {
+		if(Spell.RunRayCast(SpellManager.MeleeOrSpell.Spell)) {
 
 		}
 

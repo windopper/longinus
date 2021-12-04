@@ -583,7 +583,6 @@ public class Main extends JavaPlugin implements Listener {
 		Aether.getinstance().removemaps(p);
 		Blaster.getinstance().removemaps(p);
 		ByV.getinstance().removemaps(p);
-		Phlox.getinstance().removemaps(p);
 		
 		ClassAbility.Combination.getinstance().removemaps(p);
 		

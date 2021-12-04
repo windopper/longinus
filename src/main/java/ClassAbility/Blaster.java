@@ -1,7 +1,6 @@
 package ClassAbility;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -17,10 +16,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import Interact.Damage;
 import dynamicdata.EntityStatus;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;
@@ -76,7 +73,7 @@ public class Blaster {
 			Spell.setDamageRate(1);
 			Spell.setBurn(60, 0.1);
 
-			Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Melee);
+			Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 			
 			PlayerFunction.getinstance(p).setMeleeDelay(20);
 					
@@ -113,7 +110,7 @@ public class Blaster {
 			Spell.setEntityPassable(false);
 			Spell.setWallPassable(false);
 
-			Spell.RunLinearSpell(SpellManager.MeleeOrSpell.Melee);
+			Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 
 			if(Spell.getHitLocation().getBlock().isSolid()) {
 				Location BLoc = Spell.getHitLocation();
@@ -152,8 +149,7 @@ public class Blaster {
 		PlayerHealth.getinstance(p).ShieldAdd((int)(UserManager.getinstance(p).Health * recoverrate));
 		
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, 2, 0);
-		
-		
+
 		new BukkitRunnable() {
 			
 			double i=0;
@@ -213,17 +209,12 @@ public class Blaster {
 	                loc.subtract(x, y, z);
 
 				}
-				
-				
 			    for (int d = 0; d <= 45; d += 1) {
 			        Location particleLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
 			        particleLoc.setX(loc.getX() + Math.cos(d) * i);
 			        particleLoc.setZ(loc.getZ() + Math.sin(d) * i);
 			        loc.getWorld().spawnParticle(Particle.REDSTONE, particleLoc, 1, new Particle.DustOptions(Color.TEAL, 1));
 			    }
-				
-				
-				
 
 				Bukkit.getWorld(p.getWorld().toString());
 	            
@@ -246,36 +237,18 @@ public class Blaster {
 	}
 	
 	public void grenadelauncherbomb(Location loc, Player me) {
-		
-		List<Entity> hit = new ArrayList<>();
-		
+
+
 		loc.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, loc, 15, 1.5, 1.5, 1.5, 0, null);
 		loc.getWorld().playSound(loc, Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-		
-		for(LivingEntity e : me.getWorld().getLivingEntities()) {
-			
-			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !hit.contains(e)) {
-				Location eloc = e.getLocation();
-				BoundingBox ebox = e.getBoundingBox();
-				double distance = eloc.distance(loc);
-				
-				if(distance<4 || ebox.contains(loc.getX(), loc.getY(), loc.getZ())) {
-					
-					hit.add(e);
-					int dmg = UserManager.getinstance(me).spelldmgcalculate(me, 2);
-					
-					EntityStatus.getinstance(e).setBurnsdmg(0);
-					EntityStatus.getinstance(e).setBurnstick(0);
-					
-					me.playSound(me.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-					Damage.getinstance().taken(dmg, e, me);
-					
-					
-				}
-				
-				
-			}
-		}
+
+		SpellManager Spell = new SpellManager(me);
+		Spell.setDamageRate(2);
+		Spell.setHitBoxRange(4);
+
+		Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, loc);
+
+
 		
 	}
 	
