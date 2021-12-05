@@ -17,7 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
-import Quest.Tutorial;
+import QuestClasses.Tutorial;
 import dynamicdata.EntityStatus;
 import net.minecraft.server.v1_16_R3.EntityZombie;
 import net.minecraft.server.v1_16_R3.PacketPlayOutSpawnEntityLiving;

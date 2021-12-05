@@ -29,11 +29,11 @@ public class BankGui {
 		Inventory gui = Bukkit.createInventory(null, 54, "가상창고 #"+page);
 		
 		gui.setItem(7, containerdetach_2());
-		gui.setItem(8, rightpage(p));
+		gui.setItem(8, NextPage(p));
 		
 		gui.setItem(16, containerdetach_2());
 		if(!page.equals("1")) {
-			gui.setItem(17, leftpage());
+			gui.setItem(17, PrevPage());
 		}
 		else {
 			gui.setItem(17, containerdetach());
@@ -59,10 +59,10 @@ public class BankGui {
 		Inventory gui = Bukkit.createInventory(null, 54, "가상창고 #"+page);
 		
 		gui.setItem(7, containerdetach_2());
-		gui.setItem(8, rightpage_ask(page));
+		gui.setItem(8, NextPage_Ask(page));
 		
 		gui.setItem(16, containerdetach_2());
-		gui.setItem(17, leftpage());
+		gui.setItem(17, PrevPage());
 		gui.setItem(26, containerdetach());
 		gui.setItem(35, containerdetach());
 		gui.setItem(44, containerdetach());
@@ -98,7 +98,7 @@ public class BankGui {
 		return item;
 	}
 	
-	private ItemStack rightpage(Player p) {
+	private ItemStack NextPage(Player p) {
 		
 		ItemStack item = new ItemStack(Material.LIGHT_BLUE_DYE);
 		ItemMeta meta = item.getItemMeta();
@@ -113,7 +113,7 @@ public class BankGui {
 		return item;
 	}
 	
-	private ItemStack rightpage_ask(String page) {
+	private ItemStack NextPage_Ask(String page) {
 		
 		int pricerate = Integer.parseInt(page);
 		
@@ -125,7 +125,7 @@ public class BankGui {
 		return item;
 	}
 	
-	private ItemStack leftpage() {
+	private ItemStack PrevPage() {
 		
 		ItemStack item = new ItemStack(Material.PINK_DYE);
 		ItemMeta meta = item.getItemMeta();

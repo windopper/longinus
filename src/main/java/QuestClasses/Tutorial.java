@@ -1,4 +1,4 @@
-package Quest;
+package QuestClasses;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -45,7 +45,7 @@ public class SpellManager {
 
     private final List<Particle> ParticleTrail = new ArrayList<>();
     private final List<Integer> ParticleTrailAmount = new ArrayList<>();
-    private final List<Double>ParticleTrailX = new ArrayList<>();
+    private final List<Double> ParticleTrailX = new ArrayList<>();
     private final List<Double> ParticleTrailY = new ArrayList<>();
     private final List<Double> ParticleTrailZ = new ArrayList<>();
     private final List<Double> ParticleTrailSpeed = new ArrayList<>();
@@ -53,7 +53,7 @@ public class SpellManager {
 
     private final List<Particle> ParticleDest = new ArrayList<>();
     private final List<Integer> ParticleDestAmount = new ArrayList<>();
-    private final List<Double>ParticleDestX = new ArrayList<>();
+    private final List<Double> ParticleDestX = new ArrayList<>();
     private final List<Double> ParticleDestY = new ArrayList<>();
     private final List<Double> ParticleDestZ = new ArrayList<>();
     private final List<Double> ParticleDestSpeed = new ArrayList<>();
@@ -61,7 +61,7 @@ public class SpellManager {
 
     private final List<Particle> ParticleDepart = new ArrayList<>();
     private final List<Integer> ParticleDepartAmount = new ArrayList<>();
-    private final List<Double>ParticleDepartX = new ArrayList<>();
+    private final List<Double> ParticleDepartX = new ArrayList<>();
     private final List<Double> ParticleDepartY = new ArrayList<>();
     private final List<Double> ParticleDepartZ = new ArrayList<>();
     private final List<Double> ParticleDepartSpeed = new ArrayList<>();

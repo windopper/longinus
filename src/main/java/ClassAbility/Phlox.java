@@ -117,16 +117,16 @@ public class Phlox {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 
-		if(PF.meleerobot != null) {
+		if(PF.PHMeleeRobot != null) {
 			ShulkerBullet e = (ShulkerBullet) p.getWorld().spawnEntity(tmp, EntityType.SHULKER_BULLET);
 			e.setGravity(false);
 			e.setSilent(true);
 			e.setInvulnerable(true);
-			PF.meleerobot = e;
-			PF.meleerobotcount = 0;
+			PF.PHMeleeRobot = e;
+			PF.PHMeleeRobotCount = 0;
 		}
 		else {
-			PF.meleerobotcount = 0;
+			PF.PHMeleeRobotCount = 0;
 		}
 		
 		
@@ -345,10 +345,10 @@ public class Phlox {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			if(UserManager.getinstance(p).CurrentClass.equals("플록스")) {
-				if(PlayerFunction.getinstance(p).nanorobot == -1) PlayerFunction.getinstance(p).nanorobot = 100;
+				if(PlayerFunction.getinstance(p).PHNanoRobot == -1) PlayerFunction.getinstance(p).PHNanoRobot = 100;
 			}
 			else {
-				if(PlayerFunction.getinstance(p).nanorobot != -1) PlayerFunction.getinstance(p).nanorobot = -1;
+				if(PlayerFunction.getinstance(p).PHNanoRobot != -1) PlayerFunction.getinstance(p).PHNanoRobot = -1;
 			}
 		}
 		
@@ -382,17 +382,17 @@ public class Phlox {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
-		if(PF.nanorobot != -1) {
-			if(PF.nanorobot+robotamount>100) PF.nanorobot = 100;
+		if(PF.PHNanoRobot != -1) {
+			if(PF.PHNanoRobot +robotamount>100) PF.PHNanoRobot = 100;
 			else {
-				PF.nanorobot += robotamount;
+				PF.PHNanoRobot += robotamount;
 			}
 		}
 		
 	}
 	
 	public void nanorobotuse(int robotamount, final Player p) {
-		PlayerFunction.getinstance(p).nanorobot -= robotamount;
+		PlayerFunction.getinstance(p).PHNanoRobot -= robotamount;
 	}
 	
 	
@@ -808,7 +808,7 @@ public class Phlox {
 
 			PlayerFunction PF = PlayerFunction.getinstance(p);
 			
-			if(PF.meleerobotcount != 0) {
+			if(PF.PHMeleeRobotCount != 0) {
 				
 				Location loc = p.getEyeLocation();
 				
@@ -833,15 +833,15 @@ public class Phlox {
 				}
 				
 				
-				if(PF.meleerobotcount>40) {
-					PF.meleerobot.remove();
-					PF.meleerobotcount = 0;
-					PF.meleerobot = null;
+				if(PF.PHMeleeRobotCount >40) {
+					PF.PHMeleeRobot.remove();
+					PF.PHMeleeRobotCount = 0;
+					PF.PHMeleeRobot = null;
 					continue;
 				}
 				
-				PF.meleerobot.teleport(loc);
-				PF.meleerobotcount++;
+				PF.PHMeleeRobot.teleport(loc);
+				PF.PHMeleeRobotCount++;
 				
 			}
 			

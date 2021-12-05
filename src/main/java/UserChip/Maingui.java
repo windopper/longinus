@@ -3,14 +3,18 @@ package UserChip;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import io.papermc.paper.text.PaperComponents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.inventory.meta.SkullMeta;
+import userdata.UserLevelManager;
 import userdata.UserStatManager;
 import userdata.UserFileManager;
 import userdata.UserManager;
@@ -47,6 +51,7 @@ public class Maingui {
 		Inventory gui = Bukkit.createInventory(null, 36, "메모리카드");
 		
 		gui.setItem(4, alteraitem(p));
+		gui.setItem(8, PlayerProfile(p));
 		gui.setItem(11, alarm(p));
 		gui.setItem(12, questbook());
 		gui.setItem(13, classitem());
@@ -59,6 +64,25 @@ public class Maingui {
 
 		
 		
+	}
+
+	private ItemStack PlayerProfile(Player p) {
+
+		String CurrentClass = UserManager.getinstance(p).CurrentClass;
+		String Level = Integer.toString(UserStatManager.getinstance(p).getlvl());
+
+
+		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
+		SkullMeta meta = (SkullMeta) item.getItemMeta();
+		meta.setOwningPlayer(p);
+		meta.setDisplayName("§e§o§l"+p.getName()+"의 프로필");
+		meta.setLore(Arrays.asList("",
+				"§9- §d클래스 : "+CurrentClass,
+				"§9- §d레벨 : "+Level));
+
+		item.setItemMeta(meta);
+
+		return item;
 	}
 	
 	public ItemStack questbook() { // 퀘스트 아이템

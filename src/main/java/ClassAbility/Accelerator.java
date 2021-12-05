@@ -34,8 +34,6 @@ public class Accelerator {
 	public static final int bombthrowmana = 12;
 	public static final int randomfiremana = 12;
 	public static final int particleaccelerationmana = 15;
-	public static HashMap<Player, Integer> passivecooldown = new HashMap<>();
-	public static HashMap<Player, Double> rate = new HashMap<>();
 	
 	public int particletime = 0;
 	
@@ -46,12 +44,6 @@ public class Accelerator {
 	public static Accelerator getinstance() {
 		if(Accelerator == null) Accelerator = new Accelerator();
 		return Accelerator;
-	}
-	
-	
-	public void removemaps(Player p) {
-		passivecooldown.remove(p);
-		rate.remove(p);
 	}
 	
 	public void melee(final Player p) {
@@ -132,10 +124,10 @@ public class Accelerator {
 			@Override
 			public void run() {
 				
-				rate.put(p, 1.5d);
+				PlayerFunction.getinstance(p).ACRate = 1.5;
 				
 				if(i>=60) {
-					rate.remove(p);
+					PlayerFunction.getinstance(p).ACRate = 1;
 					cancel();
 				}
 				i++;
@@ -334,7 +326,7 @@ public class Accelerator {
 			pl.spawnParticle(Particle.PORTAL, p.getLocation(), 500, 0.1, 0.1, 0.1, 1.5, null);
 		}
 		
-		if(passivecooldown.containsKey(p)) passivecooldown.remove(p);
+		PlayerFunction.getinstance(p).ACPassiveCoolDown = 80;
 		
 		if(PlayerHealth.getinstance(p).getCurrentHealth()+(int)(Health/4) > Health) {
 			PlayerHealth.getinstance(p).setCurrentHealth(Health);
@@ -349,22 +341,17 @@ public class Accelerator {
 
 		for(Player p : Bukkit.getOnlinePlayers()) {
 
-			if(passivecooldown.containsKey(p)) {
-				passivecooldown.replace(p, passivecooldown.get(p)+1);
+			PlayerFunction PF = PlayerFunction.getinstance(p);
 
-				if(passivecooldown.get(p)>80) {
-					passivecooldown.remove(p);
-				}
+			if(PF.ACPassiveCoolDown < 80) {
+				PF.ACPassiveCoolDown++;
 
 			}
 
-			if(!passivecooldown.containsKey(p) && UserManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
-
-
+			if(PF.ACPassiveCoolDown == 80 && UserManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
 				PlayerEnergy.getinstance(p).setEnergyRate(2);
 				PotionEffect potion = new PotionEffect(PotionEffectType.SPEED, 2, 2);
 				p.addPotionEffect(potion, true);
-
 			}
 			else {
 				PlayerEnergy.getinstance(p).setEnergyRate(1);

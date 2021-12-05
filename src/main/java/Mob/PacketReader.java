@@ -51,9 +51,6 @@ public class PacketReader {
 	
 	public void readPacket(Player player, Packet<?> packet) {
 		
-		//System.out.println("PACKET >> " + packet);
-		
-		
 		if(packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInUseEntity")) {
 			
 			if(getValue(packet, "action").toString().equalsIgnoreCase("ATTACK"))
@@ -66,10 +63,9 @@ public class PacketReader {
 			int id = (int) getValue(packet, "a");
 			
 			if(getValue(packet, "action").toString().equalsIgnoreCase("INTERACT")) {
-				for(EntityPlayer npc : NPCManager.getinstance().getNPCs()) {
+				for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
 					if(npc.getId() == id) {
 						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
-							
 							@Override
 							public void run() {
 								Bukkit.getPluginManager().callEvent(new RightClickNPC(player, npc));

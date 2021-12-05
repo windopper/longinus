@@ -2,12 +2,15 @@ package spellinteracttest;
 
 import ClassAbility.*;
 import Interact.Damage;
-import Mob.NPCManager;
+import Mob.ShopNPCManager;
 import Mob.PacketReader;
 import Mob.RightClickNPC;
 import Mob.mob;
-import Quest.LeavingWhileQuestAndJoinAgain;
-import Quest.Tutorial;
+import CustomEvents.PlayerClassChange;
+import QuestFunctions.LeavingWhileQuestAndJoinAgain;
+import QuestFunctions.QuestNPCManager;
+import QuestClasses.Tutorial;
+import QuestFunctions.UserQuestManager;
 import UserChip.Goldgui;
 import UserChip.GuiEvent;
 import UserChip.UserAlarmManager;
@@ -36,6 +39,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+import returns.ReturnMech;
 import userdata.UserFileManager;
 import userdata.UserManager;
 import userdata.UserStatManager;
@@ -62,7 +66,9 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new Event(), this);
 		getServer().getPluginManager().registerEvents(new MeleeMotionCancel(), this);
 		getServer().getPluginManager().registerEvents(new PlayerActionEvent(), this);
-
+		getServer().getPluginManager().registerEvents(new PlayerClassChange(), this);
+		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
+		getServer().getPluginManager().registerEvents(UserQuestManager.getinstance(), this);
 
 		saveConfig();
 		
@@ -84,10 +90,9 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		
-		NPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
-		
-		
-		
+		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
+		QuestNPCManager.getinstance().addnpctolist();
+
 		if(!Bukkit.getOnlinePlayers().isEmpty()) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
 				
@@ -98,8 +103,10 @@ public class Main extends JavaPlugin implements Listener {
 				reader.inject(player);
 			
 				UserChip.UserAlarmManager.instance().register(player); // 알람 파일 등록
-				NPCManager.getinstance().addJoinPacket(player); // npc 보이게 하기
-				
+
+				ShopNPCManager.getinstance().addJoinPacket(player); // npc 보이게 하기
+				QuestNPCManager.getinstance().addJoinPacket(player);
+
 				RegisterInstance(player); // 유저매니저, 파일매니저, 스탯매니저 부르기
 				
 				UserFileManager.getinstance().UserDetailClassCallData(player, UserFileManager.getinstance().getPreviousClass(player));
@@ -125,7 +132,8 @@ public class Main extends JavaPlugin implements Listener {
 			UnregisterInstance(p);
 		}
 		
-		NPCManager.getinstance().removeNPCPacketallplayer();
+		ShopNPCManager.getinstance().removeNPCPacketallplayer();
+		QuestNPCManager.getinstance().removeNPCPacketallplayer();
 		
 		consol.sendMessage(ChatColor.YELLOW + "Plugin Offline");
 		
@@ -139,9 +147,7 @@ public class Main extends JavaPlugin implements Listener {
 		Player p = e.getPlayer();
 
 		ServerJoinToDo(p);
-		
-		
-		
+
 	}
 	
 	@EventHandler
@@ -178,16 +184,12 @@ public class Main extends JavaPlugin implements Listener {
 	public void PlayerWorldChangeEvent(PlayerChangedWorldEvent e) { // 월드 이동 
 		Player player = (Player) e.getPlayer();
 		
-		NPCManager.getinstance().removeNPCPacket(player);
+		ShopNPCManager.getinstance().removeNPCPacket(player);
 		
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			NPCManager.getinstance().addJoinPacket(player);
+			ShopNPCManager.getinstance().addJoinPacket(player);
 		}, 20);
-		
-	
-		
-		
-		////////////////////////////////////
+
 	}
 	
 	@EventHandler
@@ -208,18 +210,13 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 	
-	//////////////////////////////////////////
-	
 	
 	@EventHandler
 	public void onClick(RightClickNPC event) {
 		Player player = event.getPlayer();
 		player.sendMessage("nice nice nice");
 	}
-	
 
-	
-	
 	@EventHandler
 	public void hitentity(EntityDamageByEntityEvent e) { // 좌
 		
@@ -242,7 +239,7 @@ public class Main extends JavaPlugin implements Listener {
 										Damage.getinstance().taken(2000, (LivingEntity) p);
 										p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
 										p.playSound(p.getLocation(), "meme.tut6", 5, 1);
-										Quest.Tutorial.trainerbothit.put(p, 1);
+										Tutorial.trainerbothit.put(p, 1);
 									}
 								}
 							}
@@ -250,7 +247,7 @@ public class Main extends JavaPlugin implements Listener {
 						else if(e.getEntity().getCustomName().equals("과녁")) {  // 화살로 친에가 과녁이면
 							for(Player p : Bukkit.getOnlinePlayers()) {
 								if(p.getName().equals(name)) {								
-									Quest.Tutorial.trainerbothit.put(p, 1);
+									Tutorial.trainerbothit.put(p, 1);
 								}
 							}
 						}
@@ -333,7 +330,7 @@ public class Main extends JavaPlugin implements Listener {
 		switch (args[0]) {
 		
 		case "npclist":{
-			for(EntityPlayer npc : NPCManager.getinstance().getNPCs()) {
+			for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
 				Bukkit.broadcastMessage(npc.getName());
 			}
 			break;
@@ -443,12 +440,12 @@ public class Main extends JavaPlugin implements Listener {
 		
 		
 		case "impulse":{
-			Aether.impulse.replace(player, 1000d);
+			PlayerFunction.getinstance(player).AEImpulse = 1000;
 			break;
 		}
 				
 		case "essence":{
-			ByV.essence.replace(player, 1000);
+			PlayerFunction.getinstance(player).essence = 1000;
 			break;
 		}
 		
@@ -502,7 +499,7 @@ public class Main extends JavaPlugin implements Listener {
 				
 				UserManager.updateloop();
 				
-				NPCManager.getinstance().sendHeadRotationPacket();
+				ShopNPCManager.getinstance().sendHeadRotationPacket();
 				
 				for(World world : Bukkit.getWorlds()) {
 					for(LivingEntity entity : world.getLivingEntities()) {
@@ -529,17 +526,17 @@ public class Main extends JavaPlugin implements Listener {
 				
 
 				
-				Aether.getinstance().AetherPassive();
+				//Aether.getinstance().AetherPassive();
 				
 				Accelerator.getinstance().Passive1();
 				
 				Phlox.getinstance().PhloxPassive();
 				Phlox.getinstance().meleerobotcountloop();
 				
-				ByV.getinstance().ByVPassive();
+				//ByV.getinstance().ByVPassive();
 				
 				
-				Quest.Loop.loop();
+				QuestFunctions.Loop.loop();
 				
 				Packets.loop.packetloop();
 				
@@ -578,16 +575,12 @@ public class Main extends JavaPlugin implements Listener {
 	
 	
 	public void removeplayerinfo(Player p) {
-		
-		Accelerator.getinstance().removemaps(p);
-		Aether.getinstance().removemaps(p);
+
 		Blaster.getinstance().removemaps(p);
 		ByV.getinstance().removemaps(p);
 		
 		ClassAbility.Combination.getinstance().removemaps(p);
-		
-		
-		
+
 		PlayerHealth.getinstance(p).removeinstance();
 		PlayerEnergy.getinstance(p).removeinstance();
 		EntityHealthBossBar.getinstance(p).removeinstance();
@@ -626,7 +619,8 @@ public class Main extends JavaPlugin implements Listener {
 		leavingwhilequestandjoinagain.restore(p); // 튜토리얼 도중 포기 감지
 
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			NPCManager.getinstance().addJoinPacket(p);
+			ShopNPCManager.getinstance().addJoinPacket(p);
+			QuestNPCManager.getinstance().addJoinPacket(p);
 		}, 20); // npc 소환
 		
 		PacketReader reader = new PacketReader();

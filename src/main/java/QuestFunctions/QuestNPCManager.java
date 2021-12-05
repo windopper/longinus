@@ -1,12 +1,10 @@
-package Mob;
+package QuestFunctions;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
@@ -14,22 +12,20 @@ import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboardManager;
 import org.bukkit.entity.Player;
 
-import java.io.File;
 import java.util.*;
 
-public class NPCManager {
-	
-	private static NPCManager NPCManager;
-	
-	private final List<String> npcname = Arrays.asList("test0", "test1", "test2", "test3");
+public class QuestNPCManager {
+
+	private static QuestNPCManager NPCManager;
+
 	private final static List<EntityPlayer> NPC = new ArrayList<EntityPlayer>();
-	
-	private NPCManager() { 
+
+	private QuestNPCManager() {
 		
 	}
 	
-	public static NPCManager getinstance() {
-		if(NPCManager == null) NPCManager = new NPCManager();
+	public static QuestNPCManager getinstance() {
+		if(NPCManager == null) NPCManager = new QuestNPCManager();
 		return NPCManager;
 	}
 	
@@ -96,21 +92,9 @@ public class NPCManager {
 	
 	public void addnpctolist() {
 
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "NPC.yml");
-		FileConfiguration NPCFile = YamlConfiguration.loadConfiguration(file);
+		QuestNPCFunctions QN = new QuestNPCFunctions();
+		QN.addQuestNPCs();
 
-		for(String name : npcname) {
-			createNPC(new Location(Bukkit.getWorld(NPCFile.getString(name+".world")),
-					 NPCFile.getDouble(name+".x"),
-					 NPCFile.getDouble(name+".y"),
-					 NPCFile.getDouble(name+".z")),
-					 NPCFile.getString(name+".name"),
-					 NPCFile.getString(name+".texture"),
-					 NPCFile.getString(name+".signature"));
-			Bukkit.broadcastMessage("hehe");
-		}
-	
-	
 	}
 	
 	
@@ -166,22 +150,6 @@ public class NPCManager {
 		PlayerConnection conn = ((CraftPlayer)player).getHandle().playerConnection;
 		conn.sendPacket(packet);
 	}
-	
-
-//	
-//	private void sendMetadata(EntityPlayer npc, Player player, int index, byte o) {
-//		DataWatcher dataWatcher = npc.getDataWatcher();
-//		DataWatcherSerializer<Byte> registry = DataWatcherRegistry.a;
-//		dataWatcher.set(
-//			registry.a(index),
-//			o
-//		);
-//		PacketPlayOutEntityMetadata metadataPacket = new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, false);
-//		sendpacket(player, metadataPacket);
-//		
-//	}
-	
-	
 	
 	
 	  public void showTo(EntityPlayer npc, Player player) {

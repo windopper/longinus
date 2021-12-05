@@ -1,8 +1,8 @@
-package Quest;
+package QuestFunctions;
 
 import org.bukkit.entity.Player;
 
-public interface eventsinterface {
+public interface EventsInterface {
 	
 	public void AcceptQuest(String questname, Player p);
 	

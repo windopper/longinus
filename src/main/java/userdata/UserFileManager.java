@@ -14,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import Quest.QuestList;
+import QuestFunctions.QuestList;
 import UserChip.Maingui;
 
 public class UserFileManager {
@@ -236,8 +236,8 @@ public class UserFileManager {
 		
 		for(String Class : config.getConfigurationSection("Class").getKeys(false)) {
 			Arrays.stream(QuestList.values()).forEach(value-> {
-				config.set("Class."+Class+".quests."+value.name()+".progress", 0);
-				//Bukkit.broadcastMessage(value.name()+"  "+Integer.toString(value.getLevelReq()));
+				if(!config.contains("Class."+Class+".quests."+value.name()))
+					config.set("Class."+Class+".quests."+value.name()+".progress", 0);
 			});
 		}
 		

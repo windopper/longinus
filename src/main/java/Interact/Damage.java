@@ -1,5 +1,6 @@
 package Interact;
 
+import dynamicdata.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -14,10 +15,6 @@ import ClassAbility.Aether;
 import ClassAbility.ByV;
 import ClassAbility.entitycheck;
 import Mob.mobhitsound;
-import dynamicdata.EntityHealth;
-import dynamicdata.EntityHealthBossBar;
-import dynamicdata.HologramIndicator;
-import dynamicdata.PlayerHealth;
 import userdata.UserManager;
 import userdata.UserStatManager;
 
@@ -94,13 +91,12 @@ public class Damage {
 					}
 				}
 			}
-			
-			if(!Accelerator.passivecooldown.containsKey(user) && UserManager.getinstance(user).CurrentClass.equals("엑셀러레이터")) { 
+
+			if(PlayerFunction.getinstance(user).ACPassiveCoolDown > 0 && UserManager.getinstance(user).CurrentClass.equals("엑셀러레이터")) {
 				// 엑셀러레이터가 맞으면 패시브 쿨다운 초기화
-				Accelerator.passivecooldown.put(user, 0);
+				PlayerFunction.getinstance(user).ACPassiveCoolDown = 0;
 			}
-			
-			
+
 			returns.ReturnMech.getinstance().ReturnCancel(user); // 귀환을 하고 있다면 귀환을 취소해 버리기
 			
 			
@@ -132,7 +128,7 @@ public class Damage {
 						Location eloc = takenP.getLocation();
 						Location ploc = p.getLocation();
 						double dist = eloc.distance(ploc);
-						if(dist<10 && ByV.essence.containsKey(p)) ByV.essence.replace(p, ByV.essence.get(p)+1);
+						if(dist<10) PlayerFunction.getinstance(p).essence++;
 					}
 				}
 			}
@@ -210,9 +206,9 @@ public class Damage {
 				}
 			}
 			
-			if(!Accelerator.passivecooldown.containsKey(user) && UserManager.getinstance(user).CurrentClass.equals("엑셀러레이터")) { 
+			if(PlayerFunction.getinstance(user).ACPassiveCoolDown > 80 && UserManager.getinstance(user).CurrentClass.equals("엑셀러레이터")) {
 				// 엑셀러레이터가 맞으면 패시브 쿨다운 초기화
-				Accelerator.passivecooldown.put(user, 0);
+				PlayerFunction.getinstance(user).ACPassiveCoolDown = 80;
 			}
 			
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);

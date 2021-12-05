@@ -1,12 +1,10 @@
 package UserChip;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
+import CustomEvents.PlayerClassChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -22,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
 
 import ClassAbility.entitycheck;
 import returns.ReturnMech;
+import spellinteracttest.Main;
 import userdata.UserFileManager;
 import userdata.UserManager;
 import userdata.UserStatManager;
@@ -94,10 +93,10 @@ public class GuiEvent implements Listener {
 			e.setCancelled(true);
 		}
 		
-		if(invname.equals("Quests")) {
+		if(invname.equals("퀘스트")) {
 			
 			
-			if(rawslot ==45) BacktoMain(e);
+			if(rawslot == 45) BacktoMain(e);
 			
 			e.setCancelled(true);
 		}
@@ -362,6 +361,13 @@ public class GuiEvent implements Listener {
 					UserFileManager.getinstance().UserDetailClassDataSave(player);
 					
 					UserFileManager.getinstance().UserDetailClassCallData(player, Class);
+
+					Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
+						@Override
+						public void run() {
+							Bukkit.getPluginManager().callEvent(new PlayerClassChangeEvent(player));
+						}
+					}, 0);
 					
 					UserFileManager.getinstance().UserDetailClassDataSave(player);
 				}
@@ -437,17 +443,21 @@ public class GuiEvent implements Listener {
 		UserFileManager.getinstance().setGold(receiver, receivergold + gold);
 		
 		UserAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
-		UserAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님에게 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
+		UserAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
 		
 		sender.sendMessage("§a"+receiver.getName()+"님에게 성공적으로 §6"+gold+" §a알테라를 보냈습니다");
 		receiver.sendMessage("§a"+sender.getName()+"님으로 부터 §6"+gold+" §a알테라를 받았습니다");
-		
+
 	}		
 	
 	public void ReturnEvent(InventoryClickEvent e) {
 		Player p = (Player) e.getView().getPlayer();
 		
 		for(Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 10, 10, 10)) {
+
+			if(entitycheck.entitycheck(entity)) {
+
+			}
 			if(!entitycheck.entitycheck(entity) && !(entity instanceof Player) && entity != p) {
 				if(entitycheck.duelcheck(entity, p)) {
 					p.sendMessage("§cpvp상태에서는 귀환을 할 수 없습니다");

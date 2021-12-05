@@ -1,4 +1,4 @@
-package Quest;
+package QuestFunctions;
 
 import java.io.File;
 
@@ -9,9 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 public class LeavingWhileQuestAndJoinAgain {
-	
 
-	
 	public void restore(Player p) {
 		
 		File questfile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "userquest.yml");

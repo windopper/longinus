@@ -2,13 +2,12 @@ package dynamicdata;
 
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.mojang.datafixers.FunctionType.Instance;
 import org.bukkit.entity.ShulkerBullet;
+import org.bukkit.event.Listener;
 
-public class PlayerFunction {
+public class PlayerFunction implements Listener {
 	
 	private static final HashMap<Player, PlayerFunction> instance = new HashMap<>();
 	
@@ -18,25 +17,27 @@ public class PlayerFunction {
 	private int meleemode = 0;
 
 	/*
+	Accelerator Functions
+	 */
+	public int ACPassiveCoolDown = 0;
+	public double ACRate = 1;
+	/*
 	Phlox Functions
 	 */
-	public int nanorobot = -1;
-	public ShulkerBullet meleerobot;
-	public int meleerobotcount = 0;
+	public int PHNanoRobot = -1;
+	public ShulkerBullet PHMeleeRobot;
+	public int PHMeleeRobotCount = 0;
 
 	/*
 	Aether Functions
 	 */
+	public double AEImpulse = 0;
 
 	/*
 	ByV Functions
 	 */
+	public int essence = 0;
 
-
-
-	
-	
-	
 	private PlayerFunction(Player p) {
 		this.p = p;
 	}
@@ -44,6 +45,12 @@ public class PlayerFunction {
 	public static PlayerFunction getinstance(Player p) {
 		if(!instance.containsKey(p)) instance.put(p, new PlayerFunction(p));
 		return instance.get(p);
+	}
+
+	public void resetFunctions() {
+		instance.remove(p);
+		instance.put(p, new PlayerFunction(p));
+		return;
 	}
 	
 	public void removeinstance() {

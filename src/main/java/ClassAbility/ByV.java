@@ -46,7 +46,6 @@ public class ByV {
 	public static final int chainmana = 6;
 	public static final int punchmana = 4;
 	public static final int shockwavemana = 8;
-	public final static HashMap<Player, Integer> essence = new HashMap<>();
 	
 	public final static HashMap<FallingBlock, Integer> fallingblocks = new HashMap<>();
 	public final static List<Player> whiletakedown = new ArrayList<>();
@@ -61,7 +60,6 @@ public class ByV {
 	}
 	
 	public void removemaps(Player p) {
-		essence.remove(p);
 		whiletakedown.remove(p);
 	}
 	
@@ -83,7 +81,7 @@ public class ByV {
 	}
 	public void recover(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
-		essence.replace(p, essence.get(p)-1);
+		PlayerFunction.getinstance(p).essence --;
 		
 		PlayerHealth.getinstance(p).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
 		
@@ -99,7 +97,7 @@ public class ByV {
 	}
 	public void takedown(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
-		essence.replace(p, essence.get(p)-1);
+		PlayerFunction.getinstance(p).essence--;
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
 		if(!whiletakedown.contains(p)) {
@@ -237,7 +235,7 @@ public class ByV {
 						int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
-						essence.replace(p, essence.get(p)+1);
+						PlayerFunction.getinstance(p).essence++;
 						return;
 					}
 				}
@@ -253,7 +251,7 @@ public class ByV {
 	}
 	public void punch(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
-		essence.replace(p, essence.get(p)-1);
+		PlayerFunction.getinstance(p).essence--;
 
 		Location ploc = p.getEyeLocation();
 		Vector pvec = ploc.getDirection();
@@ -282,14 +280,14 @@ public class ByV {
 		p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		int rate = 1;
-		if(essence.get(p)>8) {
+		if(PlayerFunction.getinstance(p).essence>8) {
 			rate = 8;
 		}
 		else {
-			rate = essence.get(p);
+			rate = PlayerFunction.getinstance(p).essence;
 		}
-		
-		essence.replace(p, essence.get(p)-rate);
+
+		PlayerFunction.getinstance(p).essence -= rate;
 
 		SpellManager Spell = new SpellManager(p);
 		Spell.setHitBoxRange(3);
@@ -324,20 +322,20 @@ public class ByV {
 		
 	}
 	
-	public void ByVPassive() {
-				
-		for(Player p : Bukkit.getOnlinePlayers()) {
-			
-			if(userdata.UserManager.getinstance(p).CurrentClass.equals("바이V")) {
-				if(!essence.containsKey(p)) essence.put(p, 0);
-			}
-			else {
-				essence.remove(p);
-			}
-
-		}
-	
-	}
+//	public void ByVPassive() {
+//
+//		for(Player p : Bukkit.getOnlinePlayers()) {
+//
+//			if(userdata.UserManager.getinstance(p).CurrentClass.equals("바이V")) {
+//				if(!essence.containsKey(p)) essence.put(p, 0);
+//			}
+//			else {
+//				essence.remove(p);
+//			}
+//
+//		}
+//
+//	}
 	
 	public void takedownparticles(Player p) {
 		

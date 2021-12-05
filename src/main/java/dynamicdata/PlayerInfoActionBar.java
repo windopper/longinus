@@ -5,7 +5,6 @@ import org.bukkit.entity.Player;
 
 import ClassAbility.Aether;
 import ClassAbility.ByV;
-import ClassAbility.Phlox;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import userdata.UserManager;
@@ -34,15 +33,15 @@ public class PlayerInfoActionBar {
 			String CurrentClass = UserManager.getinstance(player).CurrentClass;
 			
 			// 아이테르 전용
-			String m = "§c§l☈ §l§c"+Aether.impulse.get(player)+"/1000 "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
+			String m = "§c§l☈ §l§c"+PF.AEImpulse+"/1000 "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
 					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 플록스 전용
-			String f = "§9§l◈ §l§9"+PF.nanorobot+"/100  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
+			String f = "§9§l◈ §l§9"+PF.PHNanoRobot +"/100  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
 					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 바이V 전용
-			String h = "§4§l▲ §l"+ByV.essence.get(player)+"  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
+			String h = "§4§l▲ §l"+PlayerFunction.getinstance(player).essence+"  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
 					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 기본

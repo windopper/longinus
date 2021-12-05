@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import dynamicdata.PlayerFunction;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -356,9 +357,7 @@ public class UserManager {
 			
 			
 		}
-		
-		
-			
+
 
 
 		MinDamage = mindamage;
@@ -379,16 +378,12 @@ public class UserManager {
 	public List<ItemStack> getplayerequipments(Player p){
 		
 		List<ItemStack> list = new ArrayList<>();
-		
-		
+
 		list.add(p.getInventory().getHelmet() == null ? new ItemStack(Material.AIR, 1) : p.getInventory().getHelmet());
 		list.add(p.getInventory().getChestplate() == null ? new ItemStack(Material.AIR, 1) : p.getInventory().getChestplate());
 		list.add(p.getInventory().getLeggings() == null ? new ItemStack(Material.AIR, 1) : p.getInventory().getLeggings());
 		list.add(p.getInventory().getBoots() == null ? new ItemStack(Material.AIR , 1) : p.getInventory().getBoots());
 		list.add(p.getInventory().getItemInMainHand() == null ? new ItemStack(Material.AIR, 1) : p.getInventory().getItemInMainHand());
-		
-		
-		
 		
 		return list;
 	}
@@ -465,8 +460,8 @@ public class UserManager {
 	public int spelldmgcalculate(Player p, double spellrate) {
 
 		
-		if(Accelerator.rate.containsKey(p))
-			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * spellrate * (SpellDamage+100)/100 * Accelerator.rate.get(p));
+		if(UserManager.getinstance(p).CurrentClass.equals("Accelerator"))
+			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * spellrate * (SpellDamage+100)/100 * PlayerFunction.getinstance(p).ACRate);
 		
 		
 		return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * spellrate * (SpellDamage+100)/100);
@@ -475,8 +470,8 @@ public class UserManager {
 	
 	public int meleedmgcalculate(Player p, double meleerate) {
 		
-		if(Accelerator.rate.containsKey(p))
-			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * meleerate * Accelerator.rate.get(p));
+		if(UserManager.getinstance(p).CurrentClass.equals("Accelerator"))
+			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * meleerate * PlayerFunction.getinstance(p).ACRate);
 		
 		return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * meleerate) ;
 	} 

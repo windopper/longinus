@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import Interact.Damage;
-import Quest.Tutorial;
+import QuestClasses.Tutorial;
 import dynamicdata.EntityStatus;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;
@@ -38,8 +38,7 @@ public class Combination {
 	private final static String levelrequire = "§c아직 사용할 수 없는 스킬입니다";
 	
 	public final static String blank = "                          ";
-	
-	
+
 	private Combination() {
 		
 	}
@@ -239,7 +238,7 @@ public class Combination {
 											Damage.getinstance().taken(2000, (LivingEntity) p, p);
 											p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
 											p.playSound(p.getLocation(), "meme.tut6", 5, 1);
-											Quest.Tutorial.trainerbothit.put(p, 1);
+											Tutorial.trainerbothit.put(p, 1);
 										}
 									}
 								}
@@ -307,6 +306,8 @@ public class Combination {
 	}
 	
 	public void Aether(Player p, String combo) {
+
+		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
 		int lvl = UserStatManager.getinstance(p).getlvl();
 		
@@ -327,8 +328,8 @@ public class Combination {
 		
 		if(combo.equals("L")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee()==0 && !ClassAbility.Aether.meleemode.containsKey(p)) Aether.getinstance().melee(p);
-			if(PlayerFunction.getinstance(p).getMelee()==0 && ClassAbility.Aether.meleemode.containsKey(p)) Aether.getinstance().melee2(p);
+			if(PlayerFunction.getinstance(p).getMelee()==0 && PF.getMeleemode() == 0) Aether.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMelee()==0 && PF.getMeleemode() == 1) Aether.getinstance().melee2(p);
 
 		}
 		if(combo.equals("RL")) {
@@ -378,7 +379,7 @@ public class Combination {
 				Sound(p);
 				p.sendTitle("",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
-				Aether.getinstance().ImpulseSwitchAttenuation(p, WeaponModeChangemana);
+				Aether.getinstance().SwitchWeapon(p, WeaponModeChangemana);
 			}
 			else {
 				Warning(p);
@@ -414,7 +415,7 @@ public class Combination {
 				return;
 			}
 			
-			if(ClassAbility.Aether.impulse.get(p) >= 100d) {
+			if(PF.AEImpulse >= 100d) {
 				Sound(p);
 				p.sendTitle("",blank+FF, 5, 20, 10);
 				Aether.getinstance().ImpulseSwitchEnergy(p);
@@ -583,7 +584,7 @@ public class Combination {
 		}
 		if(combo.equals("RL")) {
 			
-			if(CurrentMana >= RLmana && ByV.essence.get(p) >= 1) {
+			if(CurrentMana >= RLmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle("",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
@@ -610,7 +611,7 @@ public class Combination {
 				return;
 			}
 			
-			if(CurrentMana >= RRmana && ByV.essence.get(p) >= 1) {
+			if(CurrentMana >= RRmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle("",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
@@ -657,7 +658,7 @@ public class Combination {
 				return;
 			}
 			
-			if(CurrentMana >= RFmana && ByV.essence.get(p) >= 1) {
+			if(CurrentMana >= RFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle("",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
@@ -683,7 +684,7 @@ public class Combination {
 				return;
 			}
 			
-			if(CurrentMana >= FFmana && ByV.essence.get(p) >= 1) {
+			if(CurrentMana >= FFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle("",blank+FF, 5, 20, 10);
 				energyoverload(p, combo);
@@ -711,7 +712,7 @@ public class Combination {
 		int lvl = UserStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int CurrentRobot = PlayerFunction.getinstance(p).nanorobot;
+		int CurrentRobot = PlayerFunction.getinstance(p).PHNanoRobot;
 		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
 		
 		int RLrobot = ClassAbility.Phlox.healrobot;

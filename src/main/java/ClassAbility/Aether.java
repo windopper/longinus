@@ -35,21 +35,14 @@ public class Aether {
 	public final static int ShieldSwitchChargemana = 6;
 	public final static int WeaponModeChangemana = 3;
 	public final static int ImpulseSwitchEnergymana = 3;
-	public static HashMap<Player, Double> impulse = new HashMap<>();
-	public static HashMap<Player, Integer> meleemode = new HashMap<>();
-	
 	
 	private Aether() {
 		
 	}
+
 	public static Aether getinstance()	{
 		if(Aether == null) Aether = new Aether();
 		return Aether;
-	}
-	
-	public void removemaps(Player p) {
-		impulse.remove(p);
-		meleemode.remove(p);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -186,19 +179,20 @@ public class Aether {
 	}
 	
 	public void ImpulseSwitchShield(Player p, int mana) {
-		
+
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
+		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
 		
-		int add = (int)((double)UserManager.getinstance(p).Health * 5/100 * ((impulse.get(p)+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
+		int add = (int)((double)UserManager.getinstance(p).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
 		
 		summonCircle4(p.getLocation(), 1);
 		
 		PlayerHealth.getinstance(p).ShieldAdd(add);
 		
 		
-		double i = Double.parseDouble(String.format("%.2f", impulse.get(p)/2));
-		impulse.replace(p, i);
+		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
+		PF.AEImpulse = i;
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			player.playSound(p.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1, 1);
@@ -207,7 +201,7 @@ public class Aether {
 		for(Entity pl : p.getNearbyEntities(6, 6, 6)) { // 근처 아군
 			if(pl instanceof Player && !entitycheck.duelcheck(pl, p)) {
 				Player pla = (Player) pl;
-				add = (int)((double)UserManager.getinstance(pla).Health * 5/100 * ((impulse.get(p)+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
+				add = (int)((double)UserManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
 				
 				PlayerHealth.getinstance(p).ShieldAdd(add);
 				
@@ -245,24 +239,25 @@ public class Aether {
 		
 		
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
+		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
 		//final int spellrate = (int)(2 * (impulse.get(p)+100) / 200);
 		
-		final double spellrate = 2 * (impulse.get(p)+100) / 200;
+		final double spellrate = 2 * (PF.AEImpulse+100) / 200;
 		
-		if(impulse.get(p)<300) {
+		if(PF.AEImpulse<300) {
 			for(Player pl : Bukkit.getOnlinePlayers()) {
 				pl.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 2);
 			}
 			laser(p, 2, 2, 10, spellrate);
 		}
-		if(impulse.get(p)>=300 && impulse.get(p)<600) {
+		if(PF.AEImpulse>=300 && PF.AEImpulse<600) {
 			for(Player pl : Bukkit.getOnlinePlayers()) {
 				pl.playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 2);
 			}
 			laser(p, 2, 3, 10, spellrate);
 		}
-		if(impulse.get(p)>=600) {
+		if(PF.AEImpulse>=600) {
 			
 			new BukkitRunnable() {
 				
@@ -373,24 +368,26 @@ public class Aether {
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
-	public void ImpulseSwitchAttenuation(Player p, int mana) {
+	public void SwitchWeapon(Player p, int mana) {
 		
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
-		
-		if(meleemode.containsKey(p)) {
-			meleemode.remove(p);
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+		if(PF.getMeleemode() == 0) {
+			PF.setMeleemode(1);
 		}
 		else {
-			meleemode.put(p, 1);
+			PF.setMeleemode(0);
 		}
 
 		
 		
 	}
 	public void ImpulseSwitchEnergy(Player p) {
-		
-		double i = Double.parseDouble(String.format("%.2f",impulse.get(p)-100d));
-		impulse.replace(p, i);
+
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+
+		double i = Double.parseDouble(String.format("%.2f",PF.AEImpulse-100d));
+		PF.AEImpulse = i;
 		PlayerEnergy.getinstance(p).setEnergy(PlayerEnergy.getinstance(p).getEnergy() + ImpulseSwitchEnergymana);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
@@ -399,30 +396,36 @@ public class Aether {
 	}
 	
 	public void DmgtoImpulse(int takendmg, Player p, Player pl) { //패시브  데미지, 충격량 채울 대상, 맞은 사람의 최대 체력
-		if(!impulse.containsKey(p)) impulse.put(p, 0d);
-		double i = Double.parseDouble(String.format("%.2f",impulse.get(p) +(double)takendmg/(double)UserManager.getinstance(p).Health * 400));
-		impulse.replace(p, i); // 증가
+
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+
+		double i = Double.parseDouble(String.format("%.2f",PF.AEImpulse +(double)takendmg/(double)UserManager.getinstance(p).Health * 400));
+		PF.AEImpulse = i;
 		
-		if(impulse.get(p) > 1000) { 
-			impulse.replace(p, 1000d);
+		if(PF.AEImpulse > 1000) {
+			PF.AEImpulse = 1000;
 		}
 	}
 	
-	public void AetherPassive() {
-		
-		for(Player p : Bukkit.getOnlinePlayers()) {
-			if(UserManager.getinstance(p).CurrentClass.equals("아이테르")) {
-				if(!impulse.containsKey(p)) impulse.put(p, 0d);
-			}
-			else {
-				if(impulse.containsKey(p)) impulse.remove(p);
-			}
-		}
-				
-	}
+//	public void AetherPassive() {
+//
+//		PlayerFunction PF = PlayerFunction.getinstance(p);
+//
+//		for(Player p : Bukkit.getOnlinePlayers()) {
+//			if(UserManager.getinstance(p).CurrentClass.equals("아이테르")) {
+//				if(!impulse.containsKey(p)) impulse.put(p, 0d);
+//			}
+//			else {
+//				if(impulse.containsKey(p)) impulse.remove(p);
+//			}
+//		}
+//
+//	}
 	
 	
 	public void laser(Player p, double radius, int particlesize, int particleamount, double spellrate) {
+
+		PlayerFunction PF = PlayerFunction.getinstance(p);
 
 
 		Bukkit.broadcastMessage(Double.toString(spellrate));
@@ -442,14 +445,14 @@ public class Aether {
 		Spell.addDestinationSound(Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1);
 		Spell.addDestinationParticle(Particle.EXPLOSION_LARGE, 5, 1, 1, 1, 0, null);
 
-		if(impulse.get(p)<300)
+		if(PF.AEImpulse <300)
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.1, 0.1, 0.1, 0.5, new Particle.DustOptions(Color.RED, particlesize));
-		if(impulse.get(p)>=300 && impulse.get(p)<600) {
+		if(PF.AEImpulse >=300 && PF.AEImpulse <600) {
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.2, 0.2, 0.2, 0.5, new Particle.DustOptions(Color.RED, particlesize));
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.2, 0.2, 0.2, 100, new Particle.DustOptions(Color.BLACK, particlesize));
 		}
 
-		if(impulse.get(p)>=600) {
+		if(PF.AEImpulse >=600) {
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.3, 0.3, 0.3, 0.5, new Particle.DustOptions(Color.RED, particlesize));
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.3, 0.3, 0.3, 100, new Particle.DustOptions(Color.BLACK, particlesize));
 		}
@@ -458,8 +461,8 @@ public class Aether {
 
 		}
 
-		impulse.replace(p, 0d);
-		
+		PF.AEImpulse = 0;
+
 	}
 	
 	public void summonCircle(Location location, double size) {
