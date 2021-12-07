@@ -68,7 +68,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new PlayerActionEvent(), this);
 		getServer().getPluginManager().registerEvents(new PlayerClassChange(), this);
 		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
-		getServer().getPluginManager().registerEvents(UserQuestManager.getinstance(), this);
+		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
 
 		saveConfig();
 		
@@ -185,9 +185,11 @@ public class Main extends JavaPlugin implements Listener {
 		Player player = (Player) e.getPlayer();
 		
 		ShopNPCManager.getinstance().removeNPCPacket(player);
+		QuestNPCManager.getinstance().removeNPCPacket(player);
 		
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 			ShopNPCManager.getinstance().addJoinPacket(player);
+			QuestNPCManager.getinstance().addJoinPacket(player);
 		}, 20);
 
 	}
@@ -214,7 +216,6 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void onClick(RightClickNPC event) {
 		Player player = event.getPlayer();
-		player.sendMessage("nice nice nice");
 	}
 
 	@EventHandler
@@ -335,10 +336,17 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			break;
 		}
+
+		case "resetquest":{
+			UserQuestManager.Singleton().QuestReset(player);
+			break;
+		}
+
 		
 		case "getskull":{
 			Goldgui a = new Goldgui();
 			player.getInventory().addItem(a.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I0NjhmNTU5OGFmN2M2NmYxYzFkNzM0NjVlYzMxZGNkNjdhODhkOTAwNTFiODk3ZGFkODRiYjM2MGIzMzc5OSJ9fX0="));
+			break;
 			
 		}
 		
@@ -437,8 +445,7 @@ public class Main extends JavaPlugin implements Listener {
 			player.getInventory().addItem(UserChip.Maingui.getinstance().chipitemget(player));
 			break;
 		}
-		
-		
+
 		case "impulse":{
 			PlayerFunction.getinstance(player).AEImpulse = 1000;
 			break;
@@ -448,14 +455,7 @@ public class Main extends JavaPlugin implements Listener {
 			PlayerFunction.getinstance(player).essence = 1000;
 			break;
 		}
-		
-		case "userfile":{
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				//save.getinstance().firstfile(p);
-			}
-			break;
 
-		}
 		
 		case "duel":{
 			for(Player p : Bukkit.getOnlinePlayers()) {
@@ -472,17 +472,7 @@ public class Main extends JavaPlugin implements Listener {
 			UserManager.dual.clear();
 			break;
 		}
-		
-		
-		case "score":{
-			Tutorial.exambothitcount.replace(player, Integer.parseInt(args[1]));
-			break;
-		}
-		
-		case "registerdata":{
-			UserFileManager.getinstance().UserDetailRegister(player);
-			break;
-		}
+
 		
 		}
 		return true;
@@ -500,6 +490,7 @@ public class Main extends JavaPlugin implements Listener {
 				UserManager.updateloop();
 				
 				ShopNPCManager.getinstance().sendHeadRotationPacket();
+				QuestNPCManager.getinstance().sendHeadRotationPacket();
 				
 				for(World world : Bukkit.getWorlds()) {
 					for(LivingEntity entity : world.getLivingEntities()) {
@@ -606,8 +597,9 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public void UnregisterInstance(Player p) {
 		
-		UserStatManager.getinstance(p).removeinstance(p);
+		UserStatManager.getinstance(p).removeinstance();
 		UserManager.getinstance(p).removeinstance();
+		UserQuestManager.Singleton().RemoveQuestsInstances(p);
 		
 	}
 	

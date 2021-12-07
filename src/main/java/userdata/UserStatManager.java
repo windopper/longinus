@@ -22,18 +22,27 @@ public class UserStatManager {
 	public UserStatManager(Player p) {
 		this.p = p;
 	}
+
+	/*
 	
+	UserManager 상속받기
+	removveinstance 메서드 삭제
+
+	 */
 	public static UserStatManager getinstance(Player p) {
 		if(!instance.containsKey(p)) {
-			p.sendMessage("Statmanager succesfully initialized");
 			instance.put(p, new UserStatManager(p));
+			p.sendMessage("Statmanager succesfully initialized");
 		}
+
 		return instance.get(p);
+
 	}
-	
-	public void removeinstance(Player p) {
+
+	public void removeinstance() {
 		instance.remove(p);
 	}
+
 	
 	public int getStr() {
 		return Str;

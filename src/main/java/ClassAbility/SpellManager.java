@@ -265,8 +265,6 @@ public class SpellManager {
 
     public boolean RunRayCast(MeleeOrSpell meleeorspell) {
 
-
-
         RunParticles(ParticleType.DepartureParticle);
         RunSounds(SoundType.DepartureSound);
 

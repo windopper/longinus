@@ -39,13 +39,13 @@ public class TestQuest {
     }
 
     public void addQuestNPCs() {
-        Location StartLoc = new Location(Bukkit.getWorld("gliese581c"), -155.5, 124, 245.5, 146, 11);
-        ShopNPCManager.getinstance().createNPC(StartLoc, "TestQuest", "", "");
+       // Location StartLoc = new Location(Bukkit.getWorld("gliese581c"), -155.5, 124, 245.5, 146, 11);
+       // ShopNPCManager.getinstance().createNPC(StartLoc, "TestQuest", "", "");
     }
 
     public final void QuestProgress() {
 
-        int QuestStep = UserQuestManager.getinstance().getQuestStep(Questname, p);
+        int QuestStep = UserQuestManager.Singleton().getQuestStep(Questname, p);
 
         // When Progress is 0
         if(QuestStep == 0) {
@@ -53,7 +53,7 @@ public class TestQuest {
                 p.sendMessage("레벨부족");
             }
             else {
-                UserQuestManager.getinstance().AcceptQuest(Questname, p);
+                UserQuestManager.Singleton().AcceptQuest(Questname, p);
                 p.sendMessage("체크됨");
             }
 

@@ -32,7 +32,7 @@ public class GuiEvent implements Listener {
 	
 	@EventHandler
 	public void InventoryClick(InventoryClickEvent e) {
-		
+
 		String invname = e.getView().getTitle();
 		ItemStack item = e.getCurrentItem();
 		int rawslot = e.getRawSlot();
@@ -52,8 +52,7 @@ public class GuiEvent implements Listener {
 		}
 		
 		if(invname.equals("Alarm")) {
-			
-			
+
 			if(rawslot ==53) AlarmDeleteEvent(e);
 			if(rawslot ==45) BacktoMain(e);
 			
@@ -163,7 +162,7 @@ public class GuiEvent implements Listener {
 	public void AlarmClickEvent(InventoryClickEvent e) {
 		
 		Player p = (Player) e.getWhoClicked();
-		
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		Alarmgui.getinstance().AlarmGuiOpen(p);
 		
 	}
@@ -172,6 +171,8 @@ public class GuiEvent implements Listener {
 		
 		Player p = (Player) e.getWhoClicked();
 		InventoryAction action = e.getAction();
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(action == InventoryAction.PICKUP_HALF) {
 			UserAlarmManager.instance().removeallalarms(p);
@@ -189,6 +190,8 @@ public class GuiEvent implements Listener {
 	public void BacktoMain(InventoryClickEvent e) {
 		
 		Player p = (Player) e.getWhoClicked();
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		Maingui.getinstance().chipitemguiopen(p);
 		
@@ -198,6 +201,8 @@ public class GuiEvent implements Listener {
 	public void StatClickEvent(InventoryClickEvent e) {
 		
 		Player p = (Player) e.getWhoClicked();
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		Statgui.getinstance().StatGuiOpen(p);
 		
@@ -267,7 +272,8 @@ public class GuiEvent implements Listener {
 	public void ClassSelectEvent(InventoryClickEvent e) {
 		
 		Player p = (Player) e.getWhoClicked();
-		
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		UserFileManager.getinstance().UserDetailClassDataSave(p);
 		
 		Classgui.getinstance().ClassSelectGuiOpen(p);
@@ -280,6 +286,8 @@ public class GuiEvent implements Listener {
 		
 		int rawslot = e.getRawSlot();
 		Player p = (Player) e.getWhoClicked();
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
 			UserFileManager.getinstance().UserDetailClassDataSave(p);
@@ -335,6 +343,8 @@ public class GuiEvent implements Listener {
 		InventoryAction action = e.getAction();
 		String CurrentClass = UserManager.getinstance(player).CurrentClass+"/"+
 				Integer.toString(UserManager.getinstance(player).CurrentClassNumber);
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(e.getCurrentItem() == null) return;
 		if(!e.getCurrentItem().hasItemMeta()) return;
@@ -399,6 +409,8 @@ public class GuiEvent implements Listener {
 	public void ClassDeleteSureEvent(InventoryClickEvent e) {
 		int rawslot = e.getRawSlot();
 		Player player = (Player) e.getWhoClicked();
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
 			UserFileManager.getinstance().UserDetailClassDelete(player, UserManager.getinstance(player).AskDeleteClassName);
@@ -412,6 +424,8 @@ public class GuiEvent implements Listener {
 	public void QuestsOpenEvent(InventoryClickEvent e) {
 
 		Player player = (Player) e.getWhoClicked();
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		Questgui.getinstance().QuestGuiOpen(player);
 		
@@ -420,6 +434,8 @@ public class GuiEvent implements Listener {
 	public void GoldSendPlayerAllowChat(InventoryClickEvent e) {
 		
 		Player player = (Player) e.getWhoClicked();
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		GoldAllowReadingChatPlayerName.add(player);
 		player.sendMessage("§6송금할 사람의 닉네임을 입력해주세요. 취소하시려면 '취소' 라고 입력해주세요");
 		player.closeInventory();
@@ -452,6 +468,8 @@ public class GuiEvent implements Listener {
 	
 	public void ReturnEvent(InventoryClickEvent e) {
 		Player p = (Player) e.getView().getPlayer();
+
+		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		for(Entity entity : p.getWorld().getNearbyEntities(p.getLocation(), 10, 10, 10)) {
 

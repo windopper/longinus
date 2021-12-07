@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import QuestFunctions.QuestNPCManager;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -64,6 +65,16 @@ public class PacketReader {
 			
 			if(getValue(packet, "action").toString().equalsIgnoreCase("INTERACT")) {
 				for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
+					if(npc.getId() == id) {
+						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
+							@Override
+							public void run() {
+								Bukkit.getPluginManager().callEvent(new RightClickNPC(player, npc));
+							}
+						}, 0);
+					}
+				}
+				for(EntityPlayer npc : QuestNPCManager.getinstance().getNPCs()) {
 					if(npc.getId() == id) {
 						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 							@Override

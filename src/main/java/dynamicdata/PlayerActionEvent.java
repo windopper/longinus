@@ -1,6 +1,7 @@
 package dynamicdata;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,6 +67,7 @@ public class PlayerActionEvent implements Listener {
 				if(ChatColor.stripColor(e.getItem().getItemMeta().getDisplayName()).equals(e.getPlayer().getName()+"의 메모리 카드")) {
 
 					Maingui.getinstance().chipitemguiopen(e.getPlayer());
+					e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 					return;
 				}
 				

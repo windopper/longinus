@@ -1,5 +1,6 @@
 package QuestFunctions;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.server.v1_16_R3.*;
@@ -10,7 +11,10 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
 import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboardManager;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
 
 import java.util.*;
 
@@ -18,7 +22,8 @@ public class QuestNPCManager {
 
 	private static QuestNPCManager NPCManager;
 
-	private final static List<EntityPlayer> NPC = new ArrayList<EntityPlayer>();
+	private final static HashMap<EntityPlayer, String> NPC = new HashMap<>();
+	private final static List<ArmorStand> NPCArmorStands = new ArrayList<>();
 
 	private QuestNPCManager() {
 		
@@ -33,7 +38,7 @@ public class QuestNPCManager {
 		
 		MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
 		WorldServer nmsWorld = ((CraftWorld) location.getWorld()).getHandle();
-		GameProfile gameProfile = new GameProfile(UUID.randomUUID(), npcName);	
+		GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "Quest NPC");
 		Property property = new Property("textures", texture, signature);
 		gameProfile.getProperties().put("textures", property);
 		
@@ -41,7 +46,17 @@ public class QuestNPCManager {
 		npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 		npc.displayName = "";
 		
-		NPC.add(npc);
+		NPC.put(npc, npcName);
+
+		ArmorStand armorstand = (ArmorStand) location.getWorld().spawnEntity(location.add(0, 2.2, 0), EntityType.ARMOR_STAND);
+		armorstand.setCustomName(npcName);
+		armorstand.setCustomNameVisible(true);
+		armorstand.setInvisible(true);
+		armorstand.setSmall(true);
+		armorstand.setInvulnerable(true);
+		armorstand.setBasePlate(false);
+
+		NPCArmorStands.add(armorstand);
 		
 		//addNPCPacket(npc);
 		
@@ -57,7 +72,7 @@ public class QuestNPCManager {
 	}
 	
 	public void addJoinPacket(Player player) {
-		for(EntityPlayer npc : NPC) {
+		for(EntityPlayer npc : NPC.keySet()) {
 			if(player.getWorld().getName().equals(npc.getBukkitEntity().getWorld().getName())) {
 				 showTo(npc, player);
 			}
@@ -69,9 +84,13 @@ public class QuestNPCManager {
 	public void removeNPCPacketallplayer() {
 
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			for(EntityPlayer npc : NPC) {
+			for(EntityPlayer npc : NPC.keySet()) {
 				PlayerConnection connection = ((CraftPlayer)p).getHandle().playerConnection;
 				connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
+
+			}
+			for(ArmorStand npcNames : NPCArmorStands) {
+				npcNames.remove();
 			}
 		}
 	}
@@ -79,20 +98,20 @@ public class QuestNPCManager {
 	
 	public void removeNPCPacket(Player p) {
 
-		for(EntityPlayer npc : NPC) {
+		for(EntityPlayer npc : NPC.keySet()) {
 			PlayerConnection connection = ((CraftPlayer)p).getHandle().playerConnection;
 			connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
 		}
 
 	}
 	
-	public List<EntityPlayer> getNPCs() {
-		return NPC;
+	public Set<EntityPlayer> getNPCs() {
+		return NPC.keySet();
 	}
 	
 	public void addnpctolist() {
 
-		QuestNPCFunctions QN = new QuestNPCFunctions();
+		QuestFunctions QN = new QuestFunctions();
 		QN.addQuestNPCs();
 
 	}
@@ -100,7 +119,7 @@ public class QuestNPCManager {
 	
 	public void sendHeadRotationPacket() {
 		for(Player p : Bukkit.getOnlinePlayers()) {			
-			for(EntityPlayer npc : NPC) {
+			for(EntityPlayer npc : NPC.keySet()) {
 				
 				if(!npc.getBukkitEntity().getWorld().getName().equals(p.getWorld().getName())) continue;
 				
@@ -167,7 +186,8 @@ public class QuestNPCManager {
 
 		    CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
 		    assert scoreboardManager != null;
-		    CraftScoreboard mainScoreboard = scoreboardManager.getMainScoreboard();
+
+		    CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
 		    Scoreboard scoreboard = mainScoreboard.getHandle();
 
 		    ScoreboardTeam scoreboardTeam = scoreboard.getTeam(npc.getName());
@@ -178,7 +198,6 @@ public class QuestNPCManager {
 		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, 1)); // Create team
 		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, 0)); // Setup team options
 		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, Collections.singletonList(npc.getName()), 3)); // Add entityPlayer to team entries
-
 
 		    Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 		      try {

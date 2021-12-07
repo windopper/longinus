@@ -198,7 +198,7 @@ public class ShopNPCManager {
 
 		    CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
 		    assert scoreboardManager != null;
-		    CraftScoreboard mainScoreboard = scoreboardManager.getMainScoreboard();
+		    CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
 		    Scoreboard scoreboard = mainScoreboard.getHandle();
 
 		    ScoreboardTeam scoreboardTeam = scoreboard.getTeam(npc.getName());

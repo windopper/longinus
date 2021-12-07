@@ -75,6 +75,8 @@ public class UserManager {
 	
 	
 	private Player p;
+
+	public UserManager() {}
 	
 	public UserManager(Player p) {
 		this.p = p;

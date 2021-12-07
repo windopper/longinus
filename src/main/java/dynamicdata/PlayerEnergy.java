@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 
 import userdata.UserManager;
 
-public class PlayerEnergy {
+public class PlayerEnergy extends UserManager {
 	
 	private static final HashMap<Player, PlayerEnergy> PlayerEnergy = new HashMap<>();
 	
@@ -28,11 +28,7 @@ public class PlayerEnergy {
 		if(!PlayerEnergy.containsKey(p)) PlayerEnergy.put(p, new PlayerEnergy(p));
 		return PlayerEnergy.get(p);
 	}
-	
-	public void removeinstance() {
-		PlayerEnergy.remove(p);
-	}
-	
+
 	public int getEnergy() {
 		return Energy;
 	}
