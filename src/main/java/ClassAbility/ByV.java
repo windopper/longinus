@@ -1,6 +1,5 @@
 package ClassAbility;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import Interact.Damage;
+import dynamicdata.Damage;
 import dynamicdata.EntityStatus;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;

@@ -74,7 +74,7 @@ public class PacketReader {
 						}, 0);
 					}
 				}
-				for(EntityPlayer npc : QuestNPCManager.getinstance().getNPCs()) {
+				for(EntityPlayer npc : QuestNPCManager.getinstance().getNPCSets().keySet()) {
 					if(npc.getId() == id) {
 						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 							@Override

@@ -428,7 +428,7 @@ public class Aether {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 
 
-		Bukkit.broadcastMessage(Double.toString(spellrate));
+		//Bukkit.broadcastMessage(Double.toString(spellrate));
 
 		Vector dir = p.getLocation().getDirection();
 		Location loc = p.getEyeLocation();

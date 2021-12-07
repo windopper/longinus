@@ -1,4 +1,4 @@
-package weapons;
+package Items;
 
 
 import java.util.ArrayList;

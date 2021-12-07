@@ -1,8 +1,6 @@
 package dynamicdata;
 
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -10,8 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-
-import Interact.Damage;
 
 public class EntityStatus {
 

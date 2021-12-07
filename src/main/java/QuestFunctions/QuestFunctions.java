@@ -2,6 +2,7 @@ package QuestFunctions;
 
 import QuestClasses.FirstMission;
 import QuestClasses.TestQuest;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -26,15 +27,15 @@ public class QuestFunctions {
 
     }
 
-    public void NPCForQuest(String name) {
+    public void NPCForQuest(EntityPlayer NPC, String name) {
 
         if(name.equals("TestQuest")) TestQuest.getinstance(p).QuestProgress();
         if(name.equals("아르안"))
         {
-            FirstMission.getinstance(p).QuestProgress(name);
+            FirstMission.getinstance(p).QuestProgress(NPC, name);
         }
         if(name.equals("데이즈")) {
-            FirstMission.getinstance(p).QuestProgress(name);
+            FirstMission.getinstance(p).QuestProgress(NPC, name);
         }
 
 
@@ -46,18 +47,26 @@ public class QuestFunctions {
         p.sendMessage("§5- §b"+splits[0]+":§f"+splits[1]);
     }
 
-    public boolean NextScript(List<String> Scripts, int detailStep) {
+    public boolean ShowScripts(List<String> Scripts, int detailStep) {
         p.playSound(p.getLocation(), Sound.UI_CARTOGRAPHY_TABLE_TAKE_RESULT, 1, 1);
         if(Scripts.size()==detailStep+1) {
             StandardScript(Scripts.get(detailStep));
+            return false;
+        }
+        if(Scripts.size() == detailStep) {
             return true;
         }
         StandardScript(Scripts.get(detailStep));
         return false;
     }
 
+    public void ShowScript(String Script) {
+        StandardScript(Script);
+    }
+
 //    public void QuestStart(String v1, String v2) {
 //        p.sendTitle("§")
 //    }
+
 
 }

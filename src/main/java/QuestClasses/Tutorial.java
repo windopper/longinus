@@ -160,7 +160,7 @@ public class Tutorial {
 						if(ploc.distance(jump5)<=1.5 || ploc.distance(jump4)<=1.5) {
 							p.teleport(weapon);
 							p.sendMessage("§e시험 진행 A.I:§e §f두 번째 테스트를 시작하겠습니다. 지급받은 무기로 앞에 보이는 적을 공격하십시오.§f");
-							weapons.WeaponManager data = new weapons.WeaponManager();
+							Items.WeaponManager data = new Items.WeaponManager();
 							p.getInventory().addItem(data.getitem("검"));	
 							p.stopSound("meme.tut4");
 							p.playSound(p.getLocation(),"meme.tut5", 50, 1);

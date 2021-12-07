@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import Interact.Damage;
+import dynamicdata.Damage;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;
 import dynamicdata.PlayerHealth;

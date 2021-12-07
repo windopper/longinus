@@ -6,7 +6,7 @@ import java.util.List;
 public enum QuestList {
 	
 	튜토리얼(1),
-	첫번째임무(1),
+	첫번째_임무(1),
 	일손_도움(3),
 	TestQuest(1);
 

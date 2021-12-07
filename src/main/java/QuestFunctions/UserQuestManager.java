@@ -2,6 +2,8 @@ package QuestFunctions;
 
 import Mob.RightClickNPC;
 import QuestClasses.FirstMission;
+import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,9 +14,14 @@ import org.bukkit.event.Listener;
 import userdata.UserManager;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 
 public class UserQuestManager implements EventsInterface, Listener {
+
+	private final static List<Player> ClickDelay = new ArrayList<>();
 
 	/* 0 시작안함
 	 * 1 완료함
@@ -43,11 +50,19 @@ public class UserQuestManager implements EventsInterface, Listener {
 	@EventHandler
 	public void NpcRightClicked(RightClickNPC event) {
 
-		String NPCName = event.getNPC().getName();
+		EntityPlayer NPC = event.getNPC();
 		Player player = event.getPlayer();
 
+		if(ClickDelay.contains(player)) return;
+		ClickDelay.add(player);
+
+		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+			ClickDelay.remove(player);
+		}, 10);
+
 		QuestFunctions QNF = new QuestFunctions(player);
-		QNF.NPCForQuest(NPCName);
+		//Bukkit.broadcastMessage(QuestNPCManager.getinstance().getNPCSets().get(NPC).getCustomName().getString());
+		QNF.NPCForQuest(NPC, ChatColor.stripColor(QuestNPCManager.getinstance().getNPCSets().get(NPC).getCustomName().getString()));
 	}
 
 	@Override
@@ -55,8 +70,8 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 
 		String InsertSpace = questname.replaceAll("_", " ");
-		p.sendTitle("§a퀘스트 시작", "§e"+InsertSpace, 20, 80, 20);
-		p.sendMessage("§5>> §a퀘스트 시작: §6"+InsertSpace);
+		p.sendTitle("§a임무 시작", "§e"+InsertSpace, 20, 80, 20);
+		p.sendMessage("§5>> §a임무 시작: §6"+InsertSpace);
 		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2 ,1);
 
 
@@ -109,8 +124,8 @@ public class UserQuestManager implements EventsInterface, Listener {
 	public void CompleteQuest(String questname, Player p) {
 
 		String InsertSpace = questname.replaceAll("_", " ");
-		p.sendTitle("§a퀘스트 완료", "§e"+InsertSpace, 20, 80, 20);
-		p.sendMessage("§5>> §a퀘스트 완료: §6"+InsertSpace);
+		p.sendTitle("§a임무 완료", "§e"+InsertSpace, 20, 80, 20);
+		p.sendMessage("§5>> §a임무 완료: §6"+InsertSpace);
 		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2 ,1);
 
 		String uuid = p.getUniqueId().toString();

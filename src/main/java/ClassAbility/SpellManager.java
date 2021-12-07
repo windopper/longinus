@@ -1,5 +1,6 @@
 package ClassAbility;
 
+import dynamicdata.Damage;
 import dynamicdata.EntityStatus;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -7,7 +8,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import userdata.UserManager;
-import Interact.*;
 
 import java.util.ArrayList;
 import java.util.List;

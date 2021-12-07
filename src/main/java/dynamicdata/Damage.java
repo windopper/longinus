@@ -1,6 +1,5 @@
-package Interact;
+package dynamicdata;
 
-import dynamicdata.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,13 +9,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import ClassAbility.Accelerator;
 import ClassAbility.Aether;
-import ClassAbility.ByV;
 import ClassAbility.entitycheck;
 import Mob.mobhitsound;
 import userdata.UserManager;
-import userdata.UserStatManager;
 
 public class Damage {
 	
@@ -98,8 +94,7 @@ public class Damage {
 			}
 
 			returns.ReturnMech.getinstance().ReturnCancel(user); // 귀환을 하고 있다면 귀환을 취소해 버리기
-			
-			
+
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);
 			
 			
@@ -119,7 +114,7 @@ public class Damage {
 			takenP.setNoDamageTicks(0);	
 			takenP.damage(0.1);
 			
-			EntityHealth EH = EntityHealth.getinstance(takenP);
+			EntityHealthManager EH = EntityHealthManager.getinstance(takenP);
 			
 			
 			if(EH.getCurrentHealth()-dmg < 0) { // 바이V 정수 수집
@@ -136,6 +131,7 @@ public class Damage {
 			EH.setCurrentHealth(EH.getCurrentHealth()-dmg);
 			
 			if(damager instanceof Player) {
+				EH.EntityHealthWatcher();
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, takenP);
 			}
 			
@@ -224,7 +220,7 @@ public class Damage {
 			
 			takenP.damage(0.1);
 			
-			EntityHealth EH = EntityHealth.getinstance(takenP);
+			EntityHealthManager EH = EntityHealthManager.getinstance(takenP);
 			
 			EH.setCurrentHealth(EH.getCurrentHealth()-dmg);
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);

@@ -1,12 +1,21 @@
 package QuestClasses;
 
+import Items.ItemFunctions;
+import Items.ItemManager;
 import QuestFunctions.QuestList;
 import QuestFunctions.QuestFunctions;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import userdata.UserStatManager;
 
 import java.util.Arrays;
@@ -17,7 +26,7 @@ public class FirstMission {
 
     private static final HashMap<Player, FirstMission> instance = new HashMap<>();
 
-    private final String Questname = "첫번째임무";
+    private final String Questname = "첫번째_임무";
     private int detailStep = 0;
     private Player p;
 
@@ -72,7 +81,7 @@ public class FirstMission {
         QuestNPCManager.getinstance().createNPC(StartLoc2, "아르안", "", "");
     }
 
-    public final void QuestProgress(String NPCname) {
+    public final void QuestProgress(EntityPlayer NPC, String NPCname) {
 
         QuestFunctions QNF = new QuestFunctions(p);
 
@@ -84,7 +93,31 @@ public class FirstMission {
                 p.sendMessage("레벨부족");
             }
             else {
-                if(QNF.NextScript(Script_1, detailStep) == false) {
+                if(QNF.ShowScripts(Script_1, detailStep) == false) {
+
+                    // 종자 아이템 데이즈로부터 받기
+                    if(detailStep == 1) {
+
+                        ItemStack itemStack = new ItemStack(Material.BEETROOT_SEEDS, 1);
+                        ItemMeta itemMeta = itemStack.getItemMeta();
+                        itemMeta.setDisplayName("§6데이즈의 종자");
+                        itemMeta.setLore(Arrays.asList("",
+                                "§7글리제581c의 아르안에게 전달해야 할 종자다"));
+                        itemStack.setItemMeta(itemMeta);
+                        ItemFunctions itemFunctions = new ItemFunctions();
+                        itemFunctions.setQuestItem(itemStack);
+
+                        // Swing Main hand
+                        PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
+                        PacketPlayOutAnimation packet_2 = new PacketPlayOutAnimation(NPC, 0);
+                        conn.sendPacket(packet_2);
+
+
+                        p.getInventory().addItem(itemStack);
+                        p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+
+                    }
+
                     detailStep++;
                     return;
                 }
@@ -94,12 +127,67 @@ public class FirstMission {
             }
         }
 
-        // When Progress is 2
+
+        // 종자를 잃어버렸을 때
+        if(QuestStep == 2 && NPCname.equals("데이즈") && !ItemManager.getinstance().checkItemFromPlayer("데이즈의 종자", p)) {
+            ItemStack itemStack = new ItemStack(Material.BEETROOT_SEEDS, 1);
+            ItemMeta itemMeta = itemStack.getItemMeta();
+            itemMeta.setDisplayName("§6데이즈의 종자");
+            itemMeta.setLore(Arrays.asList("",
+                    "§7글리제581c의 아르안에게 전달해야 할 종자다"));
+            itemStack.setItemMeta(itemMeta);
+            ItemFunctions itemFunctions = new ItemFunctions();
+            itemFunctions.setQuestItem(itemStack);
+
+            p.getInventory().addItem(itemStack);
+            QNF.ShowScript("데이즈: 종자 잃어버리지 마셈");
+            p.playSound(p.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1, 1);
+        }
+
+
+        // Progress 2
         if(QuestStep == 2 && NPCname.equals("아르안")) {
-            if(QNF.NextScript(Script_2, detailStep) == false) {
+
+            if(!ItemManager.getinstance().checkItemFromPlayer("데이즈의 종자", p) && detailStep == 1) {
+                QNF.ShowScript("아르안: 뭐? 종자가 없다고? 다시 가져와라");
+                detailStep = 0;
+                return;
+            }
+
+            if(QNF.ShowScripts(Script_2, detailStep) == false) {
+
+                // 종자 아이템 아르안에게 전달하기
+                if(detailStep == 2) {
+
+                    PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
+                    Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.MAINHAND,
+                            net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.BEETROOT_SEEDS, 1)));
+
+                    PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment(NPC.getId(), Arrays.asList(pair));
+                    PacketPlayOutAnimation packet_2 = new PacketPlayOutAnimation(NPC, 0);
+
+                    conn.sendPacket(packet);
+                    conn.sendPacket(packet_2);
+
+                    ItemManager.getinstance().removeItemFromPlayer("데이즈의 종자", p);
+
+
+
+                    NPC.setSlot(EnumItemSlot.MAINHAND, net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.BEETROOT_SEEDS, 1)));
+                    NPC.updateEquipment();
+
+                }
                 detailStep++;
                 return;
             }
+
+            PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
+            Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.MAINHAND,
+                    net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.AIR, 1)));
+            PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment(NPC.getId(), Arrays.asList(pair));
+
+            conn.sendPacket(packet);
+
             UserQuestManager.Singleton().CompleteQuest(Questname, p);
             detailStep = 0;
         }

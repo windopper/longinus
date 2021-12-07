@@ -29,6 +29,7 @@ public class UserChipEvent implements Listener {
 	
 	@EventHandler
 	public void UserChipDropEvent(PlayerDropItemEvent e) {
+
 		Player p = e.getPlayer();
 		ItemStack item = e.getItemDrop().getItemStack();
 		if(item==null) return;
@@ -37,13 +38,11 @@ public class UserChipEvent implements Listener {
 		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals(p.getName()+"의 메모리 카드")) {
 			e.setCancelled(true);
 		}
-		
 	}
-	
+
 	@EventHandler
 	public void UserChipInventoryEvent(InventoryClickEvent e) {
-		
-		
+
 		if(e.getClick().isKeyboardClick()) e.setCancelled(true);
 		
 		Player p = (Player) e.getWhoClicked();
@@ -55,6 +54,5 @@ public class UserChipEvent implements Listener {
 			e.setCancelled(true);
 		}
 	}
-	
-	
+
 }

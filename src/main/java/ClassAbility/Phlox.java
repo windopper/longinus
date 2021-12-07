@@ -18,7 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import Interact.Damage;
+import dynamicdata.Damage;
 import dynamicdata.EntityStatus;
 import dynamicdata.PlayerEnergy;
 import dynamicdata.PlayerFunction;

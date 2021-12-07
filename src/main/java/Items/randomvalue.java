@@ -1,4 +1,4 @@
-package weapons;
+package Items;
 
 
 import org.bukkit.Bukkit;

@@ -1,7 +1,10 @@
 package spellinteracttest;
 
 import ClassAbility.*;
-import Interact.Damage;
+import Items.ItemManager;
+import PlanetSelect.planetDetect;
+import PlanetSelect.planetSelectEvent;
+import dynamicdata.Damage;
 import Mob.ShopNPCManager;
 import Mob.PacketReader;
 import Mob.RightClickNPC;
@@ -17,7 +20,6 @@ import UserChip.UserAlarmManager;
 import UserChip.UserChipEvent;
 import UserStorage.Event;
 import dynamicdata.*;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -43,7 +45,7 @@ import returns.ReturnMech;
 import userdata.UserFileManager;
 import userdata.UserManager;
 import userdata.UserStatManager;
-import weapons.WeaponManager;
+import Items.WeaponManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,6 +71,8 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new PlayerClassChange(), this);
 		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
 		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
+		getServer().getPluginManager().registerEvents(new ItemManager(), this);
+		getServer().getPluginManager().registerEvents(new planetSelectEvent(), this);
 
 		saveConfig();
 		
@@ -330,12 +334,12 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 		
-		case "npclist":{
-			for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
-				Bukkit.broadcastMessage(npc.getName());
-			}
-			break;
-		}
+//		case "npclist":{
+//			for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
+//				Bukkit.broadcastMessage(npc.getName());
+//			}
+//			break;
+//		}
 
 		case "resetquest":{
 			UserQuestManager.Singleton().QuestReset(player);
@@ -495,7 +499,7 @@ public class Main extends JavaPlugin implements Listener {
 				for(World world : Bukkit.getWorlds()) {
 					for(LivingEntity entity : world.getLivingEntities()) {
 						if(entity instanceof Player) continue;
-						EntityHealth.getinstance(entity).EntityHealthWatcher();
+						EntityHealthManager.getinstance(entity).EntityHealthWatcher();
 						EntityStatus.getinstance(entity).BurnsLoop();
 					}
 				}
@@ -509,7 +513,7 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerFunction.getinstance(p).MeleeDelayControlLoop();
 					
 					
-					EntityHealthBossBar.getinstance(p).healthbossbarloop();
+					EntityHealthBossBar.getinstance(p).healthBarLoop();
 					
 				}
 				
@@ -536,9 +540,18 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 		
+
+
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				planetDetect.getinstance().detectArea();
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
+
 		mob mob = new mob();
 		Hologram.loop loop = new Hologram.loop();
-		
+
 		new BukkitRunnable() {
 			
 			@Override
@@ -547,6 +560,9 @@ public class Main extends JavaPlugin implements Listener {
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					PlayerEnergy.getinstance(p).Regeneration();
 				}
+
+				planetDetect.getinstance().detectArea();
+
 				mob.loop();
 				mob.mobdelete();
 				loop.loop();
@@ -613,7 +629,7 @@ public class Main extends JavaPlugin implements Listener {
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 			ShopNPCManager.getinstance().addJoinPacket(p);
 			QuestNPCManager.getinstance().addJoinPacket(p);
-		}, 20); // npc 소환
+		}, 40); // npc 소환
 		
 		PacketReader reader = new PacketReader();
 		reader.inject(p); // npc 우클릭 감지 등록
