@@ -22,7 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import dynamicdata.EntityStatus;
+import DynamicData.EntityStatus;
 
 public class Tutorial {
 	

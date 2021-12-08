@@ -16,7 +16,7 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import userdata.UserStatManager;
+import UserData.UserStatManager;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -89,6 +89,7 @@ public class FirstMission {
 
         // When Progress is 0
         if(QuestStep == 0 && NPCname.equals("데이즈")) {
+
             if(QuestList.valueOf(Questname).getLevelReq() > UserStatManager.getinstance(p).getlvl()) {
                 p.sendMessage("레벨부족");
             }
@@ -121,6 +122,7 @@ public class FirstMission {
                     detailStep++;
                     return;
                 }
+
                 UserQuestManager.Singleton().AcceptQuest(Questname, p);
                 detailStep = 0;
 
@@ -157,7 +159,7 @@ public class FirstMission {
             if(QNF.ShowScripts(Script_2, detailStep) == false) {
 
                 // 종자 아이템 아르안에게 전달하기
-                if(detailStep == 2) {
+                if(detailStep == 1) {
 
                     PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
                     Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.MAINHAND,

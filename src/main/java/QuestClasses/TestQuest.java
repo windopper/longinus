@@ -1,12 +1,9 @@
 package QuestClasses;
 
-import Mob.ShopNPCManager;
 import QuestFunctions.QuestList;
 import QuestFunctions.UserQuestManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import userdata.UserStatManager;
+import UserData.UserStatManager;
 
 import java.util.HashMap;
 

@@ -1,4 +1,4 @@
-package userdata;
+package UserData;
 
 import org.bukkit.entity.Player;
 

@@ -21,8 +21,8 @@ public class entitycheck {
 		if(p instanceof Player && me instanceof Player) {
 			// 사람이고 듀얼목록이 있으면
 			
-			if(userdata.UserManager.dual.containsKey(p) || userdata.UserManager.dual.containsKey(me)) {
-				if(userdata.UserManager.dual.get(p)==me || userdata.UserManager.dual.get(me)==p) {
+			if(UserData.UserManager.dual.containsKey(p) || UserData.UserManager.dual.containsKey(me)) {
+				if(UserData.UserManager.dual.get(p)==me || UserData.UserManager.dual.get(me)==p) {
 					return true;
 				}
 			}	

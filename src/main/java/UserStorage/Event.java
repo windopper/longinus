@@ -1,6 +1,5 @@
 package UserStorage;
 
-import java.util.HashMap;
 import java.util.Set;
 
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import net.md_5.bungee.api.ChatColor;
-import userdata.UserFileManager;
 
 public class Event implements Listener {
 	

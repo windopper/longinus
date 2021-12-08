@@ -18,7 +18,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
 import QuestClasses.Tutorial;
-import dynamicdata.EntityStatus;
+import DynamicData.EntityStatus;
 import net.minecraft.server.v1_16_R3.EntityZombie;
 import net.minecraft.server.v1_16_R3.PacketPlayOutSpawnEntityLiving;
 import net.minecraft.server.v1_16_R3.PlayerConnection;

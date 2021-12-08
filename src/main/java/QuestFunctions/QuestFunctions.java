@@ -39,7 +39,6 @@ public class QuestFunctions {
         }
 
 
-
     }
 
     public void StandardScript(String scripts) {

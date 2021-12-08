@@ -11,8 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import userdata.UserStatManager;
-import userdata.UserFileManager;
+import UserData.UserFileManager;
 
 public class Classgui {
 	

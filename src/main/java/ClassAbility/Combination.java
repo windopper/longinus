@@ -16,14 +16,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import dynamicdata.Damage;
+import DynamicData.Damage;
 import QuestClasses.Tutorial;
-import dynamicdata.EntityStatus;
-import dynamicdata.PlayerEnergy;
-import dynamicdata.PlayerFunction;
-import dynamicdata.PlayerHealth;
-import userdata.UserManager;
-import userdata.UserStatManager;
+import DynamicData.EntityStatus;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
+import UserData.UserManager;
+import UserData.UserStatManager;
 
 public class Combination {
 	

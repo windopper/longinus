@@ -1,4 +1,4 @@
-package dynamicdata;
+package DynamicData;
 
 import java.util.HashMap;
 

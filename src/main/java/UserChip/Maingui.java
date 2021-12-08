@@ -3,10 +3,8 @@ package UserChip;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import io.papermc.paper.text.PaperComponents;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -14,10 +12,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.inventory.meta.SkullMeta;
-import userdata.UserLevelManager;
-import userdata.UserStatManager;
-import userdata.UserFileManager;
-import userdata.UserManager;
+import UserData.UserStatManager;
+import UserData.UserFileManager;
+import UserData.UserManager;
 
 public class Maingui {
 	

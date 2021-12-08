@@ -20,11 +20,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import dynamicdata.Damage;
-import dynamicdata.PlayerEnergy;
-import dynamicdata.PlayerFunction;
-import dynamicdata.PlayerHealth;
-import userdata.UserManager;
+import DynamicData.Damage;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
+import UserData.UserManager;
 
 public class Accelerator {
 	

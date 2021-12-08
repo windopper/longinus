@@ -17,3 +17,9 @@ commands :
   spi:
     description: spi
     usage: /spi
+  party:
+    description: party
+    usage: /party
+  파티:
+    description: 파티
+    usage: /파티

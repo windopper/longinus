@@ -19,11 +19,11 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import ClassAbility.entitycheck;
-import returns.ReturnMech;
+import ReturnToBase.ReturnMech;
 import spellinteracttest.Main;
-import userdata.UserFileManager;
-import userdata.UserManager;
-import userdata.UserStatManager;
+import UserData.UserFileManager;
+import UserData.UserManager;
+import UserData.UserStatManager;
 
 public class GuiEvent implements Listener {
 	

@@ -1,4 +1,4 @@
-package dynamicdata;
+package DynamicData;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import ClassAbility.Aether;
 import ClassAbility.entitycheck;
 import Mob.mobhitsound;
-import userdata.UserManager;
+import UserData.UserManager;
 
 public class Damage {
 	
@@ -64,8 +64,8 @@ public class Damage {
 			
 			// 쉴드가 없을때
 			else {
-				if(PH.getCurrentHealth()-dmg>0) {
-					PH.setCurrentHealth(PH.getCurrentHealth()-dmg);
+				if(PH.getCurrentHealth() - dmg>0) {
+					PH.setCurrentHealth(PH.getCurrentHealth() - dmg);
 				}
 				else {
 					PH.setCurrentHealth(0);
@@ -93,7 +93,7 @@ public class Damage {
 				PlayerFunction.getinstance(user).ACPassiveCoolDown = 0;
 			}
 
-			returns.ReturnMech.getinstance().ReturnCancel(user); // 귀환을 하고 있다면 귀환을 취소해 버리기
+			ReturnToBase.ReturnMech.getinstance().ReturnCancel(user); // 귀환을 하고 있다면 귀환을 취소해 버리기
 
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);
 			

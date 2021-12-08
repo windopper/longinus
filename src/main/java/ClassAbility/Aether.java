@@ -19,11 +19,11 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import dynamicdata.PlayerEnergy;
-import dynamicdata.PlayerFunction;
-import dynamicdata.PlayerHealth;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
 import org.jetbrains.annotations.NotNull;
-import userdata.UserManager;
+import UserData.UserManager;
 
 public class Aether {
 	
@@ -203,7 +203,7 @@ public class Aether {
 				Player pla = (Player) pl;
 				add = (int)((double)UserManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
 				
-				PlayerHealth.getinstance(p).ShieldAdd(add);
+				PlayerHealth.getinstance(pla).ShieldAdd(add);
 				
 				pl.sendMessage("§d"+p.getName()+" §d§5§l🛡§l§5§r §5"+add+"§5§d 부여§d");
 				

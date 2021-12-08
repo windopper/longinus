@@ -1,4 +1,4 @@
-package userdata;
+package UserData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,14 +6,12 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import dynamicdata.PlayerFunction;
-import org.bukkit.Bukkit;
+import DynamicData.PlayerFunction;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import ClassAbility.Accelerator;
 import net.md_5.bungee.api.ChatColor;
 import spellinteracttest.RandomRange;
 

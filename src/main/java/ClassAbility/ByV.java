@@ -25,11 +25,11 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import dynamicdata.Damage;
-import dynamicdata.EntityStatus;
-import dynamicdata.PlayerEnergy;
-import dynamicdata.PlayerFunction;
-import dynamicdata.PlayerHealth;
+import DynamicData.Damage;
+import DynamicData.EntityStatus;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
 import net.minecraft.server.v1_16_R3.DataWatcher;
 import net.minecraft.server.v1_16_R3.DataWatcherRegistry;
 import net.minecraft.server.v1_16_R3.EntityLiving;
@@ -87,7 +87,7 @@ public class ByV {
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(p.getWorld().getName().equals(player.getWorld().getName())) {
 				if(!entitycheck.duelcheck(player, p) && player != p) {
-					PlayerHealth.getinstance(p).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
+					PlayerHealth.getinstance(player).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
 				}
 			}
 		}
@@ -151,7 +151,7 @@ public class ByV {
 									e.setVelocity(etop);
 								}
 
-								int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
+								int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 								
 								p.getWorld().playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
@@ -231,7 +231,7 @@ public class ByV {
 						chainparticle(p, i, e);
 						chainvectorzerocc(e);
 						
-						int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+						int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
 						PlayerFunction.getinstance(p).essence++;
@@ -660,7 +660,7 @@ public class ByV {
 				BoundingBox box = e.getBoundingBox();
 				double dist = eloc.distance(loc);
 				if(dist<2 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-					int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+					int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 20));
 					Damage.getinstance().taken(dmg, e, p);
 					return true;

@@ -2,9 +2,12 @@ package spellinteracttest;
 
 import ClassAbility.*;
 import Items.ItemManager;
+import Party.EventProcess;
+import Party.PartyManager;
+import Party.TabCompleter;
 import PlanetSelect.planetDetect;
 import PlanetSelect.planetSelectEvent;
-import dynamicdata.Damage;
+import DynamicData.Damage;
 import Mob.ShopNPCManager;
 import Mob.PacketReader;
 import Mob.RightClickNPC;
@@ -19,7 +22,7 @@ import UserChip.GuiEvent;
 import UserChip.UserAlarmManager;
 import UserChip.UserChipEvent;
 import UserStorage.Event;
-import dynamicdata.*;
+import DynamicData.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -41,14 +44,15 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import returns.ReturnMech;
-import userdata.UserFileManager;
-import userdata.UserManager;
-import userdata.UserStatManager;
+import ReturnToBase.ReturnMech;
+import UserData.UserFileManager;
+import UserData.UserManager;
+import UserData.UserStatManager;
 import Items.WeaponManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -73,6 +77,10 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
 		getServer().getPluginManager().registerEvents(new ItemManager(), this);
 		getServer().getPluginManager().registerEvents(new planetSelectEvent(), this);
+		getServer().getPluginManager().registerEvents(new EventProcess(), this);
+
+		getCommand("party").setTabCompleter(new TabCompleter());
+
 
 		saveConfig();
 		
@@ -97,23 +105,27 @@ public class Main extends JavaPlugin implements Listener {
 		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
 		QuestNPCManager.getinstance().addnpctolist();
 
+
+
 		if(!Bukkit.getOnlinePlayers().isEmpty()) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
-				
-				UserFileManager.getinstance().joinedplayerlistregister(player);
-				
-				// npc 우클릭 감지
-				PacketReader reader = new PacketReader();
-				reader.inject(player);
-			
-				UserChip.UserAlarmManager.instance().register(player); // 알람 파일 등록
 
-				ShopNPCManager.getinstance().addJoinPacket(player); // npc 보이게 하기
-				QuestNPCManager.getinstance().addJoinPacket(player);
-
-				RegisterInstance(player); // 유저매니저, 파일매니저, 스탯매니저 부르기
-				
-				UserFileManager.getinstance().UserDetailClassCallData(player, UserFileManager.getinstance().getPreviousClass(player));
+				ServerJoinToDo(player);
+//
+//				UserFileManager.getinstance().joinedplayerlistregister(player);
+//
+//				// npc 우클릭 감지
+//				PacketReader reader = new PacketReader();
+//				reader.inject(player);
+//
+//				UserChip.UserAlarmManager.instance().register(player); // 알람 파일 등록
+//
+//				ShopNPCManager.getinstance().addJoinPacket(player); // npc 보이게 하기
+//				QuestNPCManager.getinstance().addJoinPacket(player);
+//
+//				RegisterInstance(player); // 유저매니저, 파일매니저, 스탯매니저 부르기
+//
+//				UserFileManager.getinstance().UserDetailClassCallData(player, UserFileManager.getinstance().getPreviousClass(player));
 				
 			
 			}
@@ -159,8 +171,6 @@ public class Main extends JavaPlugin implements Listener {
 		Player p = e.getPlayer();
 		
 		UserFileManager.getinstance().UserDetailClassDataSave(p);
-		
-		removeplayerinfo(p);
 		
 		PacketReader reader = new PacketReader();
 		reader.uninject(e.getPlayer());
@@ -326,156 +336,253 @@ public class Main extends JavaPlugin implements Listener {
     }
     
 	public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-		
-		
-		
-		
+
 		Player player = (Player) sender;
+
+		String cmdName = command.getName().toLowerCase();
+
+		if(cmdName.equals("party")) {
+			if(args.length == 0) {
+				player.sendMessage("§b/party create §7파티를 만듭니다");
+				player.sendMessage("§b/party invite <유저 이름> §7해당 유저를 파티로 초대합니다");
+				player.sendMessage("§b/party join §7초대받은 파티에 참가합니다");
+				player.sendMessage("§b/party leave §7현재 파티에서 나갑니다");
+				player.sendMessage("§b/party promote <유저 이름> §7해당 유저를 파티장으로 승급시킵니다");
+				player.sendMessage("§b/party kick <유저 이름> §7해당 유저를 파티에서 추방시킵니다");
+				return true;
+			}
+			switch (args[0]) {
+
+				case "create": {
+					PartyManager.getinstance().createParty(player);
+					break;
+				}
+				case "invite": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().inviteParty(player, p);
+						}
+					}
+					break;
+				}
+				case "join": {
+					PartyManager.getinstance().JoinParty(player);
+					break;
+				}
+				case "leave": {
+					PartyManager.getinstance().QuitParty(player);
+					break;
+				}
+				case "promote": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().ChangeMaster(player, p);
+						}
+					}
+					break;
+				}
+				case "kick": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().KickMember(player, p);
+						}
+					}
+					break;
+				}
+			}
+		}
+
+		if(cmdName.equals("파티")) {
+			if(args.length == 0) {
+				player.sendMessage("§b/파티 생성 §7파티를 만듭니다");
+				player.sendMessage("§b/파티 초대 <유저 이름> §7해당 유저를 파티로 초대합니다");
+				player.sendMessage("§b/파티 참가 §7초대받은 파티에 참가합니다");
+				player.sendMessage("§b/파티 나가기 §7현재 파티에서 나갑니다");
+				player.sendMessage("§b/파티 승급 <유저 이름> §7해당 유저를 파티장으로 승급시킵니다");
+				player.sendMessage("§b/파티 추방 <유저 이름> §7해당 유저를 파티에서 추방시킵니다");
+				return true;
+			}
+			switch (args[0]) {
+
+				case "생성": {
+					PartyManager.getinstance().createParty(player);
+					break;
+				}
+				case "초대": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().inviteParty(player, p);
+						}
+					}
+					break;
+				}
+				case "참가": {
+					PartyManager.getinstance().JoinParty(player);
+					break;
+				}
+				case "나가기": {
+					PartyManager.getinstance().QuitParty(player);
+					break;
+				}
+				case "승급": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().ChangeMaster(player, p);
+						}
+					}
+					break;
+				}
+				case "추방": {
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyManager.getinstance().KickMember(player, p);
+						}
+					}
+					break;
+				}
+			}
+		}
+		
+		
+
 		
 		switch (args[0]) {
-		
-//		case "npclist":{
-//			for(EntityPlayer npc : ShopNPCManager.getinstance().getNPCs()) {
-//				Bukkit.broadcastMessage(npc.getName());
-//			}
-//			break;
-//		}
 
-		case "resetquest":{
-			UserQuestManager.Singleton().QuestReset(player);
-			break;
-		}
+			case "resetquest":{
+				UserQuestManager.Singleton().QuestReset(player);
+				break;
+			}
 
-		
-		case "getskull":{
-			Goldgui a = new Goldgui();
-			player.getInventory().addItem(a.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I0NjhmNTU5OGFmN2M2NmYxYzFkNzM0NjVlYzMxZGNkNjdhODhkOTAwNTFiODk3ZGFkODRiYjM2MGIzMzc5OSJ9fX0="));
-			break;
-			
-		}
-		
-		case "getgold":{
-			UserFileManager.getinstance().setGold(player, Integer.parseInt(args[1]));
-			break;
-		}
-		
-		case "alarmdb":{
-			SQLiteManager sql = new SQLiteManager();
-			sql.addalarm(player, "test", "type");
-			
-			
-			break;
-		}
-		
-		case "save":{
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				
-				UserFileManager.getinstance().UserDetailClassDataSave(p);
+
+			case "getskull":{
+				Goldgui a = new Goldgui();
+				player.getInventory().addItem(a.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I0NjhmNTU5OGFmN2M2NmYxYzFkNzM0NjVlYzMxZGNkNjdhODhkOTAwNTFiODk3ZGFkODRiYjM2MGIzMzc5OSJ9fX0="));
+				break;
+
 			}
-			break;
-		}
-		
-		case "item":{
-			WeaponManager data = new WeaponManager();
-			if(data.checkname(args[1]) == true)	{
-				Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재합니다");
-				player.getInventory().addItem(data.getitem(args[1]));
+
+			case "getgold":{
+				UserFileManager.getinstance().setGold(player, Integer.parseInt(args[1]));
+				break;
 			}
-			else {
-				Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재하지 않습니다");
+
+			case "alarmdb":{
+				SQLiteManager sql = new SQLiteManager();
+				sql.addalarm(player, "test", "type");
+
+
+				break;
 			}
-			break;
-		}
-		
-		case "level":{
-			
-			UserStatManager.getinstance(player).setlvl(Integer.parseInt(args[1]));
-			break;
-		}
-		
-		case "alarm":{
-			
-			args[1].replace("_", " ");
-			
-			UserAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
-			break;
-		}
-		
-		case "hand":{
-			UserManager.getinstance(player).equipmentsetting();
-			break;
-		}
-		
-		case "stats":{
-			player.sendMessage("Damage:" + Integer.toString(UserManager.getinstance(player).MinDamage)+"-"+Integer.toString(UserManager.getinstance(player).MaxDamage));
-			player.sendMessage("Health: " + Integer.toString(UserManager.getinstance(player).Health));
-			player.sendMessage("Shield: " + Integer.toString(UserManager.getinstance(player).ShieldRaw));
-			player.sendMessage("CurrentClass " + UserManager.getinstance(player).CurrentClass);
-			player.sendMessage("WeaponClass " + UserManager.getinstance(player).WeaponClass);
-			player.sendMessage("WeaponLevel " + UserManager.getinstance(player).WeaponLevelreq);
-			player.sendMessage("WeaponStr " + UserManager.getinstance(player).WeaponStrreq);
-			player.sendMessage("WeaponDex " + UserManager.getinstance(player).WeaponDexreq);
-			player.sendMessage("WeaponDef " + UserManager.getinstance(player).WeaponDefreq);
-			player.sendMessage("WeaponAgi " + UserManager.getinstance(player).WeaponAgireq);
-			player.sendMessage("equipments " + UserManager.getinstance(player).getplayerequipments(player).size());
-			break;
-		}
-		
-		case "statcheck":{
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				if(p.getName().equals(args[1])) {
-					
-					player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getStr()));
-					player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getDex()));
-					player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getDef()));
-					player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getAgi()));
-					player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getlvl()));
-					
-					
+
+			case "save":{
+				for(Player p : Bukkit.getOnlinePlayers()) {
+
+					UserFileManager.getinstance().UserDetailClassDataSave(p);
 				}
-				
-				
+				break;
 			}
-			
-			break;
-		}
-		
-		
-		case "heal":{
-			PlayerHealth.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
-			break;
-		}
-		case "userchip":{
-			player.getInventory().addItem(UserChip.Maingui.getinstance().chipitemget(player));
-			break;
-		}
 
-		case "impulse":{
-			PlayerFunction.getinstance(player).AEImpulse = 1000;
-			break;
-		}
-				
-		case "essence":{
-			PlayerFunction.getinstance(player).essence = 1000;
-			break;
-		}
-
-		
-		case "duel":{
-			for(Player p : Bukkit.getOnlinePlayers()) {
-				if(p.getName().equals(args[1])) {
-					UserManager.dual.put(player, p);
+			case "item":{
+				WeaponManager data = new WeaponManager();
+				if(data.checkname(args[1]) == true)	{
+					Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재합니다");
+					player.getInventory().addItem(data.getitem(args[1]));
 				}
+				else {
+					Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재하지 않습니다");
+				}
+				break;
 			}
-			Bukkit.broadcastMessage(player.getName()+" "+UserManager.dual.get(player).getName());
-			break;
-			
-		}
-		
-		case "duelclose":{
-			UserManager.dual.clear();
-			break;
-		}
+
+			case "level":{
+
+				UserStatManager.getinstance(player).setlvl(Integer.parseInt(args[1]));
+				break;
+			}
+
+			case "alarm":{
+
+				args[1].replace("_", " ");
+
+				UserAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
+				break;
+			}
+
+			case "hand":{
+				UserManager.getinstance(player).equipmentsetting();
+				break;
+			}
+
+			case "stats":{
+				player.sendMessage("Damage:" + Integer.toString(UserManager.getinstance(player).MinDamage)+"-"+Integer.toString(UserManager.getinstance(player).MaxDamage));
+				player.sendMessage("Health: " + Integer.toString(UserManager.getinstance(player).Health));
+				player.sendMessage("Shield: " + Integer.toString(UserManager.getinstance(player).ShieldRaw));
+				player.sendMessage("CurrentClass " + UserManager.getinstance(player).CurrentClass);
+				player.sendMessage("WeaponClass " + UserManager.getinstance(player).WeaponClass);
+				player.sendMessage("WeaponLevel " + UserManager.getinstance(player).WeaponLevelreq);
+				player.sendMessage("WeaponStr " + UserManager.getinstance(player).WeaponStrreq);
+				player.sendMessage("WeaponDex " + UserManager.getinstance(player).WeaponDexreq);
+				player.sendMessage("WeaponDef " + UserManager.getinstance(player).WeaponDefreq);
+				player.sendMessage("WeaponAgi " + UserManager.getinstance(player).WeaponAgireq);
+				player.sendMessage("equipments " + UserManager.getinstance(player).getplayerequipments(player).size());
+				break;
+			}
+
+			case "statcheck":{
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					if(p.getName().equals(args[1])) {
+
+						player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getStr()));
+						player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getDex()));
+						player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getDef()));
+						player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getAgi()));
+						player.sendMessage(Integer.toString(UserStatManager.getinstance(p).getlvl()));
+
+
+					}
+
+
+				}
+
+				break;
+			}
+
+
+			case "heal":{
+				PlayerHealth.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
+				break;
+			}
+			case "userchip":{
+				player.getInventory().addItem(UserChip.Maingui.getinstance().chipitemget(player));
+				break;
+			}
+
+			case "impulse":{
+				PlayerFunction.getinstance(player).AEImpulse = 1000;
+				break;
+			}
+
+			case "essence":{
+				PlayerFunction.getinstance(player).essence = 1000;
+				break;
+			}
+
+
+			case "duel":{
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					if(p.getName().equals(args[1])) {
+						UserManager.dual.put(player, p);
+					}
+				}
+				Bukkit.broadcastMessage(player.getName()+" "+UserManager.dual.get(player).getName());
+				break;
+
+			}
+
+			case "duelclose":{
+				UserManager.dual.clear();
+				break;
+			}
 
 		
 		}
@@ -519,18 +626,13 @@ public class Main extends JavaPlugin implements Listener {
 				
 				PlayerInfoActionBar.actionbar();
 				
-
-				
-				//Aether.getinstance().AetherPassive();
-				
 				Accelerator.getinstance().Passive1();
 				
 				Phlox.getinstance().PhloxPassive();
 				Phlox.getinstance().meleerobotcountloop();
 				
-				//ByV.getinstance().ByVPassive();
-				
-				
+
+
 				QuestFunctions.Loop.loop();
 				
 				Packets.loop.packetloop();
@@ -546,6 +648,8 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				planetDetect.getinstance().detectArea();
+				PartyManager.getinstance().partyObjectiveLoop();
+
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
 
@@ -560,8 +664,6 @@ public class Main extends JavaPlugin implements Listener {
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					PlayerEnergy.getinstance(p).Regeneration();
 				}
-
-				planetDetect.getinstance().detectArea();
 
 				mob.loop();
 				mob.mobdelete();
@@ -583,16 +685,7 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public void removeplayerinfo(Player p) {
 
-		Blaster.getinstance().removemaps(p);
-		ByV.getinstance().removemaps(p);
-		
-		ClassAbility.Combination.getinstance().removemaps(p);
 
-		PlayerHealth.getinstance(p).removeinstance();
-		PlayerEnergy.getinstance(p).removeinstance();
-		EntityHealthBossBar.getinstance(p).removeinstance();
-		PlayerCombination.getinstance(p).removeinstance();
-		PlayerFunction.getinstance(p).removeinstance();
 		
 		
 		
@@ -603,24 +696,37 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public void RegisterInstance(Player p) {
 		
-		UserFileManager.getinstance().UserDetailRegister(p);
-		UserStatManager.getinstance(p);
-		UserManager.getinstance(p);
-		
-		
 		
 	}
 	
 	public void UnregisterInstance(Player p) {
-		
+
 		UserStatManager.getinstance(p).removeinstance();
 		UserManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
+
+
+		Blaster.getinstance().removemaps(p);
+		ByV.getinstance().removemaps(p);
+
+		ClassAbility.Combination.getinstance().removemaps(p);
+
+		PlayerHealth.getinstance(p).removeinstance();
+		PlayerEnergy.getinstance(p).removeinstance();
+		EntityHealthBossBar.getinstance(p).removeinstance();
+		PlayerCombination.getinstance(p).removeinstance();
+		PlayerFunction.getinstance(p).removeinstance();
+
+		PartyManager.getinstance().removeinstance(p);
 		
 	}
 	
 	public void ServerJoinToDo(Player p) {
-		
+
+		UserFileManager.getinstance().UserDetailRegister(p);
+		UserStatManager.getinstance(p);
+		UserManager.getinstance(p);
+
 		UserFileManager.getinstance().joinedplayerlistregister(p);
 		
 		LeavingWhileQuestAndJoinAgain leavingwhilequestandjoinagain = new LeavingWhileQuestAndJoinAgain();

@@ -3,6 +3,7 @@ package QuestFunctions;
 import Mob.RightClickNPC;
 import QuestClasses.FirstMission;
 import net.md_5.bungee.api.ChatColor;
+import net.minecraft.server.v1_16_R3.EntityArmorStand;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -11,12 +12,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import userdata.UserManager;
+import UserData.UserManager;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 public class UserQuestManager implements EventsInterface, Listener {
@@ -58,11 +57,15 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 			ClickDelay.remove(player);
-		}, 10);
+		}, 15);
 
 		QuestFunctions QNF = new QuestFunctions(player);
-		//Bukkit.broadcastMessage(QuestNPCManager.getinstance().getNPCSets().get(NPC).getCustomName().getString());
-		QNF.NPCForQuest(NPC, ChatColor.stripColor(QuestNPCManager.getinstance().getNPCSets().get(NPC).getCustomName().getString()));
+		QuestNPCManager QNM = QuestNPCManager.getinstance();
+		HashMap<EntityPlayer, EntityArmorStand> NPCSets = QNM.getNPCSets();
+
+		if(!NPCSets.containsKey(NPC)) return;
+
+		QNF.NPCForQuest(NPC, ChatColor.stripColor(NPCSets.get(NPC).getCustomName().getString()));
 	}
 
 	@Override

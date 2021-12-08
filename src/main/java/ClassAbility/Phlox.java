@@ -18,12 +18,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import dynamicdata.Damage;
-import dynamicdata.EntityStatus;
-import dynamicdata.PlayerEnergy;
-import dynamicdata.PlayerFunction;
-import dynamicdata.PlayerHealth;
-import userdata.UserManager;
+import DynamicData.Damage;
+import DynamicData.EntityStatus;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
+import UserData.UserManager;
 
 public class Phlox {
 
@@ -117,16 +117,16 @@ public class Phlox {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 
-		if(PF.PHMeleeRobot != null) {
+		if(PF.PHMeleeRobot == null) {
 			ShulkerBullet e = (ShulkerBullet) p.getWorld().spawnEntity(tmp, EntityType.SHULKER_BULLET);
 			e.setGravity(false);
 			e.setSilent(true);
 			e.setInvulnerable(true);
 			PF.PHMeleeRobot = e;
-			PF.PHMeleeRobotCount = 0;
+			PF.PHMeleeRobotCount = 1;
 		}
 		else {
-			PF.PHMeleeRobotCount = 0;
+			PF.PHMeleeRobotCount = 1;
 		}
 		
 		
@@ -831,9 +831,8 @@ public class Phlox {
 				for(Player pl : Bukkit.getOnlinePlayers()) {
 					pl.spawnParticle(Particle.CRIT_MAGIC, loc, 10, 0, 0, 0, 0, null);
 				}
-				
-				
-				if(PF.PHMeleeRobotCount >40) {
+
+				if(PF.PHMeleeRobotCount > 40) {
 					PF.PHMeleeRobot.remove();
 					PF.PHMeleeRobotCount = 0;
 					PF.PHMeleeRobot = null;

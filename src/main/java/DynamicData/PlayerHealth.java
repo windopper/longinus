@@ -1,10 +1,10 @@
-package dynamicdata;
+package DynamicData;
 
 import java.util.HashMap;
 
 import org.bukkit.entity.Player;
 
-import userdata.UserManager;
+import UserData.UserManager;
 
 public class PlayerHealth {
 	
@@ -143,7 +143,6 @@ public class PlayerHealth {
 			if(ShieldRegenerateCooldown == 0) { // 쉴드 재생 쿨다운이 없을때
 				ShieldRegenerateCooldown = 1; // 0초부터 시작
 			}
-			
 			if(ShieldRegenerateCooldown < 400) { // 쉴드 재생 쿨다운이 400이하 일때
 				
 				if(ShieldRegenerateCooldown > blastershieldregentime * 20 && CurrentClass.equals("블래스터")) { // 블래스터 보호막 재생

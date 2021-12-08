@@ -1,4 +1,4 @@
-package userdata;
+package UserData;
 
 import java.io.File;
 import java.io.IOException;
@@ -233,13 +233,16 @@ public class UserFileManager {
 		if(!config.contains("effects")) {
 			config.set("effects.return.default", 1);
 		}
-		
-		for(String Class : config.getConfigurationSection("Class").getKeys(false)) {
-			Arrays.stream(QuestList.values()).forEach(value-> {
-				if(!config.contains("Class."+Class+".quests."+value.name()))
-					config.set("Class."+Class+".quests."+value.name()+".progress", 0);
-			});
+
+		if(config.contains("Class")) {
+			for(String Class : config.getConfigurationSection("Class").getKeys(false)) {
+				Arrays.stream(QuestList.values()).forEach(value-> {
+					if(!config.contains("Class."+Class+".quests."+value.name()))
+						config.set("Class."+Class+".quests."+value.name()+".progress", 0);
+				});
+			}
 		}
+
 		
 		
 		p.sendMessage("Your data was successfully saved");

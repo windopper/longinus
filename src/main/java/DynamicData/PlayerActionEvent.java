@@ -1,4 +1,4 @@
-package dynamicdata;
+package DynamicData;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -12,7 +12,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 import UserChip.Maingui;
-import userdata.Filter;
+import UserData.Filter;
 
 public class PlayerActionEvent implements Listener {
 	

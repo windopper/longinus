@@ -1,11 +1,10 @@
-package dynamicdata;
+package DynamicData;
 
 import java.util.HashMap;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import userdata.UserManager;
+import UserData.UserManager;
 
 public class PlayerEnergy extends UserManager {
 	

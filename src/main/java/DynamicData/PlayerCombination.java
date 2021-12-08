@@ -1,4 +1,4 @@
-package dynamicdata;
+package DynamicData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import userdata.UserManager;
+import UserData.UserManager;
 
 public class PlayerCombination {
 	

@@ -30,6 +30,7 @@ public class planetDetect {
         mainGui mainGui = new mainGui();
 
         for(Player player : Bukkit.getOnlinePlayers()) {
+
             if(player.getWorld().getName().equals(longinusloc.getWorld().getName())) {
                 double dist = player.getLocation().distance(longinusloc);
                 if(dist<2) {

@@ -11,9 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.md_5.bungee.api.ChatColor;
-import spellinteracttest.Centermsg;
-import userdata.UserStatManager;
-import userdata.UserFileManager;
+import UserData.UserStatManager;
 
 public class Statgui {
 
