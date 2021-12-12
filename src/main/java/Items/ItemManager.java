@@ -30,6 +30,7 @@ public class ItemManager implements Listener {
         ItemStack itemStack = event.getItemDrop().getItemStack();
 
         if(itemStack.getItemMeta() == null) return;
+        if(itemStack.getItemMeta().getLore() == null) return;
         List<String> lores = itemStack.getItemMeta().getLore();
 
 

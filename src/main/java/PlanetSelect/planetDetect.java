@@ -35,9 +35,6 @@ public class planetDetect {
                 double dist = player.getLocation().distance(longinusloc);
                 if(dist<2) {
                     if(!areaList.contains(player)) mainGui.openGui(player);
-                    Inventory inventory = player.getOpenInventory().getTopInventory();
-
-
                     areaList.add(player);
                 }
                 else {

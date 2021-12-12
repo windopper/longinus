@@ -21,9 +21,8 @@ public class UserManager {
 	
 	private final static int DEFAULT_HEALTH = 10000;
 	
-	public final static HashMap<Player, Player> dual = new HashMap<>();
-	
 	private static final HashMap<Player, UserManager> instance = new HashMap<>();
+
 	
 	public String AskDeleteClassName;
 	public String CurrentClass = "없음";
@@ -478,6 +477,13 @@ public class UserManager {
 	
 	public double defcalculate(Player p) {
 		return statdef(p);
+	}
+
+	public List<String> getProfile() {
+		List<String> profileList = new ArrayList<>();
+
+		return profileList;
+
 	}
 	
 	

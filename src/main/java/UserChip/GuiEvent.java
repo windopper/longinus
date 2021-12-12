@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import CustomEvents.PlayerClassChangeEvent;
+import Party.PartyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,11 +17,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import ClassAbility.entitycheck;
 import ReturnToBase.ReturnMech;
+import org.bukkit.inventory.meta.SkullMeta;
 import spellinteracttest.Main;
 import UserData.UserFileManager;
 import UserData.UserManager;
@@ -29,6 +33,8 @@ public class GuiEvent implements Listener {
 	
 	private final List<Player> GoldAllowReadingChatPlayerName = new ArrayList<>();
 	private final HashMap<Player, Player> GoldAllowReadingChatAmount = new HashMap<>();
+	private final List<Player> AllowReadingChatPlayerInvite= new ArrayList<>();
+	private final Maingui Mg = Maingui.getinstance();
 	
 	@EventHandler
 	public void InventoryClick(InventoryClickEvent e) {
@@ -38,15 +44,15 @@ public class GuiEvent implements Listener {
 		int rawslot = e.getRawSlot();
 		if(invname.equals("메모리카드")) {
 			
-			if(rawslot == 4) {
+			if(rawslot == Mg.alteraslot) {
 				if(e.getClick().isLeftClick()) GoldSendPlayerAllowChat(e);
 			}
-			if(rawslot == 11) AlarmClickEvent(e);
-			if(rawslot == 12) QuestsOpenEvent(e);
-			if(rawslot == 13) ClassSelectEvent(e);
-			if(rawslot == 14) StatClickEvent(e);
-			
-			if(rawslot == 31) ReturnEvent(e);
+			if(rawslot == Mg.alarmslot) AlarmClickEvent(e);
+			if(rawslot == Mg.questbookslot) QuestsOpenEvent(e);
+			if(rawslot == Mg.classitemslot) ClassSelectEvent(e);
+			if(rawslot == Mg.statsettingslot) StatClickEvent(e);
+			if(rawslot == Mg.partymanageitemslot) partyGuiClickEvent(e);
+			if(rawslot == Mg.returnitemslot) ReturnEvent(e);
 	
 			e.setCancelled(true);
 		}
@@ -99,11 +105,40 @@ public class GuiEvent implements Listener {
 			
 			e.setCancelled(true);
 		}
+		if(invname.equals("파티 관리")) {
+
+			Player player = (Player) e.getWhoClicked();
+
+			try {
+				if(rawslot == 27) BacktoMain(e);
+				else if(rawslot == 35) {
+					PartyManager.getinstance().QuitParty(player);
+					player.closeInventory();
+				}
+				else partyPlayerClickEvent(e);
+
+				e.setCancelled(true);
+			}
+			catch(Exception exception) {
+
+			}
+		}
+		if(invname.contains("의 파티 설정")) {
+
+			Player player = (Player) e.getWhoClicked();
+
+
+			if(rawslot == 27) (new partyGui()).openPartyGui(player);
+			else partyPlayerOptionClickEvent(e);
+
+			e.setCancelled(true);
+
+		}
 		
 	}
 	
 	@EventHandler
-	public void GettingChatFromPlayer(AsyncPlayerChatEvent e) {
+	public void GettingChatFromPlayer(PlayerChatEvent e) {
 
 		Player player = e.getPlayer();
 		if(GoldAllowReadingChatPlayerName.contains(player)) {
@@ -156,7 +191,24 @@ public class GuiEvent implements Listener {
 			e.setCancelled(true);
 			
 	
-		}	
+		}
+		if(AllowReadingChatPlayerInvite.contains(player)) {
+			String content = e.getMessage();
+			e.setCancelled(true);
+			if(content.equals("취소")) {
+				AllowReadingChatPlayerInvite.remove(player);
+			}
+			for(Player onlineUser : Bukkit.getOnlinePlayers()) {
+				if(content.equals(onlineUser.getName())) {
+					PartyManager.getinstance().inviteParty(player, onlineUser);
+					AllowReadingChatPlayerInvite.remove(player);
+					return;
+				}
+			}
+			player.sendMessage("§c현재 존재 하지 않는 유저입니다");
+			AllowReadingChatPlayerInvite.remove(player);
+
+		}
 	}
 	
 	public void AlarmClickEvent(InventoryClickEvent e) {
@@ -436,7 +488,10 @@ public class GuiEvent implements Listener {
 		Player player = (Player) e.getWhoClicked();
 
 		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
-		GoldAllowReadingChatPlayerName.add(player);
+		if(!GoldAllowReadingChatPlayerName.contains(player)) {
+			GoldAllowReadingChatPlayerName.add(player);
+
+		}
 		player.sendMessage("§6송금할 사람의 닉네임을 입력해주세요. 취소하시려면 '취소' 라고 입력해주세요");
 		player.closeInventory();
 	}
@@ -492,4 +547,66 @@ public class GuiEvent implements Listener {
 		
 	}
 
+	private final void partyGuiClickEvent(InventoryClickEvent e) {
+
+		Player player = (Player) e.getView().getPlayer();
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
+		partyGui partyGui = new partyGui();
+		partyGui.openPartyGui(player);
+
+	}
+
+	private final void partyPlayerClickEvent(InventoryClickEvent e) {
+		Player player = (Player) e.getView().getPlayer();
+
+		PartyManager partyManager = PartyManager.getParty(player);
+		ItemStack clickedItem = e.getCurrentItem();
+
+		// 플레이어 초대
+		if(clickedItem.getType().equals(Material.GREEN_STAINED_GLASS_PANE)) {
+
+			if(!AllowReadingChatPlayerInvite.contains(player)) {
+				AllowReadingChatPlayerInvite.add(player);
+				player.sendMessage("§6초대 할 플레이어의 이름을 입력하세요. 취소하려면 '취소'를 입력하세요");
+			}
+			player.closeInventory();
+			return;
+		}
+
+		if(partyManager != null)
+			if(!partyManager.getMaster().getName().equals(player.getName())) {
+				player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.5f, 1);
+				player.sendMessage("§c파티장만 사용 할 수 있는 기능입니다");
+				player.closeInventory();
+				return;
+			}
+
+		// 플레이어 설정
+
+		if(clickedItem.getItemMeta() == null) return;
+
+		Player target = (Player) ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
+
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
+		partyGui partyGui = new partyGui();
+		partyGui.openPartyPlayerOptionGui(player, target);
+
+	}
+
+	private final void partyPlayerOptionClickEvent(InventoryClickEvent e) {
+		Player player = (Player) e.getWhoClicked();
+		Inventory inventory = e.getInventory();
+		Player target = (Player) (((SkullMeta) (inventory.getItem(13).getItemMeta())).getOwningPlayer());
+
+		int clickedSlot = e.getRawSlot();
+		if(clickedSlot == 21) {
+			PartyManager.getinstance().ChangeMaster(player, target);
+		}
+		else if(clickedSlot == 23) {
+			PartyManager.getinstance().KickMember(player, target);
+		}
+
+		(new partyGui()).openPartyGui(player);
+	}
 }

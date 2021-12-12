@@ -2,7 +2,9 @@ package UserChip;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import Party.PartyManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,7 +21,18 @@ import UserData.UserManager;
 public class Maingui {
 	
 	private static Maingui Maingui;
-	
+	public final int alteraslot = 4;
+	public final int playerprofileslot = 8;
+	public final int alarmslot = 11;
+	public final int questbookslot = 12;
+	public final int classitemslot = 13;
+	public final int statsettingslot = 14;
+	public final int collectingitemslot = 15;
+	public final int skilltraits = 20;
+	public final int biochips = 21;
+	public final int partymanageitemslot = 36;
+	public final int returnitemslot = 40;
+
 	private Maingui() {
 		
 	}
@@ -45,16 +58,19 @@ public class Maingui {
 	}
 	
 	public void chipitemguiopen(Player p) {
-		Inventory gui = Bukkit.createInventory(null, 36, "메모리카드");
+		Inventory gui = Bukkit.createInventory(null, 45, "메모리카드");
 		
-		gui.setItem(4, alteraitem(p));
-		gui.setItem(8, PlayerProfile(p));
-		gui.setItem(11, alarm(p));
-		gui.setItem(12, questbook());
-		gui.setItem(13, classitem());
-		gui.setItem(14, statsetting(p));
-		gui.setItem(15, collectingitem());
-		gui.setItem(31, returnitem());
+		gui.setItem(alteraslot, alteraitem(p));
+		gui.setItem(playerprofileslot, PlayerProfile(p));
+		gui.setItem(alarmslot, alarm(p));
+		gui.setItem(questbookslot, questbook());
+		gui.setItem(classitemslot, classitem());
+		gui.setItem(statsettingslot, statsetting(p));
+		gui.setItem(collectingitemslot, collectingitem());
+		gui.setItem(skilltraits, skilltraitsitem(p));
+		gui.setItem(biochips, biochipsitem(p));
+		gui.setItem(partymanageitemslot, partyManageitem(p));
+		gui.setItem(returnitemslot, returnitem());
 		
 		
 		p.openInventory(gui);
@@ -62,6 +78,22 @@ public class Maingui {
 		
 		
 	}
+	private ItemStack skilltraitsitem(Player p)	{
+		ItemStack itemStack = new ItemStack(Material.EXPERIENCE_BOTTLE, 1);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		itemMeta.setDisplayName("§b스킬 특성");
+
+		return itemStack;
+	}
+
+	private ItemStack biochipsitem(Player p) {
+		ItemStack itemStack = new ItemStack(Material.END_CRYSTAL, 1);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		itemMeta.setDisplayName("§5생체칩");
+
+		return itemStack;
+	}
+
 
 	private ItemStack PlayerProfile(Player p) {
 
@@ -80,6 +112,31 @@ public class Maingui {
 		item.setItemMeta(meta);
 
 		return item;
+	}
+
+	private ItemStack partyManageitem(Player p) {
+
+		ItemStack itemStack = new ItemStack(Material.CARTOGRAPHY_TABLE, 1);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		itemMeta.setDisplayName("§b파티 관리");
+		PartyManager partyManager = PartyManager.getParty(p);
+		if(partyManager == null) {
+			itemMeta.setLore(Arrays.asList("§7현재 파티가 없습니다"));
+			itemStack.setItemMeta(itemMeta);
+			return itemStack;
+		}
+		else {
+			List<Player> partyList = partyManager.getMembers();
+			List<String> loreList = new ArrayList<String>();
+			loreList.add("");
+
+			for(Player playerList : partyList) {
+				loreList.add("§7- §e"+playerList.getName());
+			}
+			itemMeta.setLore(loreList);
+			itemStack.setItemMeta(itemMeta);
+			return itemStack;
+		}
 	}
 	
 	public ItemStack questbook() { // 퀘스트 아이템

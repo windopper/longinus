@@ -2,9 +2,13 @@ package DynamicData;
 
 import java.util.HashMap;
 
+import CustomEvents.PlayerClassChangeEvent;
+import CustomEvents.PlayerDeathEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import UserData.UserManager;
+import spellinteracttest.Main;
 
 public class PlayerHealth {
 	
@@ -91,19 +95,18 @@ public class PlayerHealth {
 		
 		if(Heart > p.getMaxHealth()) { // 체력은 20이상 할 수 없다
 			Heart = p.getMaxHealth();
-		}					
+		}
+
 		if(Heart > 0) {
 			p.setHealth(Heart);
 		}
 		else {
-			if(!p.isDead()) {
-				p.setHealth(0); // 안 죽었을때 체력 0
-				CurrentHealth = 0;
-			}
-			else
-			{
-				//player.spigot().respawn();
-			}
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
+				@Override
+				public void run() {
+					Bukkit.getPluginManager().callEvent(new PlayerDeathEvent(p));
+				}
+			}, 0);
 		}
 		
 		

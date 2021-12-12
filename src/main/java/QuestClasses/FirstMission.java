@@ -173,8 +173,6 @@ public class FirstMission {
 
                     ItemManager.getinstance().removeItemFromPlayer("데이즈의 종자", p);
 
-
-
                     NPC.setSlot(EnumItemSlot.MAINHAND, net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.BEETROOT_SEEDS, 1)));
                     NPC.updateEquipment();
 

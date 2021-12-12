@@ -1,5 +1,6 @@
 package ClassAbility;
 
+import Duel.DuelManager;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -21,10 +22,8 @@ public class entitycheck {
 		if(p instanceof Player && me instanceof Player) {
 			// 사람이고 듀얼목록이 있으면
 			
-			if(UserData.UserManager.dual.containsKey(p) || UserData.UserManager.dual.containsKey(me)) {
-				if(UserData.UserManager.dual.get(p)==me || UserData.UserManager.dual.get(me)==p) {
-					return true;
-				}
+			if(DuelManager.checkInSameDuel((Player) me, (Player) p)) {
+				return true;
 			}	
 		}
 		else if(p instanceof LivingEntity && !(p instanceof ArmorStand) && !(p instanceof Player) && !(p instanceof ShulkerBullet)){

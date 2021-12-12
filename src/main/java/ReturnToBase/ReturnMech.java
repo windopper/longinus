@@ -97,6 +97,7 @@ public class ReturnMech implements Listener {
 					if(Return.get(p)<140) bar.setProgress((140-(double)Return.get(p))/140);
 					if(Return.get(p)>=140) bar.setProgress(0);
 
+					p.playSound(p.getLocation(), Sound.BLOCK_BEACON_AMBIENT, 1, 1);
 					Return.replace(p, Return.get(p)+1);
 				}
 				

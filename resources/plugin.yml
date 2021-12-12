@@ -23,3 +23,6 @@ commands :
   파티:
     description: 파티
     usage: /파티
+  duel:
+    description: duel
+    usage: /duel
