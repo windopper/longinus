@@ -54,7 +54,7 @@ public class EntityStatusManager {
 		this.canStun = canStun;
 	}
 	
-	
+	//test
 	public void KnockBack(Entity damager, double knockbackvector) {
 		
 		if(canKnockback == true) {
