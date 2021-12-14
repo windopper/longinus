@@ -1,11 +1,12 @@
 package UserChip;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
 import Party.PartyManager;
+import ReturnToBase.ReturnMech;
+import UserData.UserFileManager;
+import UserData.UserManager;
+import UserData.UserStatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,18 +17,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import ClassAbility.entitycheck;
-import ReturnToBase.ReturnMech;
 import org.bukkit.inventory.meta.SkullMeta;
 import spellinteracttest.Main;
-import UserData.UserFileManager;
-import UserData.UserManager;
-import UserData.UserStatManager;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class GuiEvent implements Listener {
 	
@@ -52,6 +50,8 @@ public class GuiEvent implements Listener {
 			if(rawslot == Mg.classitemslot) ClassSelectEvent(e);
 			if(rawslot == Mg.statsettingslot) StatClickEvent(e);
 			if(rawslot == Mg.partymanageitemslot) partyGuiClickEvent(e);
+			if(rawslot == Mg.collectingitemslot) openCollectingGui(e);
+			//if(rawslot == Mg.biochips)
 			if(rawslot == Mg.returnitemslot) ReturnEvent(e);
 	
 			e.setCancelled(true);
@@ -134,7 +134,32 @@ public class GuiEvent implements Listener {
 			e.setCancelled(true);
 
 		}
+		if(invname.contains((new CollectGui()).name1)) {
+
+			CollectGui a = new CollectGui();
+
+			Player player = (Player) e.getWhoClicked();
+			if(rawslot == a.back1) Maingui.getinstance().chipitemguiopen(player);
+			else a.OpenCollectGuiGui(player, rawslot);
+			clicksound(player);
+
+			e.setCancelled(true);
+
+		}
+		if(invname.contains((new CollectGui()).name2)) {
+
+			CollectGui a = new CollectGui();
+
+			Player player = (Player) e.getWhoClicked();
+			if(rawslot == a.back2) a.OpenCollectPlanetGui(player);
+
+			e.setCancelled(true);
+		}
 		
+	}
+
+	public void clicksound(Player player) {
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 	}
 	
 	@EventHandler
@@ -210,7 +235,8 @@ public class GuiEvent implements Listener {
 
 		}
 	}
-	
+
+
 	public void AlarmClickEvent(InventoryClickEvent e) {
 		
 		Player p = (Player) e.getWhoClicked();
@@ -608,5 +634,15 @@ public class GuiEvent implements Listener {
 		}
 
 		(new partyGui()).openPartyGui(player);
+	}
+
+	private final void openCollectingGui(InventoryClickEvent e) {
+
+		Player player = (Player) e.getWhoClicked();
+		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
+
+		CollectGui collectGui = new CollectGui();
+		collectGui.OpenCollectPlanetGui(player);
+
 	}
 }

@@ -1,15 +1,10 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import DynamicData.PlayerEnergy;
+import DynamicData.PlayerFunction;
+import DynamicData.PlayerHealth;
+import UserData.UserManager;
+import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -19,11 +14,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import org.jetbrains.annotations.NotNull;
-import UserData.UserManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Aether {
 	
@@ -46,7 +39,7 @@ public class Aether {
 	}
 	
 	@SuppressWarnings("deprecation")
-	public void melee(final @NotNull Player p) {
+	public void melee(final Player p) {
 
 		HashMap<Entity, Integer> meleehit = new HashMap<>();
 		Vector dir1 = p.getLocation().getDirection();

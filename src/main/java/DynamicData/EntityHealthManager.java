@@ -1,13 +1,15 @@
 package DynamicData;
 
+import org.bukkit.Bukkit;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
 
 
 public class EntityHealthManager {
@@ -16,6 +18,7 @@ public class EntityHealthManager {
 	
 	private LivingEntity e;
 	private ArmorStand ar;
+	private String CustomName;
 	private int CurrentHealth;
 	private int MaxHealth;
 	
@@ -25,11 +28,24 @@ public class EntityHealthManager {
 		CurrentHealth = (int)(e.getHealth()*500);
 		MaxHealth = (int)(e.getMaxHealth()*500);
 	}
+
+	private EntityHealthManager(@Nonnull LivingEntity e, int maxhealth) {
+		this.e = e;
+		if(e==null) Bukkit.broadcastMessage("null!");
+		CurrentHealth = maxhealth;
+		MaxHealth = maxhealth;
+	}
 	
 	
 	public static EntityHealthManager getinstance(LivingEntity e) {
 		
 		if(!instance.containsKey(e)) instance.put(e, new EntityHealthManager(e));
+		return instance.get(e);
+	}
+
+	public static EntityHealthManager getinstance(LivingEntity e, int maxhealth) {
+
+		if(!instance.containsKey(e)) instance.put(e, new EntityHealthManager(e, maxhealth));
 		return instance.get(e);
 	}
 	
@@ -54,6 +70,8 @@ public class EntityHealthManager {
 		return ar;
 	}
 
+	public String getCustomName() { return CustomName;}
+
 	public void setCurrentHealth(int currentHealth) {
 		CurrentHealth = currentHealth;
 	}
@@ -62,24 +80,27 @@ public class EntityHealthManager {
 	@SuppressWarnings("deprecation")
 	public void EntityHealthWatcher() {
 		
-		
 		if(!(e instanceof Player) && (e instanceof LivingEntity) && !(e instanceof ArmorStand)) {
+
+			if(CustomName == null && e.getCustomName() != null) {
+				CustomName = e.getCustomName();
+				//EntityNamePacketSender.getInstance().SendPacket(e);
+			}
 			
-			double heart = e.getMaxHealth() * ((double)CurrentHealth/(int)(e.getMaxHealth())*500);
-			if(heart > e.getMaxHealth()) {
-				heart = e.getMaxHealth();
-			}
-			if(heart > 0) {
-				e.setHealth(heart);
-			}
-			else {
-				e.setHealth(0);
-			}
+//			double heart = e.getMaxHealth() * ((double)CurrentHealth/(int)(e.getMaxHealth())*500);
+//			if(heart > e.getMaxHealth()) {
+//				heart = e.getMaxHealth();
+//			}
+//			if(heart > 0) {
+//				e.setHealth(heart);
+//			}
+//			else {
+//				e.setHealth(0);
+//			}
 			
 			if(CurrentHealth < 0) {
 
 				// 한방컷 날때 오류 방지
-				// 코드 밑으로 내리기 귀찮음
 				if(ar!=null) {
 					ar.remove();
 				}

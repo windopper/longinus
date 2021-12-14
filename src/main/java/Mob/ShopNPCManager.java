@@ -2,20 +2,33 @@ package Mob;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.ScoreboardTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
-import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboardManager;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboard;
+import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboardManager;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public class ShopNPCManager {
 	
@@ -32,6 +45,15 @@ public class ShopNPCManager {
 		if(ShopNPCManager == null) ShopNPCManager = new ShopNPCManager();
 		return ShopNPCManager;
 	}
+
+	public static EntityPlayer getNPCID(int EntityID) {
+		for(EntityPlayer NPCs : NPC) {
+			if(NPCs.getId() == EntityID) {
+				return NPCs;
+			}
+		}
+		return null;
+	}
 	
 	public void createNPC(Location location, String npcName, String texture, String signature) {
 		
@@ -41,7 +63,7 @@ public class ShopNPCManager {
 		Property property = new Property("textures", texture, signature);
 		gameProfile.getProperties().put("textures", property);
 		
-		EntityPlayer npc = new EntityPlayer(nmsServer, nmsWorld, gameProfile, new PlayerInteractManager(nmsWorld));	
+		EntityPlayer npc = new EntityPlayer(nmsServer, nmsWorld, gameProfile);
 		npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 		npc.displayName = "";
 		
@@ -74,7 +96,7 @@ public class ShopNPCManager {
 
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			for(EntityPlayer npc : NPC) {
-				PlayerConnection connection = ((CraftPlayer)p).getHandle().playerConnection;
+				PlayerConnection connection = ((CraftPlayer)p).getHandle().b;
 				connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
 			}
 		}
@@ -84,7 +106,7 @@ public class ShopNPCManager {
 	public void removeNPCPacket(Player p) {
 
 		for(EntityPlayer npc : NPC) {
-			PlayerConnection connection = ((CraftPlayer)p).getHandle().playerConnection;
+			PlayerConnection connection = ((CraftPlayer)p).getHandle().b;
 			connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
 		}
 
@@ -153,16 +175,16 @@ public class ShopNPCManager {
 	public void fixSkinHelmetLayerForPlayer(EntityPlayer npc, Player player) {
 		
 		DataWatcher dataWatcher = npc.getDataWatcher();
-		dataWatcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
+		dataWatcher.set(new DataWatcherObject<>(17, DataWatcherRegistry.a), (byte) 127);
 		
-		PlayerConnection conn = ((CraftPlayer)player).getHandle().playerConnection;
+		PlayerConnection conn = ((CraftPlayer)player).getHandle().b;
 		conn.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, true));
 	}
 	
 	
 	private void sendpacket(Player player, Packet<?> packet) {
 		
-		PlayerConnection conn = ((CraftPlayer)player).getHandle().playerConnection;
+		PlayerConnection conn = ((CraftPlayer)player).getHandle().b;
 		conn.sendPacket(packet);
 	}
 	
@@ -179,55 +201,58 @@ public class ShopNPCManager {
 //		sendpacket(player, metadataPacket);
 //		
 //	}
-	
-	
-	
-	
-	  public void showTo(EntityPlayer npc, Player player) {
-
-		    PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(
-		        PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,
-		        npc
-		    );
-		    sendpacket(player, packetPlayOutPlayerInfo);
-
-		    PacketPlayOutNamedEntitySpawn packetPlayOutNamedEntitySpawn = new PacketPlayOutNamedEntitySpawn(
-		        npc
-		    );
-		    sendpacket(player, packetPlayOutNamedEntitySpawn);    
-
-		    CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
-		    assert scoreboardManager != null;
-		    CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
-		    Scoreboard scoreboard = mainScoreboard.getHandle();
-
-		    ScoreboardTeam scoreboardTeam = scoreboard.getTeam(npc.getName());
-		    if (scoreboardTeam == null) {
-		      scoreboardTeam = new ScoreboardTeam(scoreboard, npc.getName());
-		    }
-
-		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, 1)); // Create team
-		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, 0)); // Setup team options
-		    sendpacket(player, new PacketPlayOutScoreboardTeam(scoreboardTeam, Collections.singletonList(npc.getName()), 3)); // Add entityPlayer to team entries
 
 
-		    Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-		      try {
-		        PacketPlayOutPlayerInfo removeFromTabPacket = new PacketPlayOutPlayerInfo(
-		            PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER,
-		            npc
-		        );
-		        sendpacket(player, removeFromTabPacket);
-		      } catch (Exception ex) {
-		        ex.printStackTrace();
-		      }
-		    }, 20);
-		    
-		    Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			      fixSkinHelmetLayerForPlayer(npc, player);
-			    }, 8);
 
 
-		  }
+	public void showTo(EntityPlayer npc, Player player) {
+
+		PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(
+				PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
+				npc
+		);
+		sendpacket(player, packetPlayOutPlayerInfo);
+
+		PacketPlayOutNamedEntitySpawn packetPlayOutNamedEntitySpawn = new PacketPlayOutNamedEntitySpawn(
+				npc
+		);
+		sendpacket(player, packetPlayOutNamedEntitySpawn);
+
+		CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
+		assert scoreboardManager != null;
+
+		CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
+		Scoreboard scoreboard = mainScoreboard.getHandle();
+
+		ScoreboardTeam scoreboardTeam = scoreboard.getPlayerTeam(npc.getName());
+
+
+		if (scoreboardTeam == null) {
+			scoreboardTeam = scoreboard.createTeam("Shop");
+			scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
+		}
+		else {
+			scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
+		}
+
+
+		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+			try {
+				PacketPlayOutPlayerInfo removeFromTabPacket = new PacketPlayOutPlayerInfo(
+						PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e,
+						npc
+				);
+				sendpacket(player, removeFromTabPacket);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}, 20);
+
+		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+			fixSkinHelmetLayerForPlayer(npc, player);
+		}, 8);
+
+
+	}
 	
 }

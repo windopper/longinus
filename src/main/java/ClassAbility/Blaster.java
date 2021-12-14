@@ -1,28 +1,19 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
 import DynamicData.EntityStatus;
 import DynamicData.PlayerEnergy;
 import DynamicData.PlayerFunction;
 import DynamicData.PlayerHealth;
 import UserData.UserManager;
+import org.bukkit.*;
+import org.bukkit.entity.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Blaster {
 	
@@ -112,7 +103,7 @@ public class Blaster {
 
 			Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 
-			if(Spell.getHitLocation().getBlock().isSolid()) {
+			if(!Spell.getHitLocation().getBlock().isPassable()) {
 				Location BLoc = Spell.getHitLocation();
 				p.getWorld().spawnParticle(Particle.BLOCK_DUST, BLoc, 30, 0.5, 0.5, 0.5, 0, BLoc.getBlock().getType().createBlockData());
 				p.getWorld().playSound(BLoc, Sound.BLOCK_STONE_BREAK, 2, 1);

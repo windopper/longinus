@@ -1,38 +1,46 @@
 package spellinteracttest;
 
 import ClassAbility.*;
+import CustomEvents.CustomEventListener;
 import Duel.DuelManager;
+import DynamicData.*;
+import Gliese581cMobs.SummonEntity;
 import Items.ItemManager;
+import Items.WeaponManager;
+import Mob.PacketReader;
+import Mob.RightClickNPC;
+import Mob.ShopNPCManager;
+import Mob.mob;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
 import PlanetSelect.planetDetect;
 import PlanetSelect.planetSelectEvent;
-import DynamicData.Damage;
-import Mob.ShopNPCManager;
-import Mob.PacketReader;
-import Mob.RightClickNPC;
-import Mob.mob;
-import CustomEvents.CustomEventListener;
+import QuestClasses.Tutorial;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
-import QuestClasses.Tutorial;
 import QuestFunctions.UserQuestManager;
+import ReturnToBase.ReturnMech;
+import SpyGlass.SpyGlassEvent;
 import UserChip.Goldgui;
 import UserChip.GuiEvent;
 import UserChip.UserAlarmManager;
 import UserChip.UserChipEvent;
+import UserData.UserFileManager;
+import UserData.UserManager;
+import UserData.UserStatManager;
 import UserStorage.Event;
-import DynamicData.*;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import net.minecraft.server.network.PlayerConnection;
 import org.bukkit.*;
-import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -49,11 +57,6 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import ReturnToBase.ReturnMech;
-import UserData.UserFileManager;
-import UserData.UserManager;
-import UserData.UserStatManager;
-import Items.WeaponManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,8 +85,11 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new ItemManager(), this);
 		getServer().getPluginManager().registerEvents(new planetSelectEvent(), this);
 		getServer().getPluginManager().registerEvents(new EventProcess(), this);
+		getServer().getPluginManager().registerEvents(new SpyGlassEvent(), this);
 
 		getCommand("party").setTabCompleter(new TabCompleter());
+
+
 
 
 
@@ -107,8 +113,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		
-		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
-		QuestNPCManager.getinstance().addnpctolist();
+
 
 
 
@@ -116,27 +121,15 @@ public class Main extends JavaPlugin implements Listener {
 			for(Player player : Bukkit.getOnlinePlayers()) {
 
 				ServerJoinToDo(player);
-//
-//				UserFileManager.getinstance().joinedplayerlistregister(player);
-//
-//				// npc 우클릭 감지
-//				PacketReader reader = new PacketReader();
-//				reader.inject(player);
-//
-//				UserChip.UserAlarmManager.instance().register(player); // 알람 파일 등록
-//
-//				ShopNPCManager.getinstance().addJoinPacket(player); // npc 보이게 하기
-//				QuestNPCManager.getinstance().addJoinPacket(player);
-//
-//				RegisterInstance(player); // 유저매니저, 파일매니저, 스탯매니저 부르기
-//
-//				UserFileManager.getinstance().UserDetailClassCallData(player, UserFileManager.getinstance().getPreviousClass(player));
-				
-			
 			}
 		}
 
 		loop();
+
+		QuestNPCManager.getinstance().addnpctolist();
+//
+		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
+
 
 	}
 	
@@ -147,7 +140,7 @@ public class Main extends JavaPlugin implements Listener {
 			
 			UserFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			PacketReader reader = new PacketReader();
+			PacketReader reader = new PacketReader(p);
 			reader.uninject(p);
 			
 			UnregisterInstance(p);
@@ -177,7 +170,7 @@ public class Main extends JavaPlugin implements Listener {
 		
 		UserFileManager.getinstance().UserDetailClassDataSave(p);
 		
-		PacketReader reader = new PacketReader();
+		PacketReader reader = new PacketReader(p);
 		reader.uninject(e.getPlayer());
 		
 		UnregisterInstance(p);
@@ -374,6 +367,13 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			switch (args[0]) {
 
+				case "summon" : {
+					player.sendMessage("hi");
+					(new SummonEntity()).summon(player);
+					player.sendMessage("hi");
+					break;
+				}
+
 				case "create": {
 					PartyManager.getinstance().createParty(player);
 					break;
@@ -473,7 +473,7 @@ public class Main extends JavaPlugin implements Listener {
 
 				DataWatcher dataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
 				dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-				PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+				PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 				for(Player member : Bukkit.getOnlinePlayers()) {
 					CraftPlayer p = (CraftPlayer) player;
 					connection.sendPacket(new PacketPlayOutEntityMetadata(p.getEntityId(), dataWatcher, true));
@@ -484,7 +484,7 @@ public class Main extends JavaPlugin implements Listener {
 			case "glowingoff": {
 				DataWatcher dataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
 				dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-				PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+				PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 				for(Player member : Bukkit.getOnlinePlayers()) {
 					CraftPlayer p = (CraftPlayer) player;
 					connection.sendPacket(new PacketPlayOutEntityMetadata(p.getEntityId(), dataWatcher, false));
@@ -668,6 +668,7 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 
+				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
 				PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
 
@@ -755,7 +756,7 @@ public class Main extends JavaPlugin implements Listener {
 			QuestNPCManager.getinstance().addJoinPacket(p);
 		}, 40); // npc 소환
 		
-		PacketReader reader = new PacketReader();
+		PacketReader reader = new PacketReader(p);
 		reader.inject(p); // npc 우클릭 감지 등록
 		
 		UserChip.UserAlarmManager.instance().register(p); // 유저 알람 파일 등록

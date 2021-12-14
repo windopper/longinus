@@ -2,17 +2,18 @@ package Party;
 
 import DynamicData.PlayerHealth;
 import UserData.UserManager;
-import UserData.UserStatManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import net.minecraft.server.network.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import org.bukkit.scoreboard.Scoreboard;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -154,7 +155,7 @@ public class PartyManager {
             target.sendMessage("§5>> §6"+commander.getName()+"§e님이 당신을 파티로 초대하였습니다");
             TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §b§n여기§r§e를 클릭하여 수락하거나 §b§n/파티 참가§r§e 명령어를 입력하세요"));
             component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/파티 참가"));
-            target.sendMessage(component);
+            target.spigot().sendMessage(component);
 
         }
 
@@ -165,7 +166,7 @@ public class PartyManager {
             target.sendMessage("§5>> §6"+commander.getName()+"§e님이 당신을 파티로 초대하였습니다");
             TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §b§n여기§r§e를 클릭하여 수락하거나 §b§n/파티 참가§r§e 명령어를 입력하세요"));
             component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/파티 참가"));
-            target.sendMessage(component);
+            target.spigot().sendMessage(component);
         }
 
     }
@@ -350,24 +351,78 @@ public class PartyManager {
     public void partyGlowingLoop() {
         for(Player p : Bukkit.getOnlinePlayers()) {
 
+            byte info = 0x00;
+            boolean sneaking = p.isSneaking();
+            boolean sprinting = p.isSprinting();
+            boolean swimming = p.isSwimming();
+            boolean invisible = p.isInvisible();
+            boolean flying = p.isGliding();
+
+            if(sneaking) info |= 0x02;
+            if(sprinting) info |= 0x08;
+            if(swimming) info |= 0x10;
+            if(invisible) info |= 0x20;
+            if(flying) info |= 0x80;
+
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                if(p==player) continue;
+
+                CraftPlayer EP = (CraftPlayer) p;
+
+                DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) info);
+
+                PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+
+                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+            }
+
             if(partyInstance.containsKey(p)) {
 
                 PartyManager partyManager = partyInstance.get(p);
 
 
-                if(partyManager.glowingDelay == true) {
+                if (partyManager.glowingDelay == true) {
                     continue;
                 }
 
-                for(Player member : partyManager.members) {
-                    CraftPlayer EP = (CraftPlayer) p;
-                    DataWatcher dataWatcher = ((CraftPlayer) member).getHandle().getDataWatcher();
-                    dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-                    PlayerConnection connection = ((CraftPlayer) member).getHandle().playerConnection;
+//                for (Player member : partyManager.members) {
+//                    if (p == member) continue;
+//
+//                    CraftPlayer EP = (CraftPlayer) p;
+//
+//                    DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+//                    dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
+//
+//                    PlayerConnection connection = ((CraftPlayer) member).getHandle().b;
+//
+//                    connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+//                }
 
-                    connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (p == player) continue;
+
+                    if (partyManager.members.contains(player)) {
+
+                        CraftPlayer EP = (CraftPlayer) p;
+
+                        DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) (0x40 | info));
+
+                        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                    } else {
+                        CraftPlayer EP = (CraftPlayer) p;
+
+                        DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) info);
+
+                        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                    }
                 }
-
             }
         }
 

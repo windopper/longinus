@@ -1,11 +1,11 @@
 package Mob;
 
+import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 
 public class RightClickNPC extends Event implements Cancellable {
 	

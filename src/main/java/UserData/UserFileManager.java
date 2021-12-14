@@ -1,10 +1,8 @@
 package UserData;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Set;
-
+import Mob.MobManager;
+import QuestFunctions.QuestList;
+import UserChip.Maingui;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,8 +12,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import QuestFunctions.QuestList;
-import UserChip.Maingui;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Set;
 
 public class UserFileManager {
 	
@@ -234,6 +234,7 @@ public class UserFileManager {
 			config.set("effects.return.default", 1);
 		}
 
+		// 클래스
 		if(config.contains("Class")) {
 			for(String Class : config.getConfigurationSection("Class").getKeys(false)) {
 				Arrays.stream(QuestList.values()).forEach(value-> {
@@ -242,6 +243,12 @@ public class UserFileManager {
 				});
 			}
 		}
+
+		// 샘플
+		Arrays.stream(MobManager.MobList.values()).forEach(value -> {
+			if(!config.contains("Sample."+value.getPlanet()+"."+value.name()+".count"))
+				config.set("Sample."+value.getPlanet()+"."+value.name()+".count", 0);
+		});
 
 		
 		

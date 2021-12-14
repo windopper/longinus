@@ -2,8 +2,6 @@ package Party;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +9,7 @@ import java.util.List;
 public class TabCompleter implements org.bukkit.command.TabCompleter {
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public List<String> onTabComplete(CommandSender commandSender, Command command, String s, String[] strings) {
 
         String cmdName = command.getName();
 

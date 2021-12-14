@@ -2,51 +2,32 @@ package PlanetSelect;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.libs.org.apache.commons.codec.binary.Base64;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
-public class mainGui {
+public enum PlanetList {
 
-    public final static List<Player> GuiViewer = new ArrayList<>();
+    Gliese581c("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTRjYmZmYjk3MTIyMzhjOTU2OTc3ZDFiZmRhNGIzMDhlZDQ3N2JhMzEwNmMzMTMwMmMyNDA4NjJlZjc3OWEifX19",
+    "Gliese581c");
 
-    public void openGui(Player player) {
+    private String skinURL;
+    private String rawName;
 
-        Inventory inventory = Bukkit.createInventory(null, 36, "이동할 행성을 선택하세요");
-
-        inventory.setItem(10, gliese581c());
-
-
-        player.openInventory(inventory);
+    PlanetList(String URL, String rawName) {
+        this.skinURL = URL;
+        this.rawName = rawName;
     }
 
-    private final ItemStack gliese581c() {
-
-        ItemStack itemStack = PlanetList.Gliese581c.getPlanet();
-        ItemMeta itemMeta = itemStack.getItemMeta();
-        itemMeta.setDisplayName("§6>>§e> §l§oGliese581c§r §e<§6<<");
-        itemMeta.setLore(Arrays.asList("§7-----------------------------",
-                "§d-[ 클릭하여 행성으로 이동하세요 ]-",
-                "",
-                "",
-                ""));
-        itemStack.setItemMeta(itemMeta);
-
-        return itemStack;
-
+    public String getRawName() {
+        return rawName;
     }
 
-    private final ItemStack getSkull(String skinURL) {
+    public ItemStack getPlanet() {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
         if(skinURL.isEmpty())return head;
 
@@ -70,4 +51,5 @@ public class mainGui {
         head.setItemMeta(headMeta);
         return head;
     }
+
 }

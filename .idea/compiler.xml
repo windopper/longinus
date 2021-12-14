@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="spellinteracttestV4" />
+        <module name="spellinteracttestV4-1.17.1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="spellinteracttestV4" target="8" />
+      <module name="spellinteracttestV4-1.17.1" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

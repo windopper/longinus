@@ -96,7 +96,7 @@ public class DuelManager {
         target.sendMessage("§5>> §b"+commander.getName()+"§3님이 당신에게 PVP를 신청하였습니다.");
         TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §6여기§3를 클릭하여 수락해 주세요"));
         component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/duel "+commander.getName()));
-        target.sendMessage(component);
+        target.spigot().sendMessage(component);
         commander.sendMessage("§5>> §b"+target.getName()+"§3님에게 PVP를 신청하였습니다");
 
         this.target = target;

@@ -273,13 +273,12 @@ public class SpellManager {
             RunParticles(ParticleType.TrailParticle);
             
             // 벽 체크
-            if(WallChecker(loc) == true) {
+            if(WallChecker(loc)) {
 
                 RunParticles(ParticleType.DestinationParticle);
                 RunSounds(SoundType.DestinationSound);
                 return true;
             }
-
             // 엔티티 체크
             for (LivingEntity e : player.getWorld().getLivingEntities()) {
 
@@ -522,7 +521,7 @@ public class SpellManager {
 
     public boolean WallChecker(Location loc) {
         // 벽 체크
-        if(WallPassable == false && loc.getBlock().isSolid()) {
+        if(WallPassable == false && !loc.getBlock().isPassable()) {
             return true;
         }
         return false;

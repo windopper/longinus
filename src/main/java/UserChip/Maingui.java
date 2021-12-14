@@ -1,22 +1,21 @@
 package UserChip;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import Party.PartyManager;
+import UserData.UserFileManager;
+import UserData.UserManager;
+import UserData.UserStatManager;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import net.md_5.bungee.api.ChatColor;
 import org.bukkit.inventory.meta.SkullMeta;
-import UserData.UserStatManager;
-import UserData.UserFileManager;
-import UserData.UserManager;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Maingui {
 	
@@ -82,6 +81,7 @@ public class Maingui {
 		ItemStack itemStack = new ItemStack(Material.EXPERIENCE_BOTTLE, 1);
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		itemMeta.setDisplayName("§b스킬 특성");
+		itemStack.setItemMeta(itemMeta);
 
 		return itemStack;
 	}
@@ -90,6 +90,7 @@ public class Maingui {
 		ItemStack itemStack = new ItemStack(Material.END_CRYSTAL, 1);
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		itemMeta.setDisplayName("§5생체칩");
+		itemStack.setItemMeta(itemMeta);
 
 		return itemStack;
 	}

@@ -1,13 +1,13 @@
 package Packets;
 
+import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
+import net.minecraft.server.network.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
 
 public class loop {
 	
@@ -38,7 +38,7 @@ public class loop {
 					
 					if(!split[1].equals(pl.getName())) {
 						CraftPlayer player = (CraftPlayer) pl;
-						PlayerConnection conn = player.getHandle().playerConnection;
+						PlayerConnection conn = player.getHandle().b;
 						
 						conn.sendPacket(new PacketPlayOutEntityDestroy(e.getEntityId()));
 					}

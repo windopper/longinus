@@ -1,29 +1,20 @@
 package ClassAbility;
 
-import java.util.HashMap;
-
+import DynamicData.*;
+import QuestClasses.Tutorial;
+import UserData.UserManager;
+import UserData.UserStatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import DynamicData.Damage;
-import QuestClasses.Tutorial;
-import DynamicData.EntityStatus;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
-import UserData.UserStatManager;
+import java.util.HashMap;
 
 public class Combination {
 	
@@ -120,7 +111,7 @@ public class Combination {
 			
 			if(CurrentMana >= charge ) {
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				
 				energyoverload(p, combo);
 				
@@ -140,7 +131,7 @@ public class Combination {
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 			
 
@@ -149,7 +140,7 @@ public class Combination {
 			
 			if(CurrentMana >= arrow) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				
 				energyoverload(p, combo);
 				
@@ -175,7 +166,7 @@ public class Combination {
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -336,13 +327,13 @@ public class Combination {
 			
 			if(CurrentMana >= impulseswitchshieldmana ) {
 				Sound(p);
-				p.sendTitle("",blank+RL, 5, 20, 10);
+				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
 				Aether.getinstance().ImpulseSwitchShield(p, impulseswitchshieldmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -350,19 +341,19 @@ public class Combination {
 			
 			if(lvl<10) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= shieldswitchchargemana ) {
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
 				Aether.getinstance().ShieldSwitchCharge(p, shieldswitchchargemana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 			
 
@@ -371,19 +362,19 @@ public class Combination {
 			
 			if(lvl<15) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= WeaponModeChangemana) {
 				Sound(p);
-				p.sendTitle("",blank+FR, 5, 20, 10);
+				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
 				Aether.getinstance().SwitchWeapon(p, WeaponModeChangemana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -391,19 +382,19 @@ public class Combination {
 			
 			if(lvl<5) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= impulseswitchweaponmana) {
 				Sound(p);
-				p.sendTitle("",blank+RF, 5, 20, 10);
+				p.sendTitle(" ",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
 				Aether.getinstance().ImpulseSwitchWeapon(p, impulseswitchweaponmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -411,18 +402,18 @@ public class Combination {
 			
 			if(lvl<20) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(PF.AEImpulse >= 100d) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				Aether.getinstance().ImpulseSwitchEnergy(p);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+impulseexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+impulseexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -456,17 +447,16 @@ public class Combination {
 
 		}
 		if(combo.equals("RL")) {
-			
-			
+
 			if(CurrentMana >= RLmana ) {
 				Sound(p);
-				p.sendTitle("",blank+RL, 5, 20, 10);
+				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
 				Accelerator.getinstance().movehit(p, RLmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -474,19 +464,19 @@ public class Combination {
 			
 			if(lvl<10) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RRmana ) {
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
 				Accelerator.getinstance().adrenaline(p, RRmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 			
 
@@ -495,19 +485,19 @@ public class Combination {
 			
 			if(lvl<15) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FRmana) {
 				Sound(p);
-				p.sendTitle("",blank+FR, 5, 20, 10);
+				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
 				Accelerator.getinstance().randomfire(p, FRmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -515,19 +505,19 @@ public class Combination {
 			
 			if(lvl<5) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RFmana) {
 				Sound(p);
-				p.sendTitle("",blank+RF, 5, 20, 10);
+				p.sendTitle(" ",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
 				Accelerator.getinstance().bombthrow(p, RFmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -535,19 +525,19 @@ public class Combination {
 			
 			if(lvl<20) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FFmana) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				energyoverload(p, combo);
 				Accelerator.getinstance().particleacceleration(p, FFmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -586,18 +576,18 @@ public class Combination {
 			
 			if(CurrentMana >= RLmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
-				p.sendTitle("",blank+RL, 5, 20, 10);
+				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
 				ByV.getinstance().recover(p, RLmana);
 			}
 			else {
 				if(CurrentMana < RLmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
 					Warning(p);
-					p.sendTitle("",blank+essenceexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+essenceexhaustion, 5, 20, 10);
 				}		
 
 			}
@@ -607,24 +597,24 @@ public class Combination {
 			
 			if(lvl<10) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RRmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
 				ByV.getinstance().takedown(p, RRmana);
 			}
 			else {
 				if(CurrentMana < RRmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
 					Warning(p);
-					p.sendTitle("",blank+essenceexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+essenceexhaustion, 5, 20, 10);
 				}
 			}
 			
@@ -634,19 +624,19 @@ public class Combination {
 			
 			if(lvl<15) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FRmana) {
 				Sound(p);
-				p.sendTitle("",blank+FR, 5, 20, 10);
+				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
 				ByV.getinstance().chain(p, FRmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -654,24 +644,24 @@ public class Combination {
 			
 			if(lvl<5) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
-				p.sendTitle("",blank+RF, 5, 20, 10);
+				p.sendTitle(" ",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
 				ByV.getinstance().punch(p, RFmana);
 			}
 			else {
 				if(CurrentMana < RFmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
 					Warning(p);
-					p.sendTitle("",blank+essenceexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+essenceexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -680,24 +670,24 @@ public class Combination {
 			
 			if(lvl<20) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				energyoverload(p, combo);
 				ByV.getinstance().shockwave(p, FFmana);
 			}
 			else {
 				if(CurrentMana < FFmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
 					Warning(p);
-					p.sendTitle("",blank+essenceexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+essenceexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -741,17 +731,17 @@ public class Combination {
 			
 			if(CurrentMana >= RLmana && CurrentRobot >= RLrobot) {
 				Sound(p);
-				p.sendTitle("",blank+RL, 5, 20, 10);
+				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
 				Phlox.getinstance().heal(p, RLmana);
 			}
 			else {
 				Warning(p);
 				if(CurrentMana < RLmana) {
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
-					p.sendTitle("",blank+robotexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
 				}
 
 			}
@@ -761,23 +751,23 @@ public class Combination {
 			
 			if(lvl<10) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RRmana && CurrentRobot >= RRrobot) {
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
 				Phlox.getinstance().escape(p, RRmana);
 			}
 			else {
 				Warning(p);
 				if(CurrentMana < RRmana) {
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
-					p.sendTitle("",blank+robotexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
 				}
 			}
 			
@@ -787,23 +777,23 @@ public class Combination {
 			
 			if(lvl<15) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FRmana && CurrentRobot >= FRrobot) {
 				Sound(p);
-				p.sendTitle("",blank+FR, 5, 20, 10);
+				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
 				Phlox.getinstance().interrupt(p, FRmana);
 			}
 			else {
 				Warning(p);
 				if(CurrentMana < FRmana) {
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
-					p.sendTitle("",blank+robotexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -812,23 +802,23 @@ public class Combination {
 			
 			if(lvl<5) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RFmana && CurrentRobot >= RFrobot) {
 				Sound(p);
-				p.sendTitle("",blank+RF, 5, 20, 10);
+				p.sendTitle(" ",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
 				Phlox.getinstance().annihilation(p, RFmana);
 			}
 			else {
 				Warning(p);
 				if(CurrentMana < RFmana) {
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 				else {
-					p.sendTitle("",blank+robotexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -837,19 +827,19 @@ public class Combination {
 			
 			if(lvl<20) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FFmana) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				energyoverload(p, combo);
 				Phlox.getinstance().robot(p, FFmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}
@@ -888,18 +878,19 @@ public class Combination {
 			if(CurrentMana >= RLmana) {
 				if(PlayerFunction.getinstance(p).getMeleemode()==0) {
 					Warning(p);
-					p.sendTitle("",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
+
+					p.sendTitle(" ",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
 					return;
 				}
 				Sound(p);
-				p.sendTitle("",blank+RL, 5, 20, 10);
+				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
 				Blaster.getinstance().railgun(p, RLmana);
 			}
 			else {
 				if(CurrentMana < RLmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 
 			}
@@ -909,25 +900,25 @@ public class Combination {
 			
 			if(lvl<10) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 
 			if(CurrentMana >= RRmana) {
 				if(PlayerFunction.getinstance(p).getMeleemode()==1) {
 					Warning(p);
-					p.sendTitle("",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
+					p.sendTitle(" ",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
 					return;
 				}	
 				Sound(p);
-				p.sendTitle("",blank+RR, 5, 20, 10);
+				p.sendTitle(" ",blank+RR, 5, 20, 10);
 				energyoverload(p, combo);
 				Blaster.getinstance().grenadelauncher(p, RRmana);
 			}
 			else {
 				if(CurrentMana < RRmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 			}
 			
@@ -937,25 +928,25 @@ public class Combination {
 			
 			if(lvl<5) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= RFmana) {
 				if(PlayerFunction.getinstance(p).getMeleemode()==2) {
 					Warning(p);
-					p.sendTitle("",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
+					p.sendTitle(" ",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
 					return;
 				}	
 				Sound(p);
-				p.sendTitle("",blank+RF, 5, 20, 10);
+				p.sendTitle(" ",blank+RF, 5, 20, 10);
 				energyoverload(p, combo);
 				Blaster.getinstance().rifle(p, RFmana);
 			}
 			else {
 				if(CurrentMana < RFmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -964,20 +955,20 @@ public class Combination {
 			
 			if(lvl<15) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FRmana) {
 				Sound(p);
-				p.sendTitle("",blank+FR, 5, 20, 10);
+				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
 				Blaster.getinstance().energytrans(p, CurrentMana);
 			}
 			else {
 				if(CurrentMana < FRmana) {
 					Warning(p);
-					p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 				}
 			}
 
@@ -986,19 +977,19 @@ public class Combination {
 			
 			if(lvl<20) {
 				Warning(p);
-				p.sendTitle("",blank+levelrequire, 5, 20, 10);
+				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
 				return;
 			}
 			
 			if(CurrentMana >= FFmana) {
 				Sound(p);
-				p.sendTitle("",blank+FF, 5, 20, 10);
+				p.sendTitle(" ",blank+FF, 5, 20, 10);
 				energyoverload(p, combo);
 				Blaster.getinstance().magneticfield(p, FFmana);
 			}
 			else {
 				Warning(p);
-				p.sendTitle("",blank+manaexhaustion, 5, 20, 10);
+				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
 			}
 
 		}

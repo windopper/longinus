@@ -1,40 +1,21 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftGuardian;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Guardian;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import DynamicData.*;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import net.minecraft.server.v1_16_R3.DataWatcher;
-import net.minecraft.server.v1_16_R3.DataWatcherRegistry;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityMetadata;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class ByV {
 	
@@ -132,7 +113,10 @@ public class ByV {
 					if(i>20 && p.isOnGround()) {
 						
 						p.setFallDistance(3);
-						
+
+						DataWatcher dataWatcher = ((CraftPlayer) p).getHandle().getDataWatcher();
+						dataWatcher.set(new DataWatcherObject<>(8, DataWatcherRegistry.a), (byte) 0x00);
+
 						Location ploc = p.getLocation();
 						p.getWorld().playSound(ploc, Sound.BLOCK_GRASS_BREAK, 2, 1);
 						p.getWorld().playSound(ploc, Sound.ENTITY_IRON_GOLEM_DEATH, 2, 2);
@@ -383,40 +367,13 @@ public class ByV {
 	
 	
 	public void riptidepacket(Player player, int tick) {
-		
-		
-		EntityLiving entity = ((CraftPlayer) player).getHandle();
-		entity.r(tick);
-		
-	}
-	
-	public void laserpacket(Player player, Player target) {
-		
-		Guardian g = (Guardian) player.getWorld().spawnEntity(player.getLocation(), EntityType.GUARDIAN);
-		g.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 2000, 100), true);
-		
-		new BukkitRunnable() {
-			
-			int i=0;
-			
-			@Override
-			public void run() {
-				DataWatcher dw = ((CraftGuardian) g).getHandle().getDataWatcher();
-				dw.set(DataWatcherRegistry.b.a(16), target.getEntityId());
-				for(Player p : Bukkit.getOnlinePlayers()) {
-					PlayerConnection conn = ((CraftPlayer) p).getHandle().playerConnection;
-					conn.sendPacket(new PacketPlayOutEntityMetadata(g.getEntityId(), dw, true));
-				}
-				
-				if(i>60) cancel();
-				i++;
-				
-			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-		
+
+		DataWatcher dataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
+		dataWatcher.set(new DataWatcherObject<>(8, DataWatcherRegistry.a), (byte) 0x04);
 
 		
 	}
+
 	
 	public void punchparticle(final Player p, Location cloc) {
 		
