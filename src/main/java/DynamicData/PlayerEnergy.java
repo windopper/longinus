@@ -1,6 +1,6 @@
 package DynamicData;
 
-import UserData.UserManager;
+import PlayerData.UserManager;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

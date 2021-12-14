@@ -2,8 +2,8 @@ package ClassAbility;
 
 import DynamicData.*;
 import QuestClasses.Tutorial;
-import UserData.UserManager;
-import UserData.UserStatManager;
+import PlayerData.UserManager;
+import PlayerData.UserStatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -221,11 +221,11 @@ public class Combination {
 								LivingEntity le = (LivingEntity) e;
 								int dmg = UserManager.getinstance(p).meleedmgcalculate(p, 1);
 								Damage.getinstance().taken(dmg, le, p);
-								EntityStatus.getinstance(le).KnockBack(p, 0.3);
+								EntityStatusManager.getinstance(le).KnockBack(p, 0.3);
 								
 								if(le.getCustomName() != null) {
 									if(le.getCustomName().equals("샌드백")) {
-										if(PlayerHealth.getinstance(p).getCurrentShield()>0) {
+										if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {
 											Damage.getinstance().taken(2000, (LivingEntity) p, p);
 											p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
 											p.playSound(p.getLocation(), "meme.tut6", 5, 1);

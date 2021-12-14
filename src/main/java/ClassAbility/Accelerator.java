@@ -23,8 +23,8 @@ import org.bukkit.util.Vector;
 import DynamicData.Damage;
 import DynamicData.PlayerEnergy;
 import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import DynamicData.PlayerHealthShield;
+import PlayerData.UserManager;
 
 public class Accelerator {
 	
@@ -328,11 +328,11 @@ public class Accelerator {
 		
 		PlayerFunction.getinstance(p).ACPassiveCoolDown = 80;
 		
-		if(PlayerHealth.getinstance(p).getCurrentHealth()+(int)(Health/4) > Health) {
-			PlayerHealth.getinstance(p).setCurrentHealth(Health);
+		if(PlayerHealthShield.getinstance(p).getCurrentHealth()+(int)(Health/4) > Health) {
+			PlayerHealthShield.getinstance(p).setCurrentHealth(Health);
 		}
 		else {
-			PlayerHealth.getinstance(p).setCurrentHealth(PlayerHealth.getinstance(p).getCurrentHealth()+(int)(Health/4));
+			PlayerHealthShield.getinstance(p).setCurrentHealth(PlayerHealthShield.getinstance(p).getCurrentHealth()+(int)(Health/4));
 		}
 		p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 2);
 	}

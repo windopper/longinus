@@ -1,7 +1,5 @@
 package DynamicData;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -9,6 +7,8 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Random;
 
 public class HologramIndicator {
 	
@@ -26,9 +26,6 @@ public class HologramIndicator {
 	
 	
 	public void DamageIndicator(final int r, final LivingEntity e) { // 데미지 뜨게 하기
-		
-				
-
 		
 
 		new BukkitRunnable() {
@@ -58,6 +55,7 @@ public class HologramIndicator {
 					as.setCollidable(false);
 					as.setGravity(false);
 					as.setSmall(true);
+					as.setMarker(true);
 					as.setInvulnerable(true);
 					as.setCustomNameVisible(true);
 					
@@ -81,10 +79,6 @@ public class HologramIndicator {
 	}
 	
 	public void ShieldBroken(final LivingEntity e) { // 데미지 뜨게 하기
-		
-				
-
-		
 
 		new BukkitRunnable() {
 
@@ -116,6 +110,7 @@ public class HologramIndicator {
 					as.setVisible(false);
 					as.setGravity(false);
 					as.setSmall(true);
+					as.setMarker(true);
 					as.setInvulnerable(true);
 					as.setCustomNameVisible(true);
 					

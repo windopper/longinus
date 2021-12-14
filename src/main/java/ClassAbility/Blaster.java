@@ -1,10 +1,10 @@
 package ClassAbility;
 
-import DynamicData.EntityStatus;
+import DynamicData.EntityStatusManager;
 import DynamicData.PlayerEnergy;
 import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import DynamicData.PlayerHealthShield;
+import PlayerData.UserManager;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
@@ -137,7 +137,7 @@ public class Blaster {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		
 		final double recoverrate = mana * 0.05;
-		PlayerHealth.getinstance(p).ShieldAdd((int)(UserManager.getinstance(p).Health * recoverrate));
+		PlayerHealthShield.getinstance(p).ShieldAdd((int)(UserManager.getinstance(p).Health * recoverrate));
 		
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, 2, 0);
 
@@ -212,7 +212,7 @@ public class Blaster {
 	            for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 10, 10, 10)) {
 	            	if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
 	            		LivingEntity le = (LivingEntity) e;
-	            		EntityStatus.getinstance(le).Stun(e, 20);
+	            		EntityStatusManager.getinstance(le).Stun(e, 20);
 	            	}
 	            }
 	            

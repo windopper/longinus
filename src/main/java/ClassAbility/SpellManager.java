@@ -1,13 +1,16 @@
 package ClassAbility;
 
 import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import org.bukkit.*;
+import DynamicData.EntityStatusManager;
+import PlayerData.UserManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import UserData.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -297,13 +300,13 @@ public class SpellManager {
                             RunSounds(SoundType.DestinationSound);
                         }
                         if(StunTick != 0)
-                            EntityStatus.getinstance(e).Stun(player, StunTick);
+                            EntityStatusManager.getinstance(e).Stun(player, StunTick);
 
                         if(BurnTick != 0)
-                            EntityStatus.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
+                            EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
                         if(KnockBackStandard != null)
-                            EntityStatus.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
+                            EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
                         HitEntityList.add(e);
                         Damage.getinstance().taken(dmg, e, player);
@@ -348,13 +351,13 @@ public class SpellManager {
                     RunSounds(SoundType.DestinationSound, CurrentLoc);
 
                     if(StunTick != 0)
-                        EntityStatus.getinstance(e).Stun(player, StunTick);
+                        EntityStatusManager.getinstance(e).Stun(player, StunTick);
 
                     if(KnockBackStandard != null)
-                        EntityStatus.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
+                        EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
                     if(BurnTick != 0)
-                        EntityStatus.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
+                        EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
                     HitEntityList.add(e);
                     Damage.getinstance().taken(dmg, e, player);
@@ -510,7 +513,7 @@ public class SpellManager {
         }
     }
 
-    private int getDamage(MeleeOrSpell meleeorspell) {
+    private Integer getDamage(MeleeOrSpell meleeorspell) {
 
         int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? UserManager.getinstance(player).meleedmgcalculate(player, DamageRate)
                 : UserManager.getinstance(player).spelldmgcalculate(player, DamageRate);

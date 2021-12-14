@@ -1,8 +1,8 @@
 package SpyGlass;
 
 import ClassAbility.entitycheck;
-import DynamicData.EntityHealthManager;
-import Mob.MobManager;
+import DynamicData.EntityManager;
+import Mob.MobListManager;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
@@ -106,9 +106,9 @@ public class SpyGlassManager {
 
                     if(entitycheck.entitycheck(livingEntity) && !(livingEntity instanceof Player)) {
 
-                        String Name = EntityHealthManager.getinstance(livingEntity).getCustomName();
-                        //player.sendTitle(" ", Name, 0, 20, 0);
+                        String Name = EntityManager.getinstance(livingEntity).getCustomName();
                         analyzing(livingEntity);
+
                         return;
                     }
 
@@ -128,17 +128,18 @@ public class SpyGlassManager {
 
         if(analyzingEntityName != null) {
 
-            if(!analyzingEntityName.equals(EntityHealthManager.getinstance(target).getCustomName()))
+            if(!analyzingEntityName.equals(EntityManager.getinstance(target).getCustomName()))
                 analyzingTime = 0;
         }
+        else {
+            analyzingTime = 0;
+        }
 
-        analyzingEntityName = EntityHealthManager.getinstance(target).getCustomName();
+        analyzingEntityName = EntityManager.getinstance(target).getCustomName();
         analyzingEntity = target;
-
 
         bossbar.addPlayer(player);
         bossbar.setVisible(true);
-
 
         if(analyzingTime > 40) {
             bossbar.setProgress(1);
@@ -170,9 +171,9 @@ public class SpyGlassManager {
         File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-        String name = EntityHealthManager.getinstance(target).getCustomName();
+        String name = EntityManager.getinstance(target).getCustomName();
 
-        Arrays.stream(MobManager.MobList.values()).forEach(value -> {
+        Arrays.stream(MobListManager.MobList.values()).forEach(value -> {
             if(value.getName().equals(name)) {
                 int intvalue = config.getInt("Sample."+value.getPlanet()+"."+value.name()+".count");
                 intvalue ++;

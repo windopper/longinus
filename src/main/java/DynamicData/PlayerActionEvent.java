@@ -11,8 +11,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import UserChip.Maingui;
-import UserData.Filter;
+import PlayerChip.Maingui;
+import PlayerData.Filter;
 
 public class PlayerActionEvent implements Listener {
 	
@@ -36,8 +36,6 @@ public class PlayerActionEvent implements Listener {
 				return;
 
 			}
-
-		
 		}
 		else if(filter==2){
 			

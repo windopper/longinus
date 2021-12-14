@@ -1,5 +1,6 @@
 package SpyGlass;
 
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,11 +21,10 @@ public class SpyGlassEvent implements Listener {
 
             if(itemStack == null) return;
             if(itemStack.getType() != Material.SPYGLASS) return;
-            SpyGlassManager.getinstance(player, itemStack);
-
-            if(itemStack.getItemMeta() != null) return;
-            if(itemStack.getItemMeta().getDisplayName() != null) return;
-            if(itemStack.getItemMeta().getLore() != null) return;
+            //SpyGlassManager.getinstance(player, itemStack);
+            if(itemStack.getItemMeta() == null) return;
+            if(!ChatColor.stripColor(itemStack.getItemMeta().getDisplayName()).equals("고성능 스캔망원경")) return;
+            if(itemStack.getItemMeta().getLore() == null) return;
 
             SpyGlassManager.getinstance(player, itemStack);
         }

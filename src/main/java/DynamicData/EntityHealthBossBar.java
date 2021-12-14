@@ -41,14 +41,14 @@ public class EntityHealthBossBar {
 	
 	public void EntityShowHealthBossbar(final Player p, final LivingEntity entity) {
 		
-		int CurrentHealth = EntityHealthManager.getinstance(entity).getCurrentHealth();
-		int MaxHealth = EntityHealthManager.getinstance(entity).getMaxHealth();
+		int CurrentHealth = EntityManager.getinstance(entity).getCurrentHealth();
+		int MaxHealth = EntityManager.getinstance(entity).getMaxHealth();
 
 		BossBar bar;
 		
 		if(entity.getCustomName() == null) return;
 
-		ArmorStand ar = EntityHealthManager.getinstance(entity).getArmorStand();
+		ArmorStand ar = EntityManager.getinstance(entity).getArmorStand();
 		if(ar == null) return;
 		bar = Bukkit.createBossBar(ar.getCustomName() +" §c♥ "+CurrentHealth+"/"+MaxHealth, color, style, flag);
 
@@ -85,7 +85,7 @@ public class EntityHealthBossBar {
 		}
 		else { // 보여주는 게 있으면
 			
-			if(EntityHealthManager.getinstance(BossBarCurrentEntity).getMaxHealth() < MaxHealth) { // 지금 들어온 엔티티가 최대체력이 더 많다면
+			if(EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth() < MaxHealth) { // 지금 들어온 엔티티가 최대체력이 더 많다면
 				
 				BossBarCurrentShow.removePlayer(p);
 				BossBarCurrentShow = bar;
@@ -114,10 +114,10 @@ public class EntityHealthBossBar {
 		
 		if(BossBarCurrentShow != null && BossBarCurrentEntity != null && BossBarShowTime != 0) { // 보스바가 떠 있다면
 			
-			int CurrentHealth = EntityHealthManager.getinstance(BossBarCurrentEntity).getCurrentHealth();
-			int MaxHealth = EntityHealthManager.getinstance(BossBarCurrentEntity).getMaxHealth();
+			int CurrentHealth = EntityManager.getinstance(BossBarCurrentEntity).getCurrentHealth();
+			int MaxHealth = EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth();
 			
-			if(CurrentHealth <= 0 || !EntityHealthManager.checkinstasnce(BossBarCurrentEntity)) { // 엔티티가 없으면
+			if(CurrentHealth <= 0 || !EntityManager.checkinstasnce(BossBarCurrentEntity)) { // 엔티티가 없으면
 				BossBarCurrentShow.removeAll();
 				BossBarCurrentShow = null;
 				BossBarCurrentEntity = null;
@@ -126,7 +126,7 @@ public class EntityHealthBossBar {
 			}
 			
 			
-			BossBarCurrentShow.setTitle(EntityHealthManager.getinstance(BossBarCurrentEntity).getArmorStand().getCustomName()
+			BossBarCurrentShow.setTitle(EntityManager.getinstance(BossBarCurrentEntity).getArmorStand().getCustomName()
 					+" §c♥ "+CurrentHealth+"/"+MaxHealth);
 			
 			if((double)CurrentHealth/(double)MaxHealth>1){

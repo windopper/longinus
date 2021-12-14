@@ -22,7 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import DynamicData.EntityStatus;
+import DynamicData.EntityStatusManager;
 
 public class Tutorial {
 	
@@ -439,7 +439,7 @@ public class Tutorial {
 //		
 //		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatus.getinstance(slime).setCanKnockback(false);
+		EntityStatusManager.getinstance(slime).setCanKnockback(false);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}

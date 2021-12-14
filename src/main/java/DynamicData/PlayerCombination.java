@@ -8,7 +8,7 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import UserData.UserManager;
+import PlayerData.UserManager;
 
 public class PlayerCombination {
 	

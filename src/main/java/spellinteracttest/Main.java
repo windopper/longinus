@@ -1,16 +1,13 @@
 package spellinteracttest;
 
 import ClassAbility.*;
-import CustomEvents.CustomEventListener;
+import CustomEvents.PlayerCustomEventListener;
 import Duel.DuelManager;
 import DynamicData.*;
-import Gliese581cMobs.SummonEntity;
+import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
-import Mob.PacketReader;
-import Mob.RightClickNPC;
-import Mob.ShopNPCManager;
-import Mob.mob;
+import Mob.*;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
@@ -21,14 +18,18 @@ import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
 import ReturnToBase.ReturnMech;
+import Shop.PacketReader;
+import Shop.RightClickNPC;
+import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
-import UserChip.Goldgui;
-import UserChip.GuiEvent;
-import UserChip.UserAlarmManager;
-import UserChip.UserChipEvent;
-import UserData.UserFileManager;
-import UserData.UserManager;
-import UserData.UserStatManager;
+import PlayerChip.Goldgui;
+import PlayerChip.GuiEvent;
+import PlayerChip.UserAlarmManager;
+import PlayerChip.UserChipEvent;
+import PlayerData.UserFileManager;
+import PlayerData.UserManager;
+import PlayerData.UserStatManager;
+import SpyGlass.SpyGlassItemManager;
 import UserStorage.Event;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.syncher.DataWatcher;
@@ -77,15 +78,17 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new GuiEvent(), this);
 		getServer().getPluginManager().registerEvents(UserChipEvent.getinstance(), this);
 		getServer().getPluginManager().registerEvents(new Event(), this);
-		getServer().getPluginManager().registerEvents(new MeleeMotionCancel(), this);
 		getServer().getPluginManager().registerEvents(new PlayerActionEvent(), this);
-		getServer().getPluginManager().registerEvents(new CustomEventListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerCustomEventListener(), this);
 		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
 		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
 		getServer().getPluginManager().registerEvents(new ItemManager(), this);
 		getServer().getPluginManager().registerEvents(new planetSelectEvent(), this);
 		getServer().getPluginManager().registerEvents(new EventProcess(), this);
 		getServer().getPluginManager().registerEvents(new SpyGlassEvent(), this);
+		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
+		getServer().getPluginManager().registerEvents(new MobAttackManager(), this);
+
 
 		getCommand("party").setTabCompleter(new TabCompleter());
 
@@ -111,11 +114,6 @@ public class Main extends JavaPlugin implements Listener {
 				e.printStackTrace();
 			}
 		}
-		
-		
-
-
-
 
 		if(!Bukkit.getOnlinePlayers().isEmpty()) {
 			for(Player player : Bukkit.getOnlinePlayers()) {
@@ -248,7 +246,7 @@ public class Main extends JavaPlugin implements Listener {
 						if(e.getEntity().getCustomName().equals("샌드백")) {  // 화살로 친에가 샌드백이면
 							for(Player p : Bukkit.getOnlinePlayers()) {
 								if(p.getName().equals(name)) {
-									if(PlayerHealth.getinstance(p).getCurrentShield()>0) {  // 플레이어가 1이상의 보호막을 가지고 있으면
+									if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {  // 플레이어가 1이상의 보호막을 가지고 있으면
 										Damage.getinstance().taken(2000, (LivingEntity) p);
 										p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
 										p.playSound(p.getLocation(), "meme.tut6", 5, 1);
@@ -315,7 +313,7 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void respawn(PlayerRespawnEvent e) {
 		Player player = (Player) e.getPlayer();
-		PlayerHealth.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
+		PlayerHealthShield.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
 
 
 	}
@@ -367,10 +365,13 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			switch (args[0]) {
 
-				case "summon" : {
-					player.sendMessage("hi");
-					(new SummonEntity()).summon(player);
-					player.sendMessage("hi");
+				case "summonbr" : {
+					(new Gliese581cEntitySummon()).summonBloodRoot(player);
+					break;
+				}
+
+				case "summonfr" : {
+					(new Gliese581cEntitySummon()).summonFoxRat(player);
 					break;
 				}
 
@@ -468,6 +469,12 @@ public class Main extends JavaPlugin implements Listener {
 
 		
 		switch (args[0]) {
+
+			case "spyglass": {
+				player.getInventory().addItem(((new SpyGlassItemManager()).getSpyGlassItem(SpyGlassItemManager.SpyGlassPlanet.Gliese581c, 1)));
+
+				break;
+			}
 
 			case "glowingon": {
 
@@ -593,11 +600,11 @@ public class Main extends JavaPlugin implements Listener {
 
 
 			case "heal":{
-				PlayerHealth.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
+				PlayerHealthShield.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
 				break;
 			}
 			case "userchip":{
-				player.getInventory().addItem(UserChip.Maingui.getinstance().chipitemget(player));
+				player.getInventory().addItem(PlayerChip.Maingui.getinstance().chipitemget(player));
 				break;
 			}
 
@@ -631,15 +638,15 @@ public class Main extends JavaPlugin implements Listener {
 				for(World world : Bukkit.getWorlds()) {
 					for(LivingEntity entity : world.getLivingEntities()) {
 						if(entity instanceof Player) continue;
-						EntityHealthManager.getinstance(entity).EntityHealthWatcher();
-						EntityStatus.getinstance(entity).BurnsLoop();
+						EntityManager.getinstance(entity).EntityWatcher();
+						EntityStatusManager.getinstance(entity).BurnsLoop();
 					}
 				}
 				
 				
 				for(Player p: Bukkit.getOnlinePlayers()) {
-					PlayerHealth.getinstance(p).HealthWatcher();
-					PlayerHealth.getinstance(p).ShieldRegeneration();
+					PlayerHealthShield.getinstance(p).HealthWatcher();
+					PlayerHealthShield.getinstance(p).ShieldRegeneration();
 					PlayerEnergy.getinstance(p).OverloadCoolDown();
 					PlayerCombination.getinstance(p).KeyBind();
 					PlayerFunction.getinstance(p).MeleeDelayControlLoop();
@@ -668,6 +675,7 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 
+				MobMechManager.getInstance().RunGliese581cMobMech();
 				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
 				PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
@@ -728,7 +736,7 @@ public class Main extends JavaPlugin implements Listener {
 
 		ClassAbility.Combination.getinstance().removemaps(p);
 
-		PlayerHealth.getinstance(p).removeinstance();
+		PlayerHealthShield.getinstance(p).removeinstance();
 		PlayerEnergy.getinstance(p).removeinstance();
 		EntityHealthBossBar.getinstance(p).removeinstance();
 		PlayerCombination.getinstance(p).removeinstance();
@@ -759,7 +767,7 @@ public class Main extends JavaPlugin implements Listener {
 		PacketReader reader = new PacketReader(p);
 		reader.inject(p); // npc 우클릭 감지 등록
 		
-		UserChip.UserAlarmManager.instance().register(p); // 유저 알람 파일 등록
+		PlayerChip.UserAlarmManager.instance().register(p); // 유저 알람 파일 등록
 		
 		UserFileManager.getinstance().UserDetailClassCallData(p, UserFileManager.getinstance().getPreviousClass(p));
 	}

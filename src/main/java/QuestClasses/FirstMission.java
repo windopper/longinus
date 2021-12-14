@@ -6,7 +6,7 @@ import QuestFunctions.QuestFunctions;
 import QuestFunctions.QuestList;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
-import UserData.UserStatManager;
+import PlayerData.UserStatManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;

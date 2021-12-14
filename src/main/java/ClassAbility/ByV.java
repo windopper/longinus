@@ -63,12 +63,12 @@ public class ByV {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence --;
 		
-		PlayerHealth.getinstance(p).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
+		PlayerHealthShield.getinstance(p).HealthAdd(PlayerHealthShield.getinstance(p).getCurrentHealth()/10);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(p.getWorld().getName().equals(player.getWorld().getName())) {
 				if(!entitycheck.duelcheck(player, p) && player != p) {
-					PlayerHealth.getinstance(player).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
+					PlayerHealthShield.getinstance(player).HealthAdd(PlayerHealthShield.getinstance(p).getCurrentHealth()/10);
 				}
 			}
 		}
@@ -130,12 +130,12 @@ public class ByV {
 								Vector etop = evec.subtract(pvec);
 								etop.normalize();
 								etop.multiply(1);
-								if(EntityStatus.getinstance((LivingEntity)e).canKnockback() == true) {
+								if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == true) {
 									
 									e.setVelocity(etop);
 								}
 
-								int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
+								int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 								
 								p.getWorld().playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
@@ -215,7 +215,7 @@ public class ByV {
 						chainparticle(p, i, e);
 						chainvectorzerocc(e);
 						
-						int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+						int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
 						PlayerFunction.getinstance(p).essence++;
@@ -477,7 +477,7 @@ public class ByV {
 					
 					 // 끌고 오기
 					
-					if(EntityStatus.getinstance(target).canKnockback() == false) {
+					if(EntityStatusManager.getinstance(target).canKnockback() == false) {
 
 
 						new BukkitRunnable() {
@@ -617,7 +617,7 @@ public class ByV {
 				BoundingBox box = e.getBoundingBox();
 				double dist = eloc.distance(loc);
 				if(dist<2 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-					int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+					int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 20));
 					Damage.getinstance().taken(dmg, e, p);
 					return true;
@@ -629,7 +629,7 @@ public class ByV {
 	
 	public void chainvectorzerocc(Entity e) {
 		
-		if(EntityStatus.getinstance((LivingEntity)e).canKnockback() == false) return;
+		if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == false) return;
 		
 		new BukkitRunnable() {
 			
