@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import UserData.UserManager;
+import PlayerData.UserManager;
 
 public class PlayerInfoActionBar {
 	
@@ -24,8 +24,8 @@ public class PlayerInfoActionBar {
 
 
 			
-			int CurrentHealth = PlayerHealth.getinstance(player).getCurrentHealth();
-			int CurrentShield = PlayerHealth.getinstance(player).getCurrentShield();
+			int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
+			int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
 			int MaxShield = UserManager.getinstance(player).ShieldRaw;
 			int MaxHealth = UserManager.getinstance(player).Health;
 			String CurrentClass = UserManager.getinstance(player).CurrentClass;

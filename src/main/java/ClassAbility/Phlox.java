@@ -1,29 +1,16 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ShulkerBullet;
+import DynamicData.*;
+import PlayerData.UserManager;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Phlox {
 
@@ -155,7 +142,7 @@ public class Phlox {
 					pl.spawnParticle(Particle.HEART, head, 1, 0, 0, 0, 0, null);
 				}
 				
-				PlayerHealth.getinstance(p).HealthAdd(UserManager.getinstance(p).Health/20);
+				PlayerHealthShield.getinstance(p).HealthAdd(UserManager.getinstance(p).Health/20);
 				p.getWorld().playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1, 1);
 				if(i==3) cancel();
 				i++;
@@ -197,7 +184,7 @@ public class Phlox {
 								}
 								
 								
-								PlayerHealth.getinstance(pl).HealthAdd(UserManager.getinstance(pl).Health/20);
+								PlayerHealthShield.getinstance(pl).HealthAdd(UserManager.getinstance(pl).Health/20);
 								
 								if(i==3) cancel();
 								i++;
@@ -246,7 +233,11 @@ public class Phlox {
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
 		for(Entity e : p.getWorld().getNearbyEntities(ploc, 3, 3, 3)) {
-		
+
+			if(e instanceof LivingEntity) {
+				if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == false) continue;
+			}
+
 			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && e != p) {
 				
 				Location eloc = e.getLocation();	
@@ -298,7 +289,7 @@ public class Phlox {
 		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5)) {
 			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && e != p) {
 				int dmg = UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
-				EntityStatus.getinstance((LivingEntity)e).Stun(p, 30);
+				EntityStatusManager.getinstance((LivingEntity)e).Stun(p, 30);
 				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 			}
 		}

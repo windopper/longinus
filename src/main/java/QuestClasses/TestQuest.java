@@ -3,7 +3,7 @@ package QuestClasses;
 import QuestFunctions.QuestList;
 import QuestFunctions.UserQuestManager;
 import org.bukkit.entity.Player;
-import UserData.UserStatManager;
+import PlayerData.UserStatManager;
 
 import java.util.HashMap;
 

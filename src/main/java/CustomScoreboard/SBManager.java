@@ -2,8 +2,7 @@ package CustomScoreboard;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.*;
 
 import java.util.HashMap;
 
@@ -13,6 +12,7 @@ public class SBManager {
 
     private ScoreboardManager scoreboardManager;
     private Scoreboard scoreboard;
+    private Objective objective;
 
     private Player player;
 
@@ -20,6 +20,9 @@ public class SBManager {
         this.player = player;
         scoreboardManager = Bukkit.getScoreboardManager();
         scoreboard = scoreboardManager.getNewScoreboard();
+        objective = scoreboard.registerNewObjective("§e"+player.getName(), "dummy", "§e"+player.getName(), RenderType.INTEGER);
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
     }
 
     public static SBManager getInstance(Player player) {

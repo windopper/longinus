@@ -2,8 +2,8 @@ package ClassAbility;
 
 import DynamicData.PlayerEnergy;
 import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import DynamicData.PlayerHealthShield;
+import PlayerData.UserManager;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -181,7 +181,7 @@ public class Aether {
 		
 		summonCircle4(p.getLocation(), 1);
 		
-		PlayerHealth.getinstance(p).ShieldAdd(add);
+		PlayerHealthShield.getinstance(p).ShieldAdd(add);
 		
 		
 		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
@@ -196,7 +196,7 @@ public class Aether {
 				Player pla = (Player) pl;
 				add = (int)((double)UserManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
 				
-				PlayerHealth.getinstance(pla).ShieldAdd(add);
+				PlayerHealthShield.getinstance(pla).ShieldAdd(add);
 				
 				pl.sendMessage("§d"+p.getName()+" §d§5§l🛡§l§5§r §5"+add+"§5§d 부여§d");
 				
@@ -304,7 +304,7 @@ public class Aether {
 		Spell.setEntityPassable(true);
 		Spell.setDamageRate(1);
 		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 0);
-		Spell.setmultiplyDamage((double)PlayerHealth.getinstance(p).getCurrentShield() / (double)UserManager.getinstance(p).ShieldRaw);
+		Spell.setmultiplyDamage((double) PlayerHealthShield.getinstance(p).getCurrentShield() / (double)UserManager.getinstance(p).ShieldRaw);
 		
 		
 		
@@ -349,8 +349,8 @@ public class Aether {
 					Location newloc = new Location(p.getWorld(), xx, yy, zz);
 					p.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation().add(0,1,0), 500, 1, 1, 1, 0, newloc.getBlock().getType().createBlockData());
 
-					PlayerHealth.getinstance(p).setCurrentShield(PlayerHealth.getinstance(p).getCurrentShield() * 95 /100);
-					PlayerHealth.getinstance(p).setShieldRegenerateStop();
+					PlayerHealthShield.getinstance(p).setCurrentShield(PlayerHealthShield.getinstance(p).getCurrentShield() * 95 /100);
+					PlayerHealthShield.getinstance(p).setShieldRegenerateStop();
 
 					cancel();
 

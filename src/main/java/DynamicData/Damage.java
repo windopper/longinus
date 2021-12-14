@@ -1,7 +1,9 @@
 package DynamicData;
 
-import CustomEvents.PlayerDeathEvent;
+import ClassAbility.Aether;
 import CustomEvents.PlayerTakeDamageEvent;
+import Mob.mobhitsound;
+import PlayerData.UserManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,11 +12,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-
-import ClassAbility.Aether;
-import ClassAbility.entitycheck;
-import Mob.mobhitsound;
-import UserData.UserManager;
+import org.bukkit.event.entity.EntityDamageEvent;
 import spellinteracttest.Main;
 
 public class Damage {
@@ -36,8 +34,7 @@ public class Damage {
 			Player user = (Player) takenP;
 			
 			//플레이어 체력 & 쉴드 객체 가져오기
-			PlayerHealth PH = PlayerHealth.getinstance(user);
-
+			PlayerHealthShield PH = PlayerHealthShield.getinstance(user);
 			// 방어도 계산
 			final int dmg = (int)(damage * UserManager.getinstance(user).defcalculate(user));
 
@@ -54,6 +51,8 @@ public class Damage {
 					
 					user.getWorld().spawnParticle(Particle.BLOCK_CRACK, user.getLocation(), 50, 0.5, 0.5, 0.5, Material.PURPLE_GLAZED_TERRACOTTA.createBlockData());
 					HologramIndicator.getinstance().ShieldBroken(user);
+					PlayerEffectEvent.getInstance().ShieldBrokenEffect(user);
+
 				}
 				else {
 					PH.setCurrentShield(PH.getCurrentShield()-dmg);
@@ -93,12 +92,14 @@ public class Damage {
 					return;
 				}
 			}
-			
+
+			takenP.setLastDamageCause(new EntityDamageEvent(damager, EntityDamageEvent.DamageCause.ENTITY_ATTACK ,0.1));
+
 			takenP.setMaximumNoDamageTicks(1);
 			takenP.setNoDamageTicks(0);	
 			takenP.damage(0.1);
 			
-			EntityHealthManager EH = EntityHealthManager.getinstance(takenP);
+			EntityManager EH = EntityManager.getinstance(takenP);
 			
 			
 			if(EH.getCurrentHealth()-damage < 0) { // 바이V 정수 수집
@@ -115,7 +116,7 @@ public class Damage {
 			EH.setCurrentHealth(EH.getCurrentHealth()-damage);
 			
 			if(damager instanceof Player) {
-				EH.EntityHealthWatcher();
+				EH.EntityWatcher();
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, takenP);
 			}
 			
@@ -135,7 +136,7 @@ public class Damage {
 			Player user = (Player) takenP;
 			
 			//플레이어 체력 & 쉴드 객체 가져오기
-			PlayerHealth PH = PlayerHealth.getinstance(user);
+			PlayerHealthShield PH = PlayerHealthShield.getinstance(user);
 			
 			
 			user.damage(0.1);
@@ -204,7 +205,7 @@ public class Damage {
 			
 			takenP.damage(0.1);
 			
-			EntityHealthManager EH = EntityHealthManager.getinstance(takenP);
+			EntityManager EH = EntityManager.getinstance(takenP);
 			
 			EH.setCurrentHealth(EH.getCurrentHealth()-dmg);
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);

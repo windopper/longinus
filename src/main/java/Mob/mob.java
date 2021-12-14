@@ -22,7 +22,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
 import QuestClasses.Tutorial;
-import DynamicData.EntityStatus;
+import DynamicData.EntityStatusManager;
 
 public class mob {
 	
@@ -121,7 +121,7 @@ public class mob {
 		
 		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatus.getinstance(skeleton).setCanKnockback(false);
+		EntityStatusManager.getinstance(skeleton).setCanKnockback(false);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}
@@ -174,7 +174,7 @@ public class mob {
 		
 		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatus.getinstance(skeleton).setCanKnockback(false);
+		EntityStatusManager.getinstance(skeleton).setCanKnockback(false);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}

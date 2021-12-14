@@ -1,7 +1,7 @@
 package Party;
 
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import DynamicData.PlayerHealthShield;
+import PlayerData.UserManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
@@ -212,6 +212,7 @@ public class PartyManager {
                 deleteSideBar(player);
                 PM.team.removeEntry(player.getName());
                 partyInstance.remove(player);
+
                 SendMessageToMembers(PM, "§5>> §6"+player.getName()+"§e님이 파티에서 떠났습니다");
                 player.sendMessage("§5>> §e당신은 파티에서 떠났습니다");
                 return;
@@ -222,6 +223,7 @@ public class PartyManager {
             PM.team.removeEntry(player.getName());
             ChangeMaster(player, PM.members.get(0));
             partyInstance.remove(player);
+
             SendMessageToMembers(PM, "§5>> §6"+player.getName()+"§e님이 파티에서 떠났습니다");
             player.sendMessage("§5>> §e당신은 파티에서 떠났습니다");
 
@@ -441,8 +443,8 @@ public class PartyManager {
     private String getObjectiveString(Player player) {
 
         int MaxHealth = UserManager.getinstance(player).Health;
-        int CurrentHealth = PlayerHealth.getinstance(player).getCurrentHealth();
-        int CurrentShield = PlayerHealth.getinstance(player).getCurrentShield();
+        int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
+        int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
 
         String Shield = "§5§l[🛡]";
         if(CurrentShield == 0) Shield = "§8§l[🛡]";

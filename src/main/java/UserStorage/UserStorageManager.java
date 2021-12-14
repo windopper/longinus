@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import UserData.UserFileManager;
+import PlayerData.UserFileManager;
 
 public class UserStorageManager {
 	

@@ -1,8 +1,8 @@
 package QuestFunctions;
 
-import Mob.RightClickNPC;
+import Shop.RightClickNPC;
 import QuestClasses.FirstMission;
-import UserData.UserManager;
+import PlayerData.UserManager;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
