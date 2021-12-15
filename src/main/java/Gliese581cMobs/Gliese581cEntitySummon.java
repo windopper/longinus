@@ -29,8 +29,18 @@ public class Gliese581cEntitySummon implements Listener {
             Parasite parasite = new Parasite(world, loc);
         }
 
+    }
 
+    public void summonGuard(Player player) {
+        org.bukkit.World world = player.getWorld();
+        Location loc = player.getLocation();
+//        MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
+//        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+//        GameProfile profile = new GameProfile(UUID.randomUUID(), "Guard");
+        //Defender defender = new Defender(nmsServer, nmsWorld, profile);
+        //defender.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
+        Defender.createNPC(player, world, loc);
     }
 
     public void summonBloodRoot(Player player) {
@@ -48,6 +58,14 @@ public class Gliese581cEntitySummon implements Listener {
         //MouseFoot mouseFoot = new MouseFoot(nmsworld);
         FoxRat foxRat = new FoxRat(EntityTypes.E, nmsworld, player);
         foxRat.setPosition(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public void summonHiddenOasis(Player player) {
+        Location loc = player.getEyeLocation();
+        World nmsworld = ((CraftWorld) loc.getWorld()).getHandle();
+        //MouseFoot mouseFoot = new MouseFoot(nmsworld);
+        HiddenOasis hiddenOasis = new HiddenOasis(EntityTypes.be, nmsworld);
+        hiddenOasis.setPosition(loc.getX(), loc.getY(), loc.getZ());
     }
 
 

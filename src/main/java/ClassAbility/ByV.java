@@ -212,9 +212,9 @@ public class ByV {
 					double dist = eloc.distance(ploc);
 					if(dist<1.2 || box.contains(ploc.getX(), ploc.getY(), ploc.getZ())) {
 						p.playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+
 						chainparticle(p, i, e);
 						chainvectorzerocc(e);
-						
 						int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
@@ -283,16 +283,6 @@ public class ByV {
 			e.setVelocity(new Vector(0, 1, 0));
 		}
 		
-//		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
-//			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
-//				p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2, 0);
-//				p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-//				int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, rate);
-//				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
-//				e.setVelocity(new Vector(0, 1, 0));
-//			}
-//		}
-		
 	    for (int d = 0; d <= 45; d += 1) {
 	        Location particleLoc = new Location(p.getLocation().getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
 	        particleLoc.setX(p.getLocation().getX() + Math.cos(d) * 3);
@@ -304,21 +294,6 @@ public class ByV {
 		
 		
 	}
-	
-//	public void ByVPassive() {
-//
-//		for(Player p : Bukkit.getOnlinePlayers()) {
-//
-//			if(userdata.UserManager.getinstance(p).CurrentClass.equals("바이V")) {
-//				if(!essence.containsKey(p)) essence.put(p, 0);
-//			}
-//			else {
-//				essence.remove(p);
-//			}
-//
-//		}
-//
-//	}
 	
 	public void takedownparticles(Player p) {
 		
@@ -425,20 +400,14 @@ public class ByV {
 		e.setInvulnerable(true);
 		e.setInvisible(true);
 		e.setGravity(false);
-		
-		
-		
-		
+
 		new BukkitRunnable() {
 
 			int j=0;
 			
 			@Override
 			public void run() {
-				
-				
-				
-				
+
 				Location ploc = e.getEyeLocation();
 				Vector pvec = ploc.getDirection();
 				pvec.normalize();	
@@ -448,13 +417,10 @@ public class ByV {
 				if(j<5) { // 파티클
 					
 					for(int i=0; i<=k; i++) {
-						
 						chainpiece1(ploc, pvecclone, i%18, j+1);
 						ploc.add(pvec);
-						
 					}
-				}	
-				
+				}
 				if(j>6) {
 					
 					p.getWorld().playSound(ploc, Sound.ENTITY_WITHER_DEATH, 1f, 2f);
@@ -474,11 +440,8 @@ public class ByV {
 								
 					}
 					
-					
 					 // 끌고 오기
-					
 					if(EntityStatusManager.getinstance(target).canKnockback() == false) {
-
 
 						new BukkitRunnable() {
 
@@ -494,7 +457,7 @@ public class ByV {
 
 								ppee.multiply(1.5);
 
-								target.setVelocity(ppee);
+								p.setVelocity(ppee);
 
 								if(p.getWorld().getName().equals(target.getWorld().getName())) {
 									if(p.getLocation().distance(target.getLocation())<3) {
@@ -502,7 +465,6 @@ public class ByV {
 										cancel();
 									}
 								}
-
 								if(i>60) cancel();
 								i++;
 							}
@@ -515,7 +477,7 @@ public class ByV {
 						new BukkitRunnable() {
 							
 							int i=0;
-							
+
 							@Override
 							public void run() {
 								

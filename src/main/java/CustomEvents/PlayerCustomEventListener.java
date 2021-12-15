@@ -54,7 +54,6 @@ public class PlayerCustomEventListener implements Listener {
             Aether.getinstance().DmgtoImpulse(damage, target, target); // 아이테르 패시브 활성화를 위해 받은 피해를 저장
         }
 
-
         for(Entity player : target.getNearbyEntities(10, 10, 10)) { // 데미지를 받은 플레이어 근처에 "아이테르"가 있으면 impulse 에너지를 부여
             if(player instanceof Player) {
                 Player pl = (Player) player;

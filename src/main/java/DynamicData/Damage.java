@@ -59,7 +59,6 @@ public class Damage {
 				}
 				
 			}
-
 			// 쉴드가 없을때
 			else {
 				if(PH.getCurrentHealth() - dmg>0) {
@@ -70,8 +69,6 @@ public class Damage {
 				}
 
 			}
-
-
 			HologramIndicator.getinstance().DamageIndicator(dmg, takenP);
 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
@@ -83,7 +80,6 @@ public class Damage {
 
 			return;
 		}
-		
 		else if(!(takenP instanceof ArmorStand) && (takenP instanceof LivingEntity)) {
 			
 			if(takenP.getCustomName() != null) { // 튜토리얼 
@@ -94,13 +90,11 @@ public class Damage {
 			}
 
 			takenP.setLastDamageCause(new EntityDamageEvent(damager, EntityDamageEvent.DamageCause.ENTITY_ATTACK ,0.1));
-
 			takenP.setMaximumNoDamageTicks(1);
 			takenP.setNoDamageTicks(0);	
 			takenP.damage(0.1);
 			
 			EntityManager EH = EntityManager.getinstance(takenP);
-			
 			
 			if(EH.getCurrentHealth()-damage < 0) { // 바이V 정수 수집
 				for(Player p : Bukkit.getOnlinePlayers()) {
@@ -113,7 +107,7 @@ public class Damage {
 				}
 			}
 			
-			EH.setCurrentHealth(EH.getCurrentHealth()-damage);
+			EH.setDamageValue(damage);
 			
 			if(damager instanceof Player) {
 				EH.EntityWatcher();
