@@ -136,11 +136,8 @@ public class HologramIndicator {
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
-	
-	
 
-	
-	public void HealIndicator(final int r, final Player p) {
+	public void HealIndicator(final int r, final Location loc) {
 		
 		new BukkitRunnable() {
 
@@ -152,8 +149,7 @@ public class HologramIndicator {
 			public void run() {
 				
 				if(time == 0) {
-					
-					Location loc = p.getLocation();
+
 					Random random = new Random();
 					double x = random.nextDouble() *2;
 					double y = random.nextDouble() *2;
@@ -173,9 +169,6 @@ public class HologramIndicator {
 					as.setCustomNameVisible(true);
 					
 				}
-				
-					
-
 					
 					if(time > 20) {
 						

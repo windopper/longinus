@@ -3,11 +3,7 @@ package SpyGlass;
 import ClassAbility.entitycheck;
 import DynamicData.EntityManager;
 import Mob.MobListManager;
-import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
-import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.network.syncher.DataWatcherRegistry;
-import net.minecraft.server.network.PlayerConnection;
+import Packets.SendEntityPacket;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.boss.BarColor;
@@ -16,11 +12,11 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -33,7 +29,7 @@ import java.util.List;
 public class SpyGlassManager {
 
     private static final HashMap<Player, SpyGlassManager> instance = new HashMap<>();
-    private final List<LivingEntity> glowingEntity = new ArrayList<>();
+    private final List<Entity> glowingEntity = new ArrayList<>();
 
     private Player player;
     private boolean isOnZoom = false;
@@ -42,9 +38,9 @@ public class SpyGlassManager {
     private double MaxDistance = 20;
     private int analyzingTimeMax = 40;
 
-
     private int analyzingTime = 0;
     private boolean GlowTerm = false;
+
     private final BossBar bossbar = Bukkit.createBossBar(" ", BarColor.YELLOW, BarStyle.SEGMENTED_10, BarFlag.PLAY_BOSS_MUSIC);
     private String analyzingEntityName;
     private LivingEntity analyzingEntity;
@@ -67,12 +63,20 @@ public class SpyGlassManager {
 
         unregisterGlowEntity();
         instance.remove(player);
+        bossbar.removePlayer(player);
         bossbar.removeAll();
     }
 
     public static void watchSpyGlassEnable() {
 
+        SpyGlassManager safedelete = null;
+
         for(SpyGlassManager spyGlass : instance.values()) {
+
+            if(safedelete != null) {
+                safedelete.removeinstance();
+                safedelete = null;
+            }
 
             Player player = spyGlass.player;
             if(player.isHandRaised()) {
@@ -80,10 +84,16 @@ public class SpyGlassManager {
                 spyGlass.observeEntity();
             }
             else {
-                spyGlass.removeinstance();
+                safedelete = spyGlass;
             }
 
         }
+
+        if(safedelete != null) {
+            safedelete.removeinstance();
+            safedelete = null;
+        }
+
     }
 
     public void observeEntity() {
@@ -152,13 +162,29 @@ public class SpyGlassManager {
             bossbar.setTitle("§5 >> §r"+analyzingEntityName+"§d 분석 중.. §5 <<");
         }
 
-        DataWatcher dataWatcher =((CraftEntity) target).getHandle().getDataWatcher();
-        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-        PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
-        conn.sendPacket(new PacketPlayOutEntityMetadata(target.getEntityId(), dataWatcher, true));
 
-        glowingEntity.add(target);
+        // 투명화 상태면 wrapper한 몹 보여주기
+        if(target.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
 
+            // wrapper한 몹이 없으면 원래 몹 발광
+            if(EntityManager.getinstance(target).getDisguises() == null) {
+                SendEntityPacket.MaintainOriginOne((Entity) target, player, (byte) 0x40);
+                glowingEntity.add(target);
+            }
+            else {
+                for(Entity disguise : EntityManager.getinstance(target).getDisguises()) {
+                    SendEntityPacket.MaintainOriginOne(disguise, player, (byte) 0x40);
+                    glowingEntity.add(disguise);
+                }
+            }
+        }
+        else {
+            SendEntityPacket.MaintainOriginOne((Entity) target, player, (byte) 0x40);
+            glowingEntity.add(target);
+        }
+
+
+        // 분석 시간 증가
         analyzingTime ++;
 
     }
@@ -179,8 +205,6 @@ public class SpyGlassManager {
                 intvalue ++;
 
                 checkHadAnalyzed(intvalue, value.name());
-
-
 
                 config.set("Sample."+value.getPlanet()+"."+value.name()+".count", intvalue);
             }
@@ -203,15 +227,9 @@ public class SpyGlassManager {
 
     }
 
-
-
-
     public void unregisterGlowEntity() {
-        for(LivingEntity LE : glowingEntity) {
-            DataWatcher dataWatcher =((CraftEntity) LE).getHandle().getDataWatcher();
-            dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x00);
-            PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
-            conn.sendPacket(new PacketPlayOutEntityMetadata(LE.getEntityId(), dataWatcher, true));
+        for(Entity E : glowingEntity) {
+            SendEntityPacket.MaintainOriginOne((Entity) E, player, (byte) 0x00);
         }
     }
 

@@ -189,12 +189,12 @@ public class PlayerHealthShield {
 			if(CurrentHealth + addhealth > UserManager.getinstance(p).Health) {
 				CurrentHealth = UserManager.getinstance(p).Health;
 				
-				HologramIndicator.getinstance().HealIndicator(addhealth, p);
+				HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
 				return;
 			}
 			
 			CurrentHealth += addhealth;
-			HologramIndicator.getinstance().HealIndicator(addhealth, p);
+			HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
 		}
 	}
 	

@@ -1,27 +1,24 @@
 package spellinteracttest;
 
-import ClassAbility.*;
+import ClassAbility.Accelerator;
+import ClassAbility.Blaster;
+import ClassAbility.ByV;
+import ClassAbility.Phlox;
 import CustomEvents.PlayerCustomEventListener;
 import Duel.DuelManager;
 import DynamicData.*;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
-import Mob.*;
+import Mob.MobAttackManager;
+import Mob.MobMechManager;
+import Mob.mob;
+import PacketListener.PacketListener;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
 import PlanetSelect.planetDetect;
 import PlanetSelect.planetSelectEvent;
-import QuestClasses.Tutorial;
-import QuestFunctions.LeavingWhileQuestAndJoinAgain;
-import QuestFunctions.QuestNPCManager;
-import QuestFunctions.UserQuestManager;
-import ReturnToBase.ReturnMech;
-import Shop.PacketReader;
-import Shop.RightClickNPC;
-import Shop.ShopNPCManager;
-import SpyGlass.SpyGlassEvent;
 import PlayerChip.Goldgui;
 import PlayerChip.GuiEvent;
 import PlayerChip.UserAlarmManager;
@@ -29,6 +26,15 @@ import PlayerChip.UserChipEvent;
 import PlayerData.UserFileManager;
 import PlayerData.UserManager;
 import PlayerData.UserStatManager;
+import QuestClasses.Tutorial;
+import QuestFunctions.LeavingWhileQuestAndJoinAgain;
+import QuestFunctions.QuestNPCManager;
+import QuestFunctions.UserQuestManager;
+import ReturnToBase.ReturnMech;
+import PacketListener.PacketReader;
+import Shop.RightClickNPC;
+import Shop.ShopNPCManager;
+import SpyGlass.SpyGlassEvent;
 import SpyGlass.SpyGlassItemManager;
 import UserStorage.Event;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
@@ -88,6 +94,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new SpyGlassEvent(), this);
 		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
 		getServer().getPluginManager().registerEvents(new MobAttackManager(), this);
+		getServer().getPluginManager().registerEvents(new PacketListener(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -178,6 +185,11 @@ public class Main extends JavaPlugin implements Listener {
 	public void slimesplitevent(SlimeSplitEvent e) {
 		e.setCancelled(true);
 	}
+
+//	@EventHandler
+//	public void packetlistnere(PacketPlayOutWorldEvent event) {
+//		Location e = event.e().
+//	}
 	
 	@EventHandler
 	public void fallingblock(EntityChangeBlockEvent e) {
@@ -365,16 +377,6 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			switch (args[0]) {
 
-				case "summonbr" : {
-					(new Gliese581cEntitySummon()).summonBloodRoot(player);
-					break;
-				}
-
-				case "summonfr" : {
-					(new Gliese581cEntitySummon()).summonFoxRat(player);
-					break;
-				}
-
 				case "create": {
 					PartyManager.getinstance().createParty(player);
 					break;
@@ -469,6 +471,26 @@ public class Main extends JavaPlugin implements Listener {
 
 		
 		switch (args[0]) {
+
+			case "summonbr" : {
+				(new Gliese581cEntitySummon()).summonBloodRoot(player);
+				break;
+			}
+
+			case "summonfr" : {
+				(new Gliese581cEntitySummon()).summonFoxRat(player);
+				break;
+			}
+
+			case "summonho" : {
+				(new Gliese581cEntitySummon()).summonHiddenOasis(player);
+				break;
+			}
+
+			case "summond" : {
+				(new Gliese581cEntitySummon()).summonGuard(player);
+				break;
+			}
 
 			case "spyglass": {
 				player.getInventory().addItem(((new SpyGlassItemManager()).getSpyGlassItem(SpyGlassItemManager.SpyGlassPlanet.Gliese581c, 1)));
@@ -642,8 +664,7 @@ public class Main extends JavaPlugin implements Listener {
 						EntityStatusManager.getinstance(entity).BurnsLoop();
 					}
 				}
-				
-				
+
 				for(Player p: Bukkit.getOnlinePlayers()) {
 					PlayerHealthShield.getinstance(p).HealthWatcher();
 					PlayerHealthShield.getinstance(p).ShieldRegeneration();
@@ -679,7 +700,6 @@ public class Main extends JavaPlugin implements Listener {
 				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
 				PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
-
 
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"),0, 1);
@@ -759,7 +779,7 @@ public class Main extends JavaPlugin implements Listener {
 		leavingwhilequestandjoinagain.restore(p); // 튜토리얼 도중 포기 감지
 
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			p.setResourcePack("https://www.dropbox.com/s/yavjepjt7q273mq/%EC%84%9C%EB%B2%84%ED%85%8D%EC%8A%A4%EC%B3%90.zip?dl=1");
+			//p.setResourcePack("https://www.dropbox.com/s/yavjepjt7q273mq/%EC%84%9C%EB%B2%84%ED%85%8D%EC%8A%A4%EC%B3%90.zip?dl=1");
 			ShopNPCManager.getinstance().addJoinPacket(p);
 			QuestNPCManager.getinstance().addJoinPacket(p);
 		}, 40); // npc 소환

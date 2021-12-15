@@ -38,18 +38,10 @@ public class MobMechManager {
 
             if(mobList.equals(MobListManager.MobList.블러드루트) && ehms.get(entity).getPatterntime() % 20 == 0) {
 
-                Player target = GetNearestPlayerFromEntity(entity, 10);
+                Player target = GetNearestPlayerFromEntity(entity, 15);
                 if(target == null) continue;
                 BloodRoot.BloodRootSkill1(entity, target);
-
             }
-
-
-
-
-
-
-
         }
         time++;
     }
@@ -84,7 +76,7 @@ public class MobMechManager {
         double nearestdist = distance;
         Player nearestplayer = null;
 
-        for(Entity target : entity.getWorld().getNearbyEntities(location, distance, 2, distance)) {
+        for(Entity target : entity.getWorld().getNearbyEntities(location, distance, 5, distance)) {
             if(target instanceof Player) {
                 Player targetPlayer = (Player) target;
                 if(targetPlayer.getGameMode().equals(GameMode.ADVENTURE)) {

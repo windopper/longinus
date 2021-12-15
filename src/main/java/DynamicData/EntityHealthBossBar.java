@@ -1,7 +1,5 @@
 package DynamicData;
 
-import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
@@ -10,6 +8,8 @@ import org.bukkit.boss.BossBar;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+
+import java.util.HashMap;
 
 public class EntityHealthBossBar {
 	
@@ -48,26 +48,17 @@ public class EntityHealthBossBar {
 		
 		if(entity.getCustomName() == null) return;
 
-		ArmorStand ar = EntityManager.getinstance(entity).getArmorStand();
+		ArmorStand ar = EntityManager.getinstance(entity).getNameArmorStand();
 		if(ar == null) return;
-		bar = Bukkit.createBossBar(ar.getCustomName() +" §c♥ "+CurrentHealth+"/"+MaxHealth, color, style, flag);
+		bar = Bukkit.createBossBar(EntityManager.getinstance(entity).getCustomName() +" §c♥ "+CurrentHealth+"/"+MaxHealth, color, style, flag);
 
-//		if(EntityHealth.getinstance(entity).getArmorStand() != null) {
-//			ArmorStand ar = EntityHealth.getinstance(entity).getArmorStand();
-//			bar = Bukkit.createBossBar(ar.getCustomName() +" §c♥ "+CurrentHealth+"/"+MaxHealth, color, style, flag);
-//		}
-//		else {
-//			bar = Bukkit.createBossBar(entity.getCustomName() +" §c♥ "+CurrentHealth+"/"+MaxHealth, color, style, flag);
-//		}
 		if((double)CurrentHealth /(double)MaxHealth >= 0 && (double)CurrentHealth /(double)MaxHealth <= 1) {
 			bar.setProgress((double)CurrentHealth /(double)MaxHealth);
 		}
 		else if((double)CurrentHealth /(double)MaxHealth >= 1){
 			bar.setProgress(1);
 		}
-		
-		
-		
+
 		if(BossBarCurrentShow == null || BossBarShowTime == 0 || BossBarCurrentEntity == null) { // 현재 보여주는게 없으면
 
 
@@ -126,7 +117,7 @@ public class EntityHealthBossBar {
 			}
 			
 			
-			BossBarCurrentShow.setTitle(EntityManager.getinstance(BossBarCurrentEntity).getArmorStand().getCustomName()
+			BossBarCurrentShow.setTitle(EntityManager.getinstance(BossBarCurrentEntity).getCustomName()
 					+" §c♥ "+CurrentHealth+"/"+MaxHealth);
 			
 			if((double)CurrentHealth/(double)MaxHealth>1){

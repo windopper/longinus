@@ -1,6 +1,7 @@
-package Shop;
+package PacketListener;
 
 import QuestFunctions.QuestNPCManager;
+import Shop.RightClickNPC;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -44,6 +45,8 @@ public class PacketReader {
 			}
 
 		});
+
+
 	}
 	
 	public void uninject(Player player) {
@@ -66,17 +69,7 @@ public class PacketReader {
 				}
 			}, 0);
 
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
-				@Override
-				public void run() {
-					Bukkit.getPluginManager().callEvent(new RightClickNPC(player, ShopNPCManager.getNPCID(entityID)));
-				}
-			}, 0);
-
-
 		}
-
-
 	}
 	
 	private Object getValue(Object instance, String name) {

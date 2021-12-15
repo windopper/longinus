@@ -31,6 +31,8 @@ public class DuelManager {
             return false;
         }
 
+        if(duelInstance.get(player1).pvpStatus == false || duelInstance.get(player2).pvpStatus == false) return false;
+
         DuelManager player1DuelManager = duelInstance.get(player1);
         DuelManager player2DuelManager = duelInstance.get(player2);
 
