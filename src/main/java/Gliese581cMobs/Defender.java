@@ -1,147 +1,141 @@
 package Gliese581cMobs;
 
-import DynamicData.EntityManager;
-import com.mojang.authlib.GameProfile;
-import net.minecraft.network.protocol.EnumProtocolDirection;
-import net.minecraft.network.protocol.game.*;
-import net.minecraft.server.MinecraftServer;
+import EntityPlayerManager.EntityPlayerManager;
+import EntityPlayerManager.EntityPlayerWatcher;
+import Mob.MobListManager;
 import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.WorldServer;
-import net.minecraft.server.network.PlayerConnection;
-import org.bukkit.Bukkit;
+import net.minecraft.sounds.SoundEffect;
+import net.minecraft.sounds.SoundEffects;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.ai.attributes.AttributeBase;
+import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
+import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
+import net.minecraft.world.entity.ai.goal.PathfinderGoalLookAtPlayer;
+import net.minecraft.world.entity.ai.goal.PathfinderGoalMeleeAttack;
+import net.minecraft.world.entity.ai.goal.PathfinderGoalRandomLookaround;
+import net.minecraft.world.entity.ai.goal.PathfinderGoalRandomStrollLand;
+import net.minecraft.world.entity.ai.goal.target.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.world.entity.npc.EntityVillager;
+import net.minecraft.world.entity.player.EntityHuman;
 import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_17_R1.attribute.CraftAttributeMap;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Villager;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-import spellinteracttest.DummyNetworkManager;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.Map;
 
-public class Defender extends EntityPlayer {
+public class Defender extends EntityVillager {
 
-    public static HashMap<EntityPlayer, Villager> npclist = new HashMap<>();
+    public Defender(EntityTypes<? extends EntityVillager> entitytypes, net.minecraft.world.level.World world, Location loc) {
+        super(entitytypes, world);
 
-    public Defender(MinecraftServer nmsServer, WorldServer nmsWorld, GameProfile profile) {
-        super(nmsServer, nmsWorld, profile);
+        Villager defenderai = (Villager) this.getBukkitEntity();
+        MobListManager.MobList mobList = MobListManager.MobList.edison1304;
 
-        //Player defender = (Player) this.getBukkitEntity();
+        defenderai.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10, true, true));
+        defenderai.setCustomName(mobList.getName());
+        defenderai.setCustomNameVisible(true);
 
-        //this.getWorld().addEntity(this);
+        Field attributeField = null;
 
-    }
-
-
-
-    public static Defender createNPC(Player p, World world , Location location) {
-
-        MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "Defender");
-        //PlayerInteractManager interactManager = new PlayerInteractManager(nmsWorld);
-        Defender entityPlayer = new Defender(nmsServer, nmsWorld, profile);
-        entityPlayer.b = new PlayerConnection(nmsServer, new DummyNetworkManager(EnumProtocolDirection.a), entityPlayer);
-
-        Player defender = (Player) entityPlayer.getBukkitEntity();
-        defender.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999, 10, false, false));
-        defender.setGravity(true);
-
-        entityPlayer.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(),
-                location.getPitch());
-
-        nmsWorld.addEntity(entityPlayer);
-
-        PacketPlayOutPlayerInfo playerInfoAdd = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, entityPlayer);
-        PacketPlayOutNamedEntitySpawn namedEntitySpawn = new PacketPlayOutNamedEntitySpawn(entityPlayer);
-        PacketPlayOutEntityHeadRotation headRotation = new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) ((location.getYaw() * 256f) / 360f));
-        PacketPlayOutPlayerInfo playerInfoRemove = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.d, entityPlayer);
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
-            connection.sendPacket(playerInfoAdd);
-            connection.sendPacket(namedEntitySpawn);
-            connection.sendPacket(headRotation);
-            connection.sendPacket(playerInfoRemove);
+        try {
+            attributeField = AttributeMapBase.class.getDeclaredField("b");
+            attributeField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
         }
+        try {
+            AttributeMapBase attributeMapBase = ((CraftLivingEntity) defenderai).getHandle().getAttributeMap();
+            Map<AttributeBase, AttributeModifiable> map = (Map<AttributeBase, AttributeModifiable>) attributeField.get(attributeMapBase);
+            AttributeBase attributeBase = CraftAttributeMap.toMinecraft(Attribute.GENERIC_ATTACK_DAMAGE);
+            AttributeModifiable attributeModifiable = new AttributeModifiable(attributeBase, AttributeModifiable::getAttribute);
+            map.put(attributeBase, attributeModifiable);
+        }
+        catch(Exception e) {
 
-        EntityManager.getinstance(entityPlayer.getBukkitEntity());
+        }
+        //this.w().a(GenericAttributes.f, 1).a(GenericAttributes.g, 1).a(GenericAttributes.h, 1);
 
+        this.getWorld().addEntity(this);
 
-        Villager v = (Villager) world.spawnEntity(location, EntityType.VILLAGER);
-        v.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 9999, 100, true, true));
-
-        npclist.put(entityPlayer, v);
-
-
-        new BukkitRunnable() {
-
-            //Location original = entityPlayer.getBukkitEntity().getLocation();
-
-            int count = 0;
-
-            @Override
-            public void run() {
-
-                Location original = npclist.get(entityPlayer).getLocation();
-                entityPlayer.setPosition(original.getX(), original.getY(), original.getZ());
-
-                Location ploc = p.getLocation();
-
-                Vector vec = ploc.clone().subtract(original.clone()).toVector().normalize().multiply(0.3);
-
-                short x = (short) (4096 * vec.getX());
-                short y = (short) (4096 * vec.getY());
-                short z = (short) (4096 * vec.getZ());
-
-                Location location = original.clone().setDirection(p.getLocation().subtract(original.clone()).toVector());
-
-                byte yaw = (byte) (location.getYaw() * 256 / 360);
-                byte pitch = (byte) (location.getPitch() * 256 / 360);
-
-                double distance = original.distance(ploc);
-
-                for (Player player : Bukkit.getOnlinePlayers()) {
-
-                    PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
-
-                    PacketPlayOutEntityHeadRotation headRotationPacket = new PacketPlayOutEntityHeadRotation(entityPlayer, yaw);
-                    connection.sendPacket(headRotationPacket);
-
-                    PacketPlayOutEntity.PacketPlayOutEntityLook lookPacket = new PacketPlayOutEntity.PacketPlayOutEntityLook(
-                            entityPlayer.getId(),
-                            yaw,
-                            pitch,
-                            false);
-
-                    connection.sendPacket(lookPacket);
-
-//                    if(distance >= 5) {
-//                        connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(entityPlayer.getId(),
-//                                x, y, z, yaw, pitch, true));
-//
-//                    }
-
-                }
-
-                entityPlayer.setPosition(original.getX(), original.getY(), original.getZ());
+        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
 
-                if(count==2000) {
-                    cancel();
-                }
-                count++;
+        EntityPlayer entityPlayer = (new EntityPlayerManager()).summonnpc(loc.getWorld(), loc, "ewogICJ0aW1lc3RhbXAiIDogMTYxNzk1MTkyNzUzOCwKICAicHJvZmlsZUlkIiA6ICI3MzlkYzg4OThmODg0OTRmOGNkNDE4NDI4NjUxNzBkYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJlZGlzb24xMzA0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM4MjYwNjkzNjQwYzIxYWJjZDNiYTQwYjI4N2ZmMzhiMGIxNGMyYTljM2FlMmFlOGVhYmIwZTNiNDU3YzJiMmUiCiAgICB9CiAgfQp9"
+                , "N0/34BBcnfe8x2gF8xwdhQ1fpFuU5bT1y3/uh0NsSja0UwTblI0qK0UzF7EPpye+O+ZrbVAp82DuDioC6LH/Al0dQRqUFRETgQuJRSJRNavpgikDCKE7TRqFclMELvxQ5xika0HpoR6+bI80H82+9H+4ePrhL8W9JVacCDiq9m8/TEG9SlUKsHxbg0cjXKi7xfOouk6LvIZl68PtdZlkVCmOzgTDZgX3fJ6lXjl0gSmu+afLZ7bKumoKBFWYddacwlBLIqnuxHK+byd9wb5Kg45Lle0CH2edcNxVydcPgEG9wSwf8aHJbryQQFtJMjRooZQgGBn/aFFM7hpo+CuG7w2B2kZ6YPMyTzRhJoEvJDdyeweAPssyTqTkLn32/cJ2Mot18PJHJSnekp/CFJaqIKRbGkNBkYZIzuy/IuC5noAftI41J4Ty3IumEIeLyRRD4w2Bh68pIBSwOe5rxmGrkF4USfumdejUtHo4C6AxhQ/N9kbvv6Yn/Z8+wX7srIhDuqBtYBv/31q30G/cGI0aq3MIFR2dueTNO3Oj2+4XVlp7Dpz5g2K5Cg0UhS8xdHsj38SjLJA+TWaT9fnXAkBUnNLoQ8McXUOe9WKwqleDmSszQiMBR66t3zWE17XeGvOznIMYmBfW//GN1VYQPNjUyGr3T2vPgmQF8AMV72YlLYQ=");
 
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-
-        return entityPlayer;
+        EntityPlayerWatcher.EntityWrapper(entityPlayer, defenderai, mobList);
     }
+    @Override
+    protected void initPathfinder() {
+
+        //super.initPathfinder();
+        this.bP.a(0, new PathfinderGoalMeleeAttack(this, 0.7, true));
+        this.bP.a(2, new PathfinderGoalRandomStrollLand(this, 0.6D));
+        this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F));
+        this.bP.a(4, new PathfinderGoalRandomLookaround(this));
+
+        this.bQ.a(0, new PathfinderGoalNearestAttackableTarget(this, EntityLiving.class, 10, false, false, (entityliving) -> {
+
+            if(entityliving instanceof EntityHuman || entityliving instanceof Defender) {
+                return false;
+            }
+            return true;
+
+//            if(((EntityLiving) entityliving).getBukkitEntity().getHandle() instanceof LivingEntity) {
+//                LivingEntity lE = (LivingEntity) ((EntityLiving) entityliving).getBukkitEntity().getHandle();
+//                MobListManager.MobList mobList = EntityManager.getinstance(lE).getMobList();
+//                if(mobList == null) return true;
+//                else {
+//                    String name = mobList.getName();
+//                    if(Arrays.stream(MobListManager.MobList.values()).filter(value -> name.equals(value.getName()))
+//                            .filter(MobListManager.MobList::isScannable).toArray().length >= 1) return true;
+//
+//                }
+//            }
+//            return false;
+        }));
+
+    }
+
+    @Override
+    protected SoundEffect getSoundHurt(DamageSource damagesource) {
+        return SoundEffects.ot;
+    }
+
+    @Override
+    protected SoundEffect getSoundDeath() {
+        return SoundEffects.os;
+    }
+
+    @Override
+    protected SoundEffect getSoundAmbient() {
+        return SoundEffects.fi;
+    }
+
+
+//    public static EntityPlayer createNPC(Player p, World world , Location location) {
+//
+//        MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
+//        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+//        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+//        DummyEntityPlayer entityPlayer = new DummyEntityPlayer(nmsServer, nmsWorld, profile);
+//        entityPlayer.setInvulnerable(true);
+//
+//        entityPlayer.b = new PlayerConnection(nmsServer, new DummyNetworkManager(EnumProtocolDirection.a), entityPlayer);
+//
+//        (new EntityPlayerSummon()).summonnpc(world, location, "ewogICJ0aW1lc3RhbXAiIDogMTYxNzk1MTkyNzUzOCwKICAicHJvZmlsZUlkIiA6ICI3MzlkYzg4OThmODg0OTRmOGNkNDE4NDI4NjUxNzBkYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJlZGlzb24xMzA0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM4MjYwNjkzNjQwYzIxYWJjZDNiYTQwYjI4N2ZmMzhiMGIxNGMyYTljM2FlMmFlOGVhYmIwZTNiNDU3YzJiMmUiCiAgICB9CiAgfQp9"
+//                , "N0/34BBcnfe8x2gF8xwdhQ1fpFuU5bT1y3/uh0NsSja0UwTblI0qK0UzF7EPpye+O+ZrbVAp82DuDioC6LH/Al0dQRqUFRETgQuJRSJRNavpgikDCKE7TRqFclMELvxQ5xika0HpoR6+bI80H82+9H+4ePrhL8W9JVacCDiq9m8/TEG9SlUKsHxbg0cjXKi7xfOouk6LvIZl68PtdZlkVCmOzgTDZgX3fJ6lXjl0gSmu+afLZ7bKumoKBFWYddacwlBLIqnuxHK+byd9wb5Kg45Lle0CH2edcNxVydcPgEG9wSwf8aHJbryQQFtJMjRooZQgGBn/aFFM7hpo+CuG7w2B2kZ6YPMyTzRhJoEvJDdyeweAPssyTqTkLn32/cJ2Mot18PJHJSnekp/CFJaqIKRbGkNBkYZIzuy/IuC5noAftI41J4Ty3IumEIeLyRRD4w2Bh68pIBSwOe5rxmGrkF4USfumdejUtHo4C6AxhQ/N9kbvv6Yn/Z8+wX7srIhDuqBtYBv/31q30G/cGI0aq3MIFR2dueTNO3Oj2+4XVlp7Dpz5g2K5Cg0UhS8xdHsj38SjLJA+TWaT9fnXAkBUnNLoQ8McXUOe9WKwqleDmSszQiMBR66t3zWE17XeGvOznIMYmBfW//GN1VYQPNjUyGr3T2vPgmQF8AMV72YlLYQ=");
+//
+//        //Defender defender = new Defender(EntityTypes.aV, entityPlayer.getWorld(), entityPlayer);
+//        //defender.setPosition(location.getX(), location.getY(), location.getZ());
+//
+//        return entityPlayer;
+//    }
 }

@@ -22,8 +22,6 @@ public class PlayerInfoActionBar {
 
 			PlayerFunction PF = PlayerFunction.getinstance(player);
 
-
-			
 			int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
 			int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
 			int MaxShield = UserManager.getinstance(player).ShieldRaw;

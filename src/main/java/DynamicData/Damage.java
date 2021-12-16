@@ -110,7 +110,6 @@ public class Damage {
 			EH.setDamageValue(damage);
 			
 			if(damager instanceof Player) {
-				EH.EntityWatcher();
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, takenP);
 			}
 			

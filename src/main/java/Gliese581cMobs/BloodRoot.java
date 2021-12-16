@@ -3,15 +3,17 @@ package Gliese581cMobs;
 import DynamicData.EntityManager;
 import DynamicData.EntityStatusManager;
 import Mob.MobListManager;
-import net.minecraft.server.level.EntityPlayer;
+import Mob.MobMechManager;
 import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.ai.goal.PathfinderGoalLookAtPlayer;
-import net.minecraft.world.entity.ai.goal.target.PathfinderGoalNearestAttackableTarget;
+import net.minecraft.world.entity.ai.attributes.GenericAttributes;
 import net.minecraft.world.entity.monster.EntitySkeleton;
 import net.minecraft.world.level.World;
 import org.bukkit.*;
 import org.bukkit.block.data.type.PointedDripstone;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Skeleton;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -30,7 +32,10 @@ public class BloodRoot extends EntitySkeleton {
 
         this.getWorld().addEntity(this);
         this.setSilent(true);
-        this.setInvulnerable(true);
+        bloodroot.setCollidable(false);
+
+        this.w().a(GenericAttributes.g, 10);
+
         bloodroot.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 100, true));
         bloodroot.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 100, true));
         bloodroot.setCustomName(mobList.getName());
@@ -66,13 +71,13 @@ public class BloodRoot extends EntitySkeleton {
     public void initPathfinder() {
 
         //this.bP.a(1, new PathfinderGoalArrowAttack(this, 1, 2, 1));
-        this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F, 3, false));
-
-        //this.bQ.a(2, new PathfinderGoalHurtByTarget(this, new Class[0]));
-        this.bQ.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityPlayer.class, true));
+//        this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F, 3, false));
+//
+//        //this.bQ.a(2, new PathfinderGoalHurtByTarget(this, new Class[0]));
+//        this.bQ.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityPlayer.class, true));
     }
 
-    public static void BloodRootSkill1(LivingEntity entity, final Player target) {
+    public static void BloodRootSkill1(LivingEntity entity, final LivingEntity target) {
 
         Location location = entity.getLocation();
         Location targetlocation = target.getLocation();
@@ -106,8 +111,8 @@ public class BloodRoot extends EntitySkeleton {
                     if(location.distance(target.getLocation()) < 1.5) {
 
                         for(Entity le : location.getWorld().getNearbyEntities(location, 1.5, 1.5, 1.5 )) {
-                            if(le instanceof Player) {
-                                Player targets = (Player) le;
+                            if(MobMechManager.getInstance().EntityCheck(le, entity)) {
+                                LivingEntity targets = (LivingEntity) le;
 
                                 targets.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 10, 5), true);
 

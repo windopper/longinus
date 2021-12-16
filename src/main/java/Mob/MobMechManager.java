@@ -2,14 +2,11 @@ package Mob;
 
 import DynamicData.EntityManager;
 import Gliese581cMobs.BloodRoot;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
-
-import java.util.HashMap;
 
 public class MobMechManager {
 
@@ -28,18 +25,16 @@ public class MobMechManager {
 
     public void RunGliese581cMobMech() {
 
-        HashMap<LivingEntity, EntityManager> ehms = EntityManager.getEntityHealthManager();
+        for (LivingEntity entity : EntityManager.getEntityHealthManager().keySet()) {
+            if (entity == null) continue;
+            if (EntityManager.getEntityHealthManager().get(entity).getMobList() == null) continue;
 
-        for(LivingEntity entity : ehms.keySet()) {
-            if(entity == null) continue;
-            if(ehms.get(entity).getMobList() == null) continue;
+            MobListManager.MobList mobList = EntityManager.getEntityHealthManager().get(entity).getMobList();
 
-            MobListManager.MobList mobList = ehms.get(entity).getMobList();
+            if (mobList.equals(MobListManager.MobList.블러드루트) && EntityManager.getEntityHealthManager().get(entity).getPatterntime() % 20 == 0) {
 
-            if(mobList.equals(MobListManager.MobList.블러드루트) && ehms.get(entity).getPatterntime() % 20 == 0) {
-
-                Player target = GetNearestPlayerFromEntity(entity, 15);
-                if(target == null) continue;
+                LivingEntity target = GetNearestPlayerFromEntity(entity, 15);
+                if (target == null) continue;
                 BloodRoot.BloodRootSkill1(entity, target);
             }
         }
@@ -70,24 +65,45 @@ public class MobMechManager {
         return null;
     }
 
-    private Player GetNearestPlayerFromEntity(LivingEntity entity, double distance) {
+    private LivingEntity GetNearestPlayerFromEntity(LivingEntity entity, double distance) {
 
         Location location = entity.getLocation();
         double nearestdist = distance;
-        Player nearestplayer = null;
+        LivingEntity nearestplayer = null;
 
         for(Entity target : entity.getWorld().getNearbyEntities(location, distance, 5, distance)) {
-            if(target instanceof Player) {
-                Player targetPlayer = (Player) target;
-                if(targetPlayer.getGameMode().equals(GameMode.ADVENTURE)) {
-                    Location targetlocation = targetPlayer.getLocation();
+            if(EntityCheck(target, entity)) {
+                LivingEntity lE = (LivingEntity) target;
+                    Location targetlocation = lE.getLocation();
                     if(targetlocation.distance(location) < nearestdist) {
                         nearestdist = targetlocation.distance(location);
-                        nearestplayer = targetPlayer;
+                        nearestplayer = lE;
                     }
-                }
             }
         }
         return nearestplayer;
+    }
+
+    public boolean EntityCheck(Entity target, Entity ME) {
+
+        if(target instanceof LivingEntity && !(target instanceof ArmorStand) && !(target instanceof FallingBlock) && ME != target) {
+
+            if(target instanceof Player) {
+                for(Player player : Bukkit.getOnlinePlayers()) {
+                    if(target.getName().equals(player.getName())) return true;
+                }
+                return false;
+            }
+
+            MobListManager.MobList TmobList = EntityManager.getinstance((LivingEntity) target).getMobList();
+            MobListManager.MobList MmobList = EntityManager.getinstance((LivingEntity) ME).getMobList();
+
+            if(TmobList == null || MmobList == null) return false;
+            if(TmobList.name().equals(MmobList.name())) return false;
+
+            return true;
+        }
+
+        return false;
     }
 }

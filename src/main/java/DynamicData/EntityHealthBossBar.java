@@ -108,7 +108,7 @@ public class EntityHealthBossBar {
 			int CurrentHealth = EntityManager.getinstance(BossBarCurrentEntity).getCurrentHealth();
 			int MaxHealth = EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth();
 			
-			if(CurrentHealth <= 0 || !EntityManager.checkinstasnce(BossBarCurrentEntity)) { // 엔티티가 없으면
+			if(CurrentHealth <= 0 || !EntityManager.checkinstance(BossBarCurrentEntity)) { // 엔티티가 없으면
 				BossBarCurrentShow.removeAll();
 				BossBarCurrentShow = null;
 				BossBarCurrentEntity = null;

@@ -37,8 +37,6 @@ public class PlayerHealthShield {
 		return instance.get(p);
 	}
 	
-	
-	
 	public void removeinstance() {
 		instance.remove(p);
 	}
@@ -74,10 +72,7 @@ public class PlayerHealthShield {
 	public void setShieldRegenerateCooldown(int shieldRegenerateCooldown) {
 		ShieldRegenerateCooldown = shieldRegenerateCooldown;
 	}
-	
-	
-	
-	
+
 	@SuppressWarnings("deprecation")
 	public void HealthWatcher() {
 		
@@ -89,8 +84,7 @@ public class PlayerHealthShield {
 		if(CurrentHealth > MaxHealth) {
 			CurrentHealth = MaxHealth;
 		}
-		
-		
+
 		if(Heart > p.getMaxHealth()) { // 체력은 20이상 할 수 없다
 			Heart = p.getMaxHealth();
 		}
@@ -106,16 +100,22 @@ public class PlayerHealthShield {
 				}
 			}, 0);
 		}
-		
-		
+
+//		if(CurrentHealth < 0) {
+//			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
+//				@Override
+//				public void run() {
+//					Bukkit.getPluginManager().callEvent(new PlayerDeathEvent(p));
+//				}
+//			}, 0);
+//		}
+
 		if(CurrentShield>0) { // 쉴드
 			p.setAbsorptionAmount(CurrentShield/100);
 		}
 		else if(CurrentShield==0) {
 			p.setAbsorptionAmount(0);
 		}
-				
-				
 
 	}
 	
@@ -133,9 +133,6 @@ public class PlayerHealthShield {
 				CurrentShield = CurrentShield-(int)(CurrentShield/400); // 최대보다 크면 줄어듬
 			}
 
-				
-			
-			
 			ShieldRegenerateCooldown = 0; // 보호막 쿨다운 제거
 			return;
 		}
@@ -180,9 +177,6 @@ public class PlayerHealthShield {
 
 		}
 	}
-	
-	
-	
 	public void HealthAdd(int addhealth) {
 		
 		if(CurrentHealth > 0) {
