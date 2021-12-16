@@ -187,23 +187,6 @@ public class ShopNPCManager {
 		PlayerConnection conn = ((CraftPlayer)player).getHandle().b;
 		conn.sendPacket(packet);
 	}
-	
-
-//	
-//	private void sendMetadata(EntityPlayer npc, Player player, int index, byte o) {
-//		DataWatcher dataWatcher = npc.getDataWatcher();
-//		DataWatcherSerializer<Byte> registry = DataWatcherRegistry.a;
-//		dataWatcher.set(
-//			registry.a(index),
-//			o
-//		);
-//		PacketPlayOutEntityMetadata metadataPacket = new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, false);
-//		sendpacket(player, metadataPacket);
-//		
-//	}
-
-
-
 
 	public void showTo(EntityPlayer npc, Player player) {
 

@@ -164,11 +164,11 @@ public class SpyGlassManager {
 
 
         // 투명화 상태면 wrapper한 몹 보여주기
-        if(target.hasPotionEffect(PotionEffectType.INVISIBILITY)) {
+        if(target.hasPotionEffect(PotionEffectType.INVISIBILITY) || target.isInvisible()) {
 
             // wrapper한 몹이 없으면 원래 몹 발광
             if(EntityManager.getinstance(target).getDisguises() == null) {
-                SendEntityPacket.MaintainOriginOne((Entity) target, player, (byte) 0x40);
+                SendEntityPacket.MaintainOriginOne(target, player, (byte) 0x40);
                 glowingEntity.add(target);
             }
             else {
@@ -200,7 +200,7 @@ public class SpyGlassManager {
         String name = EntityManager.getinstance(target).getCustomName();
 
         Arrays.stream(MobListManager.MobList.values()).forEach(value -> {
-            if(value.getName().equals(name)) {
+            if(value.getName().equals(name) && value.isScannable()) {
                 int intvalue = config.getInt("Sample."+value.getPlanet()+"."+value.name()+".count");
                 intvalue ++;
 

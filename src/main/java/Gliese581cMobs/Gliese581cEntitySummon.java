@@ -34,13 +34,8 @@ public class Gliese581cEntitySummon implements Listener {
     public void summonGuard(Player player) {
         org.bukkit.World world = player.getWorld();
         Location loc = player.getLocation();
-//        MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
-//        WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-//        GameProfile profile = new GameProfile(UUID.randomUUID(), "Guard");
-        //Defender defender = new Defender(nmsServer, nmsWorld, profile);
-        //defender.setPosition(loc.getX(), loc.getY(), loc.getZ());
 
-        Defender.createNPC(player, world, loc);
+        Defender defender = new Defender(EntityTypes.aV, ((CraftWorld) world).getHandle(), loc);
     }
 
     public void summonBloodRoot(Player player) {

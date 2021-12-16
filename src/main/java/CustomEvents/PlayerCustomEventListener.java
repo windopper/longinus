@@ -3,9 +3,13 @@ package CustomEvents;
 import ClassAbility.Aether;
 import ClassAbility.entitycheck;
 import Duel.DuelManager;
+import DynamicData.EntityManager;
 import DynamicData.PlayerFunction;
 import DynamicData.PlayerHealthShield;
+import EntityPlayerManager.EntityPlayerManager;
+import EntityPlayerManager.EntityPlayerWatcher;
 import PlayerData.UserManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -41,6 +45,19 @@ public class PlayerCustomEventListener implements Listener {
         {
             //player.spigot().respawn();
         }
+
+        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+
+            EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> EntityPlayerWatcher.Remove(value, player));
+
+        }, 5);
+
+        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+
+            EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> (new EntityPlayerManager()).showTo(value, player));
+
+        },20);
+
     }
 
     @EventHandler
@@ -69,10 +86,6 @@ public class PlayerCustomEventListener implements Listener {
             PlayerFunction.getinstance(target).ACPassiveCoolDown = 0;
         }
         ReturnToBase.ReturnMech.getinstance().ReturnCancel(target); // 귀환을 하고 있다면 귀환을 취소해 버리기
-
-
-
-
 
 
     }

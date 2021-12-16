@@ -13,7 +13,7 @@ import Items.WeaponManager;
 import Mob.MobAttackManager;
 import Mob.MobMechManager;
 import Mob.mob;
-import PacketListener.PacketListener;
+import PacketListener.PacketReader;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
@@ -31,7 +31,6 @@ import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
 import ReturnToBase.ReturnMech;
-import PacketListener.PacketReader;
 import Shop.RightClickNPC;
 import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
@@ -48,10 +47,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Slime;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -94,7 +90,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new SpyGlassEvent(), this);
 		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
 		getServer().getPluginManager().registerEvents(new MobAttackManager(), this);
-		getServer().getPluginManager().registerEvents(new PacketListener(), this);
+		//getServer().getPluginManager().registerEvents(new PacketListener(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -660,6 +656,7 @@ public class Main extends JavaPlugin implements Listener {
 				for(World world : Bukkit.getWorlds()) {
 					for(LivingEntity entity : world.getLivingEntities()) {
 						if(entity instanceof Player) continue;
+						if(entity instanceof ArmorStand) continue;
 						EntityManager.getinstance(entity).EntityWatcher();
 						EntityStatusManager.getinstance(entity).BurnsLoop();
 					}
@@ -703,7 +700,6 @@ public class Main extends JavaPlugin implements Listener {
 
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"),0, 1);
-
 
 
 		new BukkitRunnable() {
@@ -782,6 +778,7 @@ public class Main extends JavaPlugin implements Listener {
 			//p.setResourcePack("https://www.dropbox.com/s/yavjepjt7q273mq/%EC%84%9C%EB%B2%84%ED%85%8D%EC%8A%A4%EC%B3%90.zip?dl=1");
 			ShopNPCManager.getinstance().addJoinPacket(p);
 			QuestNPCManager.getinstance().addJoinPacket(p);
+			EntityManager.showEntityPlayerNPC(p);
 		}, 40); // npc 소환
 		
 		PacketReader reader = new PacketReader(p);

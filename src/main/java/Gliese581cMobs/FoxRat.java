@@ -11,6 +11,7 @@ import net.minecraft.world.entity.ai.goal.PathfinderGoalRandomLookaround;
 import net.minecraft.world.entity.ai.goal.PathfinderGoalRandomStroll;
 import net.minecraft.world.entity.ai.goal.target.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.world.entity.animal.EntityFox;
+import net.minecraft.world.entity.npc.EntityVillager;
 import net.minecraft.world.level.World;
 import org.bukkit.entity.Fox;
 import org.bukkit.entity.Player;
@@ -40,6 +41,7 @@ public class FoxRat extends EntityFox {
         this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F));
         this.bP.a(4, new PathfinderGoalRandomLookaround(this));
 
+        this.bQ.a(2, new PathfinderGoalNearestAttackableTarget<EntityVillager>(this, EntityVillager.class, true, true));
         this.bQ.a(3, new PathfinderGoalNearestAttackableTarget<EntityPlayer>(this, EntityPlayer.class, true, true));
 
     }

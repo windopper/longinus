@@ -246,7 +246,7 @@ public class UserFileManager {
 
 		// 샘플
 		Arrays.stream(MobListManager.MobList.values()).forEach(value -> {
-			if(!config.contains("Sample."+value.getPlanet()+"."+value.name()+".count"))
+			if(!config.contains("Sample."+value.getPlanet()+"."+value.name()+".count") && value.isScannable() == true)
 				config.set("Sample."+value.getPlanet()+"."+value.name()+".count", 0);
 		});
 
