@@ -1,4 +1,4 @@
-package DynamicData;
+package PlayerManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,8 +7,6 @@ import java.util.List;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import PlayerData.UserManager;
 
 public class PlayerCombination {
 	
@@ -77,7 +75,7 @@ public class PlayerCombination {
 	public void KeyBind() {
 			
 		if(sneakingleft.contains(p)) { // 기관총
-			ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "L");
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
 		}
 		if(sneakingleft.contains(p) && !p.isSneaking()) {
 			
@@ -85,7 +83,7 @@ public class PlayerCombination {
 		}
 		
 		
-		if(p.isSneaking() && UserManager.getinstance(p).CurrentClass.equals("블래스터") && keybind.equals("L")) {
+		if(p.isSneaking() && PlayerManager.getinstance(p).CurrentClass.equals("블래스터") && keybind.equals("L")) {
 			
 			if(!sneakingleft.contains(p)) {
 				sneakingleft.add(p);
@@ -93,7 +91,7 @@ public class PlayerCombination {
 		}
 		
 		if(keybind.equals("L") && key1.equals("none")) { // 첫번째가 없고 좌클릭이 시작일때
-			ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "L");
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
 			
 			keybind = "none";
 			return;
@@ -118,27 +116,27 @@ public class PlayerCombination {
 			
 			
 			if(key1.equals("R") && key2.equals("L")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "RL");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "RL");
 				// p.sendTitle("",blank+"RL", 5, 20, 10);
 			}
 			if(key1.equals("R") && key2.equals("R")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "RR");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "RR");
 				//p.sendTitle("",blank+"RR", 5, 20, 10);
 			}
 			if(key1.equals("R") && key2.equals("F")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "RF");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "RF");
 				//p.sendTitle("",blank+"RF", 5, 20, 10);
 			}
 			if(key1.equals("F") && key2.equals("R")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "FR");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FR");
 				//p.sendTitle("",blank+"F L", 5, 20, 10);
 			}
 			if(key1.equals("F") && key2.equals("F")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "FF");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FF");
 				//p.sendTitle("",blank+"FF", 5, 20, 10);
 			}
 			if(key1.equals("SHIFT") && key2.equals("F")) {
-				ClassAbility.Combination.getinstance().Checkclass(UserManager.getinstance(p).CurrentClass, p, "SHIFTF");
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "SHIFTF");
 				//p.sendTitle("",blank+"SHIFTF", 5, 20, 10);
 			}
 			

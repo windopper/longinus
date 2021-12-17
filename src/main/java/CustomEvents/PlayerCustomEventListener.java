@@ -3,12 +3,12 @@ package CustomEvents;
 import ClassAbility.Aether;
 import ClassAbility.entitycheck;
 import Duel.DuelManager;
-import DynamicData.EntityManager;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealthShield;
+import Mob.EntityManager;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
 import EntityPlayerManager.EntityPlayerManager;
 import EntityPlayerManager.EntityPlayerWatcher;
-import PlayerData.UserManager;
+import PlayerManager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -33,7 +33,7 @@ public class PlayerCustomEventListener implements Listener {
 
         if (DuelManager.checkInDuel(player)) {
             DuelManager.getDuelManager(player).setLoser(player);
-            PlayerHealthShield.getinstance(player).setCurrentHealth(UserManager.getinstance(player).Health);
+            PlayerHealthShield.getinstance(player).setCurrentHealth(PlayerManager.getinstance(player).Health);
             return;
         }
 
@@ -54,7 +54,7 @@ public class PlayerCustomEventListener implements Listener {
 
         Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 
-            EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> (new EntityPlayerManager()).showTo(value, player));
+            EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> EntityPlayerManager.getInstance().showTo(value, player));
 
         },20);
 
@@ -67,7 +67,7 @@ public class PlayerCustomEventListener implements Listener {
         Player target = e.getTarget();
         int damage = e.getDamage();
 
-        if(UserManager.getinstance(target).CurrentClass.equals("아이테르")) {
+        if(PlayerManager.getinstance(target).CurrentClass.equals("아이테르")) {
             Aether.getinstance().DmgtoImpulse(damage, target, target); // 아이테르 패시브 활성화를 위해 받은 피해를 저장
         }
 
@@ -75,13 +75,13 @@ public class PlayerCustomEventListener implements Listener {
             if(player instanceof Player) {
                 Player pl = (Player) player;
                 //자신이 아이테르가 아니고 자신주변 10칸 이내에 아이테르가 있으면 그 사람에게 에너지를 줌
-                if(UserManager.getinstance(pl).CurrentClass.equals("아이테르") && !entitycheck.duelcheck(pl, target)) {
+                if(PlayerManager.getinstance(pl).CurrentClass.equals("아이테르") && !entitycheck.duelcheck(pl, target)) {
                     Aether.getinstance().DmgtoImpulse((int)(damage/2), pl, target);
                 }
             }
         }
 
-        if(PlayerFunction.getinstance(target).ACPassiveCoolDown > 0 && UserManager.getinstance(target).CurrentClass.equals("엑셀러레이터")) {
+        if(PlayerFunction.getinstance(target).ACPassiveCoolDown > 0 && PlayerManager.getinstance(target).CurrentClass.equals("엑셀러레이터")) {
             // 엑셀러레이터가 맞으면 패시브 쿨다운 초기화
             PlayerFunction.getinstance(target).ACPassiveCoolDown = 0;
         }

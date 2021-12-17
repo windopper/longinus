@@ -3,6 +3,7 @@ package Gliese581cMobs;
 import CustomEvents.CustomMobDeathEvent;
 import Mob.MobListManager;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.animal.EntityFox;
 import net.minecraft.world.level.World;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
@@ -43,6 +44,7 @@ public class Gliese581cEntitySummon implements Listener {
         World nmsworld = ((CraftWorld) loc.getWorld()).getHandle();
         //MouseFoot mouseFoot = new MouseFoot(nmsworld);
         //FoxRat foxRat = new FoxRat(EntityTypes.E, nmsworld, player);
+
         BloodRoot bloodRoot = new BloodRoot(EntityTypes.aB, nmsworld);
         bloodRoot.setPosition(loc.getX(), loc.getY(), loc.getZ());
     }
@@ -51,8 +53,17 @@ public class Gliese581cEntitySummon implements Listener {
         Location loc = player.getEyeLocation();
         World nmsworld = ((CraftWorld) loc.getWorld()).getHandle();
         //MouseFoot mouseFoot = new MouseFoot(nmsworld);
-        FoxRat foxRat = new FoxRat(EntityTypes.E, nmsworld, player);
-        foxRat.setPosition(loc.getX(), loc.getY(), loc.getZ());
+
+        FoxMother fox = FoxMother.getFoxMother(EntityTypes.E, nmsworld);
+        fox.setPosition(loc.getX(), loc.getY(), loc.getZ());
+
+
+        for(int i=0; i<10; i++) {
+            FoxRat foxRat = new FoxRat(EntityTypes.E, nmsworld, (EntityFox) fox);
+            foxRat.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        }
+
+
     }
 
     public void summonHiddenOasis(Player player) {
@@ -61,6 +72,14 @@ public class Gliese581cEntitySummon implements Listener {
         //MouseFoot mouseFoot = new MouseFoot(nmsworld);
         HiddenOasis hiddenOasis = new HiddenOasis(EntityTypes.be, nmsworld);
         hiddenOasis.setPosition(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public void summonGlowingButterFly(Player player) {
+        Location loc = player.getEyeLocation();
+        World nmsworld = ((CraftWorld) loc.getWorld()).getHandle();
+        GlowingButterfly glowingButterfly =  new GlowingButterfly(EntityTypes.be, nmsworld, loc);
+        glowingButterfly.setPosition(loc.getX(), loc.getY(), loc.getZ());
+
     }
 
 

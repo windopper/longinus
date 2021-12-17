@@ -1,11 +1,10 @@
-package DynamicData;
+package PlayerManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import PlayerData.UserManager;
 
 public class PlayerInfoActionBar {
 	
@@ -24,9 +23,9 @@ public class PlayerInfoActionBar {
 
 			int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
 			int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
-			int MaxShield = UserManager.getinstance(player).ShieldRaw;
-			int MaxHealth = UserManager.getinstance(player).Health;
-			String CurrentClass = UserManager.getinstance(player).CurrentClass;
+			int MaxShield = PlayerManager.getinstance(player).ShieldRaw;
+			int MaxHealth = PlayerManager.getinstance(player).Health;
+			String CurrentClass = PlayerManager.getinstance(player).CurrentClass;
 			
 			// 아이테르 전용
 			String m = "§c§l☈ §l§c"+PF.AEImpulse+"/1000 "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+

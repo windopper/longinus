@@ -1,4 +1,4 @@
-package DynamicData;
+package PlayerManager;
 
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;

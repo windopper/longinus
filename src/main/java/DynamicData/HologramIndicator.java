@@ -26,14 +26,11 @@ public class HologramIndicator {
 	
 	
 	public void DamageIndicator(final int r, final LivingEntity e) { // 데미지 뜨게 하기
-		
 
 		new BukkitRunnable() {
-
 			int time = 0;
 			ArmorStand as;
-			
-			
+
 			@Override
 			public void run() {
 				
@@ -60,20 +57,14 @@ public class HologramIndicator {
 					as.setCustomNameVisible(true);
 					
 				}
-				
-				
 					if(time > 20) {
-						
 						as.remove();
 						cancel();
 						return;
-						
 					}
 					
 				time++;
 
-				
-				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}

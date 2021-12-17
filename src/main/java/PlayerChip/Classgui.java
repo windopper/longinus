@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import PlayerData.UserFileManager;
+import PlayerManager.PlayerFileManager;
 
 public class Classgui {
 	
@@ -272,14 +272,14 @@ public class Classgui {
 		
 		int GUIlocation = 11;
 		
-		if(UserFileManager.getinstance().getClasses(p) == null) { // 등록된 클래스가 없으면
+		if(PlayerFileManager.getinstance().getClasses(p) == null) { // 등록된 클래스가 없으면
 			
 			gui.setItem(GUIlocation, ClassAddItem(p));
 			return;
 		}
 		
 		
-		for(String Class : UserFileManager.getinstance().getClasses(p)) {
+		for(String Class : PlayerFileManager.getinstance().getClasses(p)) {
 			
 			if(GUIlocation == 16) GUIlocation = 20;
 			if(GUIlocation == 25) GUIlocation = 29;
@@ -304,7 +304,7 @@ public class Classgui {
 	
 	private ItemStack AetherSelectItem(Player p, String classname) {
 		
-		int lvl = UserFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -331,7 +331,7 @@ public class Classgui {
 	
 	private ItemStack AcceleratorSelectItem(Player p, String classname) {
 		
-		int lvl = UserFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_HOE, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -358,7 +358,7 @@ public class Classgui {
 	
 	private ItemStack BlasterSelectItem(Player p, String classname) {
 		
-		int lvl = UserFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_SHOVEL, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -383,7 +383,7 @@ public class Classgui {
 	
 	private ItemStack ByVSelectItem(Player p, String classname) {
 		
-		int lvl = UserFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -410,7 +410,7 @@ public class Classgui {
 	
 	private ItemStack PhloxSelectItem(Player p, String classname) {
 		
-		int lvl = UserFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE, 1);
 		ItemMeta meta = item.getItemMeta();

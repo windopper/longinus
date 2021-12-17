@@ -2,7 +2,7 @@ package QuestFunctions;
 
 import Shop.RightClickNPC;
 import QuestClasses.FirstMission;
-import PlayerData.UserManager;
+import PlayerManager.PlayerManager;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
@@ -80,7 +80,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -107,7 +107,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 	public void SetQuestNextStep(String questname, Player p) {
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -133,7 +133,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2 ,1);
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -151,7 +151,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 	public int getQuestStep(String questname, Player p) {
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -163,7 +163,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 	public void QuestReset(Player p) {
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);

@@ -1,12 +1,14 @@
 package Mob;
 
-import DynamicData.EntityManager;
 import Gliese581cMobs.BloodRoot;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MobMechManager {
 
@@ -25,19 +27,26 @@ public class MobMechManager {
 
     public void RunGliese581cMobMech() {
 
-        for (LivingEntity entity : EntityManager.getEntityHealthManager().keySet()) {
-            if (entity == null) continue;
-            if (EntityManager.getEntityHealthManager().get(entity).getMobList() == null) continue;
+        List<Entity> entitylist = new CopyOnWriteArrayList<>(EntityManager.getEntityHealthManager().keySet());
 
-            MobListManager.MobList mobList = EntityManager.getEntityHealthManager().get(entity).getMobList();
+//        try {
+            for (Entity entity : entitylist) {
+                if (entity == null) continue;
+                if (EntityManager.getEntityHealthManager().get(entity).getMobList() == null) continue;
 
-            if (mobList.equals(MobListManager.MobList.블러드루트) && EntityManager.getEntityHealthManager().get(entity).getPatterntime() % 20 == 0) {
+                MobListManager.MobList mobList = EntityManager.getEntityHealthManager().get(entity).getMobList();
 
-                LivingEntity target = GetNearestPlayerFromEntity(entity, 15);
-                if (target == null) continue;
-                BloodRoot.BloodRootSkill1(entity, target);
+                if (mobList.equals(MobListManager.MobList.블러드루트) && EntityManager.getEntityHealthManager().get(entity).getPatterntime() % 20 == 0) {
+
+                    Entity target = GetNearestPlayerFromEntity(entity, 15);
+                    if (target == null) continue;
+                    BloodRoot.BloodRootSkill1(entity, target);
+                }
             }
-        }
+//        }
+//        catch(ConcurrentModificationException e) {
+//
+//        }
         time++;
     }
 
@@ -65,7 +74,7 @@ public class MobMechManager {
         return null;
     }
 
-    private LivingEntity GetNearestPlayerFromEntity(LivingEntity entity, double distance) {
+    private Entity GetNearestPlayerFromEntity(Entity entity, double distance) {
 
         Location location = entity.getLocation();
         double nearestdist = distance;

@@ -8,7 +8,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import PlayerData.UserFileManager;
+import PlayerManager.PlayerFileManager;
 
 public class UserStorageManager {
 	
@@ -30,7 +30,7 @@ public class UserStorageManager {
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 		
-		for(String slot : UserFileManager.getinstance().getStorageSlot()) {
+		for(String slot : PlayerFileManager.getinstance().getStorageSlot()) {
 			
 			config.set("storage.storage"+page+"."+slot, inv.getItem(Integer.parseInt(slot)));
 			
@@ -51,7 +51,7 @@ public class UserStorageManager {
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 		
-		for(String slot : UserFileManager.getinstance().getStorageSlot()) {
+		for(String slot : PlayerFileManager.getinstance().getStorageSlot()) {
 
 			inv.setItem(Integer.parseInt(slot), config.getItemStack("storage.storage"+page+"."+slot));
 			

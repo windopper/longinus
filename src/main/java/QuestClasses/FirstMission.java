@@ -6,7 +6,7 @@ import QuestFunctions.QuestFunctions;
 import QuestFunctions.QuestList;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
-import PlayerData.UserStatManager;
+import PlayerManager.PlayerStatManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
@@ -95,7 +95,7 @@ public class FirstMission {
         // When Progress is 0
         if(QuestStep == 0 && NPCname.equals("데이즈")) {
 
-            if(QuestList.valueOf(Questname).getLevelReq() > UserStatManager.getinstance(p).getlvl()) {
+            if(QuestList.valueOf(Questname).getLevelReq() > PlayerStatManager.getinstance(p).getlvl()) {
                 p.sendMessage("레벨부족");
             }
             else {

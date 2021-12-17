@@ -1,7 +1,7 @@
 package SpyGlass;
 
 import ClassAbility.entitycheck;
-import DynamicData.EntityManager;
+import Mob.EntityManager;
 import Mob.MobListManager;
 import Packets.SendEntityPacket;
 import org.bukkit.Bukkit;
@@ -125,8 +125,6 @@ public class SpyGlassManager {
                 }
 
             }
-
-
             location.add(vector);
         }
 
@@ -204,7 +202,7 @@ public class SpyGlassManager {
                 int intvalue = config.getInt("Sample."+value.getPlanet()+"."+value.name()+".count");
                 intvalue ++;
 
-                checkHadAnalyzed(intvalue, value.name());
+                checkHadAnalyzed(intvalue, value.getRawName());
 
                 config.set("Sample."+value.getPlanet()+"."+value.name()+".count", intvalue);
             }

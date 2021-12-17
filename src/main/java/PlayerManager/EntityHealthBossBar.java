@@ -1,5 +1,6 @@
-package DynamicData;
+package PlayerManager;
 
+import Mob.EntityManager;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;

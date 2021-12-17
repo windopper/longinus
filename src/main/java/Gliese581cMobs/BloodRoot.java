@@ -1,7 +1,7 @@
 package Gliese581cMobs;
 
-import DynamicData.EntityManager;
-import DynamicData.EntityStatusManager;
+import Mob.EntityManager;
+import Mob.EntityStatusManager;
 import Mob.MobListManager;
 import Mob.MobMechManager;
 import net.minecraft.world.entity.EntityTypes;
@@ -63,21 +63,16 @@ public class BloodRoot extends EntitySkeleton {
         map.put(fallingBlock, location);
         map.put(fallingBlock2, location.clone().add(0, 1, 0));
 
-        EntityManager.getinstance(bloodroot, mobList, map);
+        EntityManager.getinstance(bloodroot, mobList, map).setShowNameTag(false);
         EntityStatusManager.getinstance(bloodroot).setCanKnockback(false);
     }
 
     @Override
     public void initPathfinder() {
 
-        //this.bP.a(1, new PathfinderGoalArrowAttack(this, 1, 2, 1));
-//        this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F, 3, false));
-//
-//        //this.bQ.a(2, new PathfinderGoalHurtByTarget(this, new Class[0]));
-//        this.bQ.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityPlayer.class, true));
     }
 
-    public static void BloodRootSkill1(LivingEntity entity, final LivingEntity target) {
+    public static void BloodRootSkill1(Entity entity, final Entity target) {
 
         Location location = entity.getLocation();
         Location targetlocation = target.getLocation();

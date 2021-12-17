@@ -1,8 +1,8 @@
 package ClassAbility;
 
 import DynamicData.Damage;
-import DynamicData.EntityStatusManager;
-import PlayerData.UserManager;
+import Mob.EntityStatusManager;
+import PlayerManager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -515,8 +515,8 @@ public class SpellManager {
 
     private Integer getDamage(MeleeOrSpell meleeorspell) {
 
-        int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? UserManager.getinstance(player).meleedmgcalculate(player, DamageRate)
-                : UserManager.getinstance(player).spelldmgcalculate(player, DamageRate);
+        int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? PlayerManager.getinstance(player).meleedmgcalculate(player, DamageRate)
+                : PlayerManager.getinstance(player).spelldmgcalculate(player, DamageRate);
         dmg = (int)(dmg * multiplyDamage);
         dmg += (int)addDamage;
         return dmg;

@@ -1,9 +1,9 @@
 package ClassAbility;
 
-import DynamicData.*;
+import DynamicData.Damage;
+import Mob.EntityStatusManager;
+import PlayerManager.*;
 import QuestClasses.Tutorial;
-import PlayerData.UserManager;
-import PlayerData.UserStatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -96,7 +96,7 @@ public class Combination {
 	@SuppressWarnings("deprecation")
 	public void Trainer(final Player p, String combo) {
 		
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
 		
 		
@@ -157,7 +157,7 @@ public class Combination {
 				dir.normalize();
 				dir.multiply(1.5);
 				Arrow ar = (Arrow) p.getWorld().spawnEntity(p.getEyeLocation(), EntityType.ARROW);
-				int dmg = UserManager.getinstance(p).meleedmgcalculate(p, 1);
+				int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
 				ar.setVelocity(dir);
 				ar.setCustomName("dart"+":"+p.getName());
 				
@@ -219,7 +219,7 @@ public class Combination {
 								p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2);
 								meleehit.put(e, 0);
 								LivingEntity le = (LivingEntity) e;
-								int dmg = UserManager.getinstance(p).meleedmgcalculate(p, 1);
+								int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
 								Damage.getinstance().taken(dmg, le, p);
 								EntityStatusManager.getinstance(le).KnockBack(p, 0.3);
 								
@@ -300,10 +300,10 @@ public class Combination {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
-		int lvl = UserStatManager.getinstance(p).getlvl();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
 		int impulseswitchshieldmana = ClassAbility.Aether.ImpulseSwitchShieldmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
 		int shieldswitchchargemana = ClassAbility.Aether.ShieldSwitchChargemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
@@ -424,10 +424,10 @@ public class Combination {
 
 	public void Accelerator(Player p, String combo) {
 		
-		int lvl = UserStatManager.getinstance(p).getlvl();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
 		int RLmana = ClassAbility.Accelerator.movehitmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
 		int RRmana = ClassAbility.Accelerator.adrenalinemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
@@ -549,10 +549,10 @@ public class Combination {
 	
 	public void ByV(Player p, String combo) {
 		
-		int lvl = UserStatManager.getinstance(p).getlvl();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 
 		
 		int RLmana = ClassAbility.ByV.recovermana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
@@ -699,11 +699,11 @@ public class Combination {
 
 	public void Phlox(Player p, String combo) {
 		
-		int lvl = UserStatManager.getinstance(p).getlvl();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int CurrentRobot = PlayerFunction.getinstance(p).PHNanoRobot;
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
 		int RLrobot = ClassAbility.Phlox.healrobot;
 		int RRrobot = ClassAbility.Phlox.escaperobot;
@@ -851,10 +851,10 @@ public class Combination {
 	
 	public void Blaster(Player p, String combo) {
 		
-		int lvl = UserStatManager.getinstance(p).getlvl();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = UserManager.getinstance(p).ManaDecrease;
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
 		int RLmana = ClassAbility.Blaster.railgunmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
 		int RRmana = ClassAbility.Blaster.grenadelaunchermana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();

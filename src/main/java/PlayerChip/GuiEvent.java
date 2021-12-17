@@ -4,9 +4,9 @@ import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
 import Party.PartyManager;
 import ReturnToBase.ReturnMech;
-import PlayerData.UserFileManager;
-import PlayerData.UserManager;
-import PlayerData.UserStatManager;
+import PlayerManager.PlayerFileManager;
+import PlayerManager.PlayerManager;
+import PlayerManager.PlayerStatManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -191,7 +191,7 @@ public class GuiEvent implements Listener {
 			
 			
 			try {	
-				int currentgold = UserFileManager.getinstance().getGold(player);
+				int currentgold = PlayerFileManager.getinstance().getGold(player);
 				int content = Integer.parseInt(e.getMessage());
 				
 				if(currentgold < content) {
@@ -294,37 +294,37 @@ public class GuiEvent implements Listener {
 		if(rawslot == 11) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				UserStatManager.getinstance(p).statadd(p, "str", 1);
+				PlayerStatManager.getinstance(p).statadd(p, "str", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				UserStatManager.getinstance(p).statadd(p, "str", 5);
+				PlayerStatManager.getinstance(p).statadd(p, "str", 5);
 			}
 		}
 		if(rawslot == 12) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				UserStatManager.getinstance(p).statadd(p, "dex", 1);
+				PlayerStatManager.getinstance(p).statadd(p, "dex", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				UserStatManager.getinstance(p).statadd(p, "dex", 5);
+				PlayerStatManager.getinstance(p).statadd(p, "dex", 5);
 			}
 		}
 		if(rawslot == 14) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				UserStatManager.getinstance(p).statadd(p, "def", 1);
+				PlayerStatManager.getinstance(p).statadd(p, "def", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				UserStatManager.getinstance(p).statadd(p, "def", 5);
+				PlayerStatManager.getinstance(p).statadd(p, "def", 5);
 			}
 		}
 		if(rawslot == 15) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				UserStatManager.getinstance(p).statadd(p, "agi", 1);
+				PlayerStatManager.getinstance(p).statadd(p, "agi", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				UserStatManager.getinstance(p).statadd(p, "agi", 5);
+				PlayerStatManager.getinstance(p).statadd(p, "agi", 5);
 			}
 		}
 		if(rawslot == 27) {
@@ -340,7 +340,7 @@ public class GuiEvent implements Listener {
 			}
 			if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equals("정말로 초기화 하시겠습니까?")) {
 				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 0);
-				UserStatManager.getinstance(p).statreset();
+				PlayerStatManager.getinstance(p).statreset();
 			}	
 		}
 		
@@ -352,7 +352,7 @@ public class GuiEvent implements Listener {
 		Player p = (Player) e.getWhoClicked();
 
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
-		UserFileManager.getinstance().UserDetailClassDataSave(p);
+		PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		
 		Classgui.getinstance().ClassSelectGuiOpen(p);
 		
@@ -368,44 +368,44 @@ public class GuiEvent implements Listener {
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			UserFileManager.getinstance().UserDetailClassCallData(p, 
-					UserFileManager.getinstance().UserDetailClassRegister(p, "아이테르"));
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "아이테르"));
 			
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
 		if(rawslot == 12) {
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			UserFileManager.getinstance().UserDetailClassCallData(p, 
-					UserFileManager.getinstance().UserDetailClassRegister(p, "엑셀러레이터"));
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "엑셀러레이터"));
 			
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
 		if(rawslot == 13) {
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			UserFileManager.getinstance().UserDetailClassCallData(p, 
-					UserFileManager.getinstance().UserDetailClassRegister(p, "블래스터"));
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "블래스터"));
 			
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
 		if(rawslot == 14) {
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			UserFileManager.getinstance().UserDetailClassCallData(p, 
-					UserFileManager.getinstance().UserDetailClassRegister(p, "바이V"));
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "바이V"));
 			
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
 		if(rawslot == 15) {
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
-			UserFileManager.getinstance().UserDetailClassCallData(p, 
-					UserFileManager.getinstance().UserDetailClassRegister(p, "플록스"));
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "플록스"));
 			
-			UserFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
 		if(rawslot == 27) {
 			Classgui.getinstance().ClassSelectGuiOpen(p);
@@ -419,8 +419,8 @@ public class GuiEvent implements Listener {
 		int rawslot = e.getRawSlot();
 		Player player = (Player) e.getWhoClicked();
 		InventoryAction action = e.getAction();
-		String CurrentClass = UserManager.getinstance(player).CurrentClass+"/"+
-				Integer.toString(UserManager.getinstance(player).CurrentClassNumber);
+		String CurrentClass = PlayerManager.getinstance(player).CurrentClass+"/"+
+				Integer.toString(PlayerManager.getinstance(player).CurrentClassNumber);
 
 		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
@@ -443,12 +443,12 @@ public class GuiEvent implements Listener {
 		
 		if(action==InventoryAction.PICKUP_ALL) {
 			
-			for(String Class : UserFileManager.getinstance().getClasses(player)) {
+			for(String Class : PlayerFileManager.getinstance().getClasses(player)) {
 				
 				if(rawslot == 1) {
-					UserFileManager.getinstance().UserDetailClassDataSave(player);
+					PlayerFileManager.getinstance().UserDetailClassDataSave(player);
 					
-					UserFileManager.getinstance().UserDetailClassCallData(player, Class);
+					PlayerFileManager.getinstance().UserDetailClassCallData(player, Class);
 
 					Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 						@Override
@@ -457,7 +457,7 @@ public class GuiEvent implements Listener {
 						}
 					}, 0);
 					
-					UserFileManager.getinstance().UserDetailClassDataSave(player);
+					PlayerFileManager.getinstance().UserDetailClassDataSave(player);
 				}
 				rawslot --;
 				
@@ -465,7 +465,7 @@ public class GuiEvent implements Listener {
 		}
 		if(action==InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			
-			for(String Class : UserFileManager.getinstance().getClasses(player)) {
+			for(String Class : PlayerFileManager.getinstance().getClasses(player)) {
 				
 				if(rawslot == 1) {
 					if(CurrentClass.equals(Class)) {
@@ -473,7 +473,7 @@ public class GuiEvent implements Listener {
 						player.sendMessage("§c현재 클래스는 삭제 할 수 없습니다");
 						return;
 					}
-					UserManager.getinstance(player).AskDeleteClassName = Class;
+					PlayerManager.getinstance(player).AskDeleteClassName = Class;
 					Classgui.getinstance().ClassDeleteAskAreYouSureGuiOpen(player, e.getCurrentItem());
 				}
 				rawslot --;
@@ -491,7 +491,7 @@ public class GuiEvent implements Listener {
 		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
-			UserFileManager.getinstance().UserDetailClassDelete(player, UserManager.getinstance(player).AskDeleteClassName);
+			PlayerFileManager.getinstance().UserDetailClassDelete(player, PlayerManager.getinstance(player).AskDeleteClassName);
 			player.closeInventory();
 		}
 		if(rawslot == 15) {
@@ -524,7 +524,7 @@ public class GuiEvent implements Listener {
 	
 	public void GoldSetPlayerAmount(Player sender, Player receiver) {
 		
-		int gold = UserFileManager.getinstance().getGold(sender);
+		int gold = PlayerFileManager.getinstance().getGold(sender);
 		sender.sendMessage("§6"+receiver.getName()+"님에게 보낼 알테라를 입력해주세요. 현재 알테라 "+gold);
 		GoldAllowReadingChatAmount.put(sender, receiver);
 		
@@ -533,11 +533,11 @@ public class GuiEvent implements Listener {
 	
 	public void GoldSendPlayertoPlayer(Player sender, Player receiver, int gold) {
 		
-		int sendergold = UserFileManager.getinstance().getGold(sender);
-		UserFileManager.getinstance().setGold(sender, sendergold - gold);
+		int sendergold = PlayerFileManager.getinstance().getGold(sender);
+		PlayerFileManager.getinstance().setGold(sender, sendergold - gold);
 		
-		int receivergold = UserFileManager.getinstance().getGold(receiver);
-		UserFileManager.getinstance().setGold(receiver, receivergold + gold);
+		int receivergold = PlayerFileManager.getinstance().getGold(receiver);
+		PlayerFileManager.getinstance().setGold(receiver, receivergold + gold);
 		
 		UserAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
 		UserAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");

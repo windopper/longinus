@@ -28,7 +28,7 @@
   </repository>
   <!-- And so on -->
 </repositories>
-  
+
   <dependencies>
   <dependency>
     <groupId>com.comphenix.protocol</groupId>

@@ -1,11 +1,10 @@
-package DynamicData;
+package PlayerManager;
 
-import PlayerData.UserManager;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
-public class PlayerEnergy extends UserManager {
+public class PlayerEnergy extends PlayerManager {
 	
 	private static final HashMap<Player, PlayerEnergy> PlayerEnergy = new HashMap<>();
 	
@@ -61,21 +60,17 @@ public class PlayerEnergy extends UserManager {
 	public void setPreviousSkill(String previousSkill) {
 		PreviousSkill = previousSkill;
 	}
-	
-	
-	
+
 	public void Regeneration() {
 		
 		if(Energy<=20) {
-			Energy += UserManager.getinstance(p).EnergyPerSecond * EnergyRate;
+			Energy += PlayerManager.getinstance(p).EnergyPerSecond * EnergyRate;
 			p.setFoodLevel((int)Energy);
 		}
 		if(Energy>20) {
 			Energy = 20;
 			p.setFoodLevel((int)Energy);
 		}
-
-		
 	}
 	
 	public void OverloadCoolDown() {

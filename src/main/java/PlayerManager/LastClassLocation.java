@@ -1,6 +1,4 @@
-package PlayerData;
-
-import java.io.File;
+package PlayerManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,17 +6,19 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-public class Classlocation {
+import java.io.File;
+
+public class LastClassLocation {
 	
-	private static Classlocation Classlocation;
+	private static LastClassLocation LastClassLocation;
 	
-	private Classlocation() {
+	private LastClassLocation() {
 		
 	}
 	
-	public static Classlocation getinstance() {
-		if(Classlocation == null) Classlocation = new Classlocation();
-		return Classlocation;
+	public static LastClassLocation getinstance() {
+		if(LastClassLocation == null) LastClassLocation = new LastClassLocation();
+		return LastClassLocation;
 	}
 
 	public String coordtostring(Player p) {

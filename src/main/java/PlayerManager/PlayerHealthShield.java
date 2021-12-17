@@ -1,8 +1,10 @@
-package DynamicData;
+package PlayerManager;
 
 import CustomEvents.PlayerDeathEvent;
-import PlayerData.UserManager;
+import DynamicData.HologramIndicator;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import spellinteracttest.Main;
 
@@ -27,8 +29,8 @@ public class PlayerHealthShield {
 	
 	private PlayerHealthShield(Player p) {
 		this.p = p;
-		CurrentShield = UserManager.getinstance(p).ShieldRaw;
-		CurrentHealth = UserManager.getinstance(p).Health;
+		CurrentShield = PlayerManager.getinstance(p).ShieldRaw;
+		CurrentHealth = PlayerManager.getinstance(p).Health;
 	}
 	
 	public static PlayerHealthShield getinstance(Player p) {
@@ -73,12 +75,64 @@ public class PlayerHealthShield {
 		ShieldRegenerateCooldown = shieldRegenerateCooldown;
 	}
 
+	public void HealthAdd(int addhealth) {
+
+		if(CurrentHealth > 0) {
+			if(CurrentHealth + addhealth > PlayerManager.getinstance(p).Health) {
+				CurrentHealth = PlayerManager.getinstance(p).Health;
+
+				HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
+				return;
+			}
+
+			CurrentHealth += addhealth;
+			HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
+		}
+	}
+
+	public void ShieldAdd(int addshield) {
+		if(CurrentHealth > 0) {
+			CurrentShield += addshield;
+		}
+	}
+
+	public void setDamage(int damage) {
+
+		if(getShieldRegenerateStop()==0) //피해 받으면 보호막 재생이 멈춤
+			setShieldRegenerateStop();
+
+		// 쉴드가 있을때
+		if(getCurrentShield() > 0) {
+			if(getCurrentShield()-damage <= 0) { //쉴드가 깨짐
+				setCurrentShield(0);
+				setShieldRegenerateCooldown(0);
+				p.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation(), 50, 0.5, 0.5, 0.5, Material.PURPLE_GLAZED_TERRACOTTA.createBlockData());
+				HologramIndicator.getinstance().ShieldBroken(p);
+				PlayerEffectEvent.getInstance().ShieldBrokenEffect(p);
+
+			}
+			else {
+				setCurrentShield(getCurrentShield()-damage);
+			}
+
+		}
+		// 쉴드가 없을때
+		else {
+			if(getCurrentHealth() - damage>0) {
+				setCurrentHealth(getCurrentHealth() - damage);
+			}
+			else {
+				setCurrentHealth(0);
+			}
+		}
+	}
+
 	@SuppressWarnings("deprecation")
 	public void HealthWatcher() {
 		
-		final int MaxHealth = UserManager.getinstance(p).Health;
+		final int MaxHealth = PlayerManager.getinstance(p).Health;
 		
-		String CurrentClass = UserManager.getinstance(p).CurrentClass;
+		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		double Heart = p.getMaxHealth() * ((double)CurrentHealth/MaxHealth);
 		
 		if(CurrentHealth > MaxHealth) {
@@ -101,15 +155,6 @@ public class PlayerHealthShield {
 			}, 0);
 		}
 
-//		if(CurrentHealth < 0) {
-//			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
-//				@Override
-//				public void run() {
-//					Bukkit.getPluginManager().callEvent(new PlayerDeathEvent(p));
-//				}
-//			}, 0);
-//		}
-
 		if(CurrentShield>0) { // 쉴드
 			p.setAbsorptionAmount(CurrentShield/100);
 		}
@@ -121,8 +166,8 @@ public class PlayerHealthShield {
 	
 	public void ShieldRegeneration() {
 		
-		final int MaxShield = UserManager.getinstance(p).ShieldRaw;
-		String CurrentClass = UserManager.getinstance(p).CurrentClass;
+		final int MaxShield = PlayerManager.getinstance(p).ShieldRaw;
+		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		
 		if(CurrentShield > MaxShield) { // 현재 보호막이 최대를 넘을때
 			
@@ -177,25 +222,6 @@ public class PlayerHealthShield {
 
 		}
 	}
-	public void HealthAdd(int addhealth) {
-		
-		if(CurrentHealth > 0) {
-			if(CurrentHealth + addhealth > UserManager.getinstance(p).Health) {
-				CurrentHealth = UserManager.getinstance(p).Health;
-				
-				HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
-				return;
-			}
-			
-			CurrentHealth += addhealth;
-			HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
-		}
-	}
-	
-	public void ShieldAdd(int addshield) {
-		if(CurrentHealth > 0) {
-			CurrentShield += addshield;
-		}
-	}
+
 
 }

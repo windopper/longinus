@@ -3,7 +3,7 @@ package QuestClasses;
 import QuestFunctions.QuestList;
 import QuestFunctions.UserQuestManager;
 import org.bukkit.entity.Player;
-import PlayerData.UserStatManager;
+import PlayerManager.PlayerStatManager;
 
 import java.util.HashMap;
 
@@ -46,7 +46,7 @@ public class TestQuest {
 
         // When Progress is 0
         if(QuestStep == 0) {
-            if(QuestList.valueOf(Questname).getLevelReq() > UserStatManager.getinstance(p).getlvl()) {
+            if(QuestList.valueOf(Questname).getLevelReq() > PlayerStatManager.getinstance(p).getlvl()) {
                 p.sendMessage("레벨부족");
             }
             else {
