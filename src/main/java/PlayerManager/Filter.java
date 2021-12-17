@@ -1,4 +1,4 @@
-package PlayerData;
+package PlayerManager;
 
 import org.bukkit.entity.Player;
 
@@ -18,8 +18,8 @@ public class Filter {
 		 
 		 */
 		
-		String CurrentClass = UserManager.getinstance(p).CurrentClass;
-		String WeaponClass = UserManager.getinstance(p).WeaponClass;
+		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
+		String WeaponClass = PlayerManager.getinstance(p).WeaponClass;
 
 		
 		if(WeaponClass.equals("없음")) {
@@ -68,7 +68,7 @@ public class Filter {
 	}
 	
 	public static void UserRequirementChecker(int req, Player p) {
-		int level = UserStatManager.getinstance(p).getlvl();
+		int level = PlayerStatManager.getinstance(p).getlvl();
 		if(level<req) {
 			p.sendMessage("§c아직 필요레벨을 충족하지 못하였습니다");
 		}
@@ -77,61 +77,61 @@ public class Filter {
 	
 	private static boolean UserRequirementChecker(Player p) {
 
-		int lvl = UserStatManager.getinstance(p).getlvl();
-		int str = UserStatManager.getinstance(p).getStr();
-		int dex = UserStatManager.getinstance(p).getDex();
-		int def = UserStatManager.getinstance(p).getDef();
-		int agi = UserStatManager.getinstance(p).getAgi();
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int str = PlayerStatManager.getinstance(p).getStr();
+		int dex = PlayerStatManager.getinstance(p).getDex();
+		int def = PlayerStatManager.getinstance(p).getDef();
+		int agi = PlayerStatManager.getinstance(p).getAgi();
 		
-		if(lvl < UserManager.getinstance(p).WeaponLevelreq || 
-				lvl < UserManager.getinstance(p).HelmetLevelreq ||
-				lvl < UserManager.getinstance(p).ChestplateLevelreq ||
-				lvl < UserManager.getinstance(p).LeggingsLevelreq ||
-				lvl < UserManager.getinstance(p).BootsLevelreq) {
+		if(lvl < PlayerManager.getinstance(p).WeaponLevelreq ||
+				lvl < PlayerManager.getinstance(p).HelmetLevelreq ||
+				lvl < PlayerManager.getinstance(p).ChestplateLevelreq ||
+				lvl < PlayerManager.getinstance(p).LeggingsLevelreq ||
+				lvl < PlayerManager.getinstance(p).BootsLevelreq) {
 			
 			p.sendMessage("§c아직 필요레벨을 충족하지 못하였습니다");
 			
 			return false;
 		}
 		
-		if(str < UserManager.getinstance(p).WeaponStrreq || 
-				str < UserManager.getinstance(p).HelmetStrreq ||
-				str < UserManager.getinstance(p).ChestplateStrreq ||
-				str < UserManager.getinstance(p).LeggingsStrreq ||
-				str < UserManager.getinstance(p).BootsStrreq) {
+		if(str < PlayerManager.getinstance(p).WeaponStrreq ||
+				str < PlayerManager.getinstance(p).HelmetStrreq ||
+				str < PlayerManager.getinstance(p).ChestplateStrreq ||
+				str < PlayerManager.getinstance(p).LeggingsStrreq ||
+				str < PlayerManager.getinstance(p).BootsStrreq) {
 			
 			p.sendMessage("§c무기강화스탯이 부족합니다");
 			
 			return false;
 		}
 		
-		if(dex < UserManager.getinstance(p).WeaponDexreq || 
-				dex < UserManager.getinstance(p).HelmetDexreq ||
-				dex < UserManager.getinstance(p).ChestplateDexreq ||
-				dex < UserManager.getinstance(p).LeggingsDexreq ||
-				dex < UserManager.getinstance(p).BootsDexreq) {
+		if(dex < PlayerManager.getinstance(p).WeaponDexreq ||
+				dex < PlayerManager.getinstance(p).HelmetDexreq ||
+				dex < PlayerManager.getinstance(p).ChestplateDexreq ||
+				dex < PlayerManager.getinstance(p).LeggingsDexreq ||
+				dex < PlayerManager.getinstance(p).BootsDexreq) {
 			
 			p.sendMessage("§c감각강화스탯이 부족합니다");	
 			
 			return false;
 		}
 		
-		if(def < UserManager.getinstance(p).WeaponDefreq || 
-				def < UserManager.getinstance(p).HelmetDefreq ||
-				def < UserManager.getinstance(p).ChestplateDefreq ||
-				def < UserManager.getinstance(p).LeggingsDefreq ||
-				def < UserManager.getinstance(p).BootsDefreq) {
+		if(def < PlayerManager.getinstance(p).WeaponDefreq ||
+				def < PlayerManager.getinstance(p).HelmetDefreq ||
+				def < PlayerManager.getinstance(p).ChestplateDefreq ||
+				def < PlayerManager.getinstance(p).LeggingsDefreq ||
+				def < PlayerManager.getinstance(p).BootsDefreq) {
 			
 			p.sendMessage("§c외피강화스탯이 부족합니다");
 			
 			return false;
 		}
 		
-		if(agi < UserManager.getinstance(p).WeaponAgireq || 
-				agi < UserManager.getinstance(p).HelmetAgireq ||
-				agi < UserManager.getinstance(p).ChestplateAgireq ||
-				agi < UserManager.getinstance(p).LeggingsAgireq ||
-				agi < UserManager.getinstance(p).BootsAgireq) {
+		if(agi < PlayerManager.getinstance(p).WeaponAgireq ||
+				agi < PlayerManager.getinstance(p).HelmetAgireq ||
+				agi < PlayerManager.getinstance(p).ChestplateAgireq ||
+				agi < PlayerManager.getinstance(p).LeggingsAgireq ||
+				agi < PlayerManager.getinstance(p).BootsAgireq) {
 			
 			p.sendMessage("§c기동강화스탯이 부족합니다");
 			

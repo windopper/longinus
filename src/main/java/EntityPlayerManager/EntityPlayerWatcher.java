@@ -1,8 +1,9 @@
 package EntityPlayerManager;
 
-import DynamicData.EntityManager;
+import Mob.EntityManager;
 import Mob.MobListManager;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
@@ -17,27 +18,44 @@ import java.util.HashMap;
 
 public class EntityPlayerWatcher {
 
-    public static void EntityWrapper(EntityPlayer entityPlayer, LivingEntity WrappedEntity, MobListManager.MobList mobList) {
+    public static EntityManager EntityWrapper(EntityPlayer entityPlayer, LivingEntity WrappedEntity, MobListManager.MobList mobList) {
         HashMap<Entity, Location> disguises = new HashMap<>();
         disguises.put(entityPlayer.getBukkitEntity(), new Location(WrappedEntity.getWorld(), 0, 0, 0));
-        EntityManager.getinstance(WrappedEntity, mobList, disguises);
+        return EntityManager.getinstance(WrappedEntity, mobList, disguises);
     }
 
     public static void Remove(EntityPlayer entityPlayer) {
-        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.d, entityPlayer);
+        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer);
+        PacketPlayOutEntityDestroy packetPlayOutEntityDestroy = new PacketPlayOutEntityDestroy(entityPlayer.getId());
 
         for(Player player : Bukkit.getOnlinePlayers()) {
             PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
             playerConnection.sendPacket(packetPlayOutPlayerInfo);
+            playerConnection.sendPacket(packetPlayOutEntityDestroy);
         }
+
+        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
+                playerConnection.sendPacket(packetPlayOutPlayerInfo);
+                playerConnection.sendPacket(packetPlayOutEntityDestroy);
+            }
+        }, 8);
         
     }
 
     public static void Remove(EntityPlayer entityPlayer, Player player) {
-        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.d, entityPlayer);
+        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, entityPlayer);
+        PacketPlayOutEntityDestroy packetPlayOutEntityDestroy = new PacketPlayOutEntityDestroy(entityPlayer.getId());
 
-        PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
+        final PlayerConnection playerConnection = ((CraftPlayer) player).getHandle().b;
         playerConnection.sendPacket(packetPlayOutPlayerInfo);
+        playerConnection.sendPacket(packetPlayOutEntityDestroy);
+
+        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+            playerConnection.sendPacket(packetPlayOutPlayerInfo);
+            playerConnection.sendPacket(packetPlayOutEntityDestroy);
+        }, 8);
 
     }
 

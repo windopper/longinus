@@ -1,4 +1,4 @@
-package PlayerData;
+package PlayerManager;
 
 import Mob.MobListManager;
 import QuestFunctions.QuestList;
@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Set;
 
-public class UserFileManager {
+public class PlayerFileManager {
 	
-	private static UserFileManager UserFile;
+	private static PlayerFileManager UserFile;
 	
 	final static String[] data = {".str", ".dex", ".def", ".agi", ".lvl", ".exp", ".coord"};
 	private final static String[] Storage = {
@@ -31,12 +31,12 @@ public class UserFileManager {
 			"45","46","47","48","49","50","51"};
 
 	
-	private UserFileManager() {
+	private PlayerFileManager() {
 		
 	}
 	
-	public static UserFileManager getinstance() {
-		if(UserFile == null) UserFile = new UserFileManager();
+	public static PlayerFileManager getinstance() {
+		if(UserFile == null) UserFile = new PlayerFileManager();
 		return UserFile;
 	}
 	
@@ -366,16 +366,16 @@ public class UserFileManager {
 		p.updateInventory();
 		
 		
-		UserManager.getinstance(p).CurrentClass = classname.split("/")[0];
-		UserManager.getinstance(p).CurrentClassNumber = Integer.parseInt(classname.split("/")[1]);
-		UserStatManager.getinstance(p).setStr(config.getInt(classaddress+".str"));
-		UserStatManager.getinstance(p).setDex(config.getInt(classaddress+".dex"));
-		UserStatManager.getinstance(p).setDef(config.getInt(classaddress+".def"));
-		UserStatManager.getinstance(p).setAgi(config.getInt(classaddress+".agi"));
-		UserStatManager.getinstance(p).setlvl(config.getInt(classaddress+".lvl") <= 0 ? 1 : config.getInt(classaddress+".lvl"));
-		UserStatManager.getinstance(p).setexp(config.getInt(classaddress+".exp"));
+		PlayerManager.getinstance(p).CurrentClass = classname.split("/")[0];
+		PlayerManager.getinstance(p).CurrentClassNumber = Integer.parseInt(classname.split("/")[1]);
+		PlayerStatManager.getinstance(p).setStr(config.getInt(classaddress+".str"));
+		PlayerStatManager.getinstance(p).setDex(config.getInt(classaddress+".dex"));
+		PlayerStatManager.getinstance(p).setDef(config.getInt(classaddress+".def"));
+		PlayerStatManager.getinstance(p).setAgi(config.getInt(classaddress+".agi"));
+		PlayerStatManager.getinstance(p).setlvl(config.getInt(classaddress+".lvl") <= 0 ? 1 : config.getInt(classaddress+".lvl"));
+		PlayerStatManager.getinstance(p).setexp(config.getInt(classaddress+".exp"));
 		
-		Classlocation.getinstance().classchangeteleport(p, classname); // 텔레포트
+		LastClassLocation.getinstance().classchangeteleport(p, classname); // 텔레포트
 		
 		
 		ItemStack air = new ItemStack(org.bukkit.Material.AIR, 1);
@@ -418,25 +418,25 @@ public class UserFileManager {
 	
 	public void UserDetailClassDataSave(final Player p) {
 		
-		if(UserManager.getinstance(p).CurrentClass.equals("없음")) return;
+		if(PlayerManager.getinstance(p).CurrentClass.equals("없음")) return;
 		
 		String uuid = p.getUniqueId().toString();
 		String username = p.getName();
-		String classaddress = "Class."+UserManager.getinstance(p).CurrentClass+"/"
-		+Integer.toString(UserManager.getinstance(p).CurrentClassNumber);
+		String classaddress = "Class."+ PlayerManager.getinstance(p).CurrentClass+"/"
+		+Integer.toString(PlayerManager.getinstance(p).CurrentClassNumber);
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 		
-		config.set(classaddress+".str", UserStatManager.getinstance(p).getStr());
-		config.set(classaddress+".dex", UserStatManager.getinstance(p).getDex());
-		config.set(classaddress+".def", UserStatManager.getinstance(p).getDef());
-		config.set(classaddress+".agi", UserStatManager.getinstance(p).getAgi());
-		config.set(classaddress+".lvl", UserStatManager.getinstance(p).getlvl());
-		config.set(classaddress+".exp", UserStatManager.getinstance(p).getexp());
-		config.set(classaddress+".coord", Classlocation.getinstance().coordtostring(p));
-		config.set("PreviousClass", UserManager.getinstance(p).CurrentClass+"/"
-		+Integer.toString(UserManager.getinstance(p).CurrentClassNumber));
+		config.set(classaddress+".str", PlayerStatManager.getinstance(p).getStr());
+		config.set(classaddress+".dex", PlayerStatManager.getinstance(p).getDex());
+		config.set(classaddress+".def", PlayerStatManager.getinstance(p).getDef());
+		config.set(classaddress+".agi", PlayerStatManager.getinstance(p).getAgi());
+		config.set(classaddress+".lvl", PlayerStatManager.getinstance(p).getlvl());
+		config.set(classaddress+".exp", PlayerStatManager.getinstance(p).getexp());
+		config.set(classaddress+".coord", LastClassLocation.getinstance().coordtostring(p));
+		config.set("PreviousClass", PlayerManager.getinstance(p).CurrentClass+"/"
+		+Integer.toString(PlayerManager.getinstance(p).CurrentClassNumber));
 	
 		for(int i=0; i<41; i++) {
 			

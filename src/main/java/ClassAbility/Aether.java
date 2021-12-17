@@ -1,9 +1,9 @@
 package ClassAbility;
 
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealthShield;
-import PlayerData.UserManager;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 import org.bukkit.*;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -177,7 +177,7 @@ public class Aether {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
 		
-		int add = (int)((double)UserManager.getinstance(p).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
+		int add = (int)((double) PlayerManager.getinstance(p).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (PlayerManager.getinstance(p).Shield + 100) / 100);
 		
 		summonCircle4(p.getLocation(), 1);
 		
@@ -194,7 +194,7 @@ public class Aether {
 		for(Entity pl : p.getNearbyEntities(6, 6, 6)) { // 근처 아군
 			if(pl instanceof Player && !entitycheck.duelcheck(pl, p)) {
 				Player pla = (Player) pl;
-				add = (int)((double)UserManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (UserManager.getinstance(p).Shield + 100) / 100);
+				add = (int)((double) PlayerManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (PlayerManager.getinstance(p).Shield + 100) / 100);
 				
 				PlayerHealthShield.getinstance(pla).ShieldAdd(add);
 				
@@ -304,7 +304,7 @@ public class Aether {
 		Spell.setEntityPassable(true);
 		Spell.setDamageRate(1);
 		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 0);
-		Spell.setmultiplyDamage((double) PlayerHealthShield.getinstance(p).getCurrentShield() / (double)UserManager.getinstance(p).ShieldRaw);
+		Spell.setmultiplyDamage((double) PlayerHealthShield.getinstance(p).getCurrentShield() / (double) PlayerManager.getinstance(p).ShieldRaw);
 		
 		
 		
@@ -392,7 +392,7 @@ public class Aether {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 
-		double i = Double.parseDouble(String.format("%.2f",PF.AEImpulse +(double)takendmg/(double)UserManager.getinstance(p).Health * 400));
+		double i = Double.parseDouble(String.format("%.2f",PF.AEImpulse +(double)takendmg/(double) PlayerManager.getinstance(p).Health * 400));
 		PF.AEImpulse = i;
 		
 		if(PF.AEImpulse > 1000) {

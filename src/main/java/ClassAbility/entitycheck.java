@@ -1,12 +1,7 @@
 package ClassAbility;
 
 import Duel.DuelManager;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ShulkerBullet;
+import org.bukkit.entity.*;
 
 public class entitycheck {
 	
@@ -14,6 +9,9 @@ public class entitycheck {
 		
 		if((e instanceof Player || e instanceof LivingEntity) && !(e instanceof ArmorStand) && !(e instanceof ShulkerBullet)
 				&& !(e instanceof FallingBlock)) {
+
+			if(e.isInvulnerable()) return false;
+
 			return true;
 		}
 		return false;

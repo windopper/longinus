@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import QuestFunctions.QuestList;
-import PlayerData.UserManager;
+import PlayerManager.PlayerManager;
 
 public class Questgui {
 	
@@ -49,8 +49,8 @@ public class Questgui {
 	public Inventory QuestBooks(Inventory gui, Player p) {
 		
 		String uuid = p.getUniqueId().toString();
-		String CurrentClass = UserManager.getinstance(p).CurrentClass;
-		int CurrentClassNumber = UserManager.getinstance(p).CurrentClassNumber;
+		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
+		int CurrentClassNumber = PlayerManager.getinstance(p).CurrentClassNumber;
 		String path = "Class."+CurrentClass+"/"+CurrentClassNumber+".quests";
 		
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");

@@ -1,5 +1,6 @@
 package Mob;
 
+import QuestClasses.Tutorial;
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
@@ -7,7 +8,7 @@ import net.minecraft.world.entity.monster.EntityZombie;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_17_R1.*;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -18,15 +19,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.ProtocolManager;
-
-import QuestClasses.Tutorial;
-import DynamicData.EntityStatusManager;
-
 public class mob {
-	
-	static final ProtocolManager manager = ProtocolLibrary.getProtocolManager();
 	
 	public void mobdelete() {
 		for(LivingEntity e : Bukkit.getWorld("world").getLivingEntities()) {

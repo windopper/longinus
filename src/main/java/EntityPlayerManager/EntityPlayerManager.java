@@ -32,6 +32,17 @@ import java.util.UUID;
 
 public class EntityPlayerManager {
 
+    private static EntityPlayerManager entityPlayerManager = null;
+
+    private EntityPlayerManager() {
+
+    }
+
+    public static EntityPlayerManager getInstance() {
+        if(entityPlayerManager==null) entityPlayerManager = new EntityPlayerManager();
+        return entityPlayerManager;
+    }
+
     public EntityPlayer summonnpc(World world, Location location, String texture, String signature) {
 
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
@@ -103,7 +114,6 @@ public class EntityPlayerManager {
             scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
         }
 
-
         scoreboardTeam.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.d);
 
         Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
@@ -116,7 +126,7 @@ public class EntityPlayerManager {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }, 20);
+        }, 10);
 
         Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
             fixSkinHelmetLayerForPlayer(npc, player);

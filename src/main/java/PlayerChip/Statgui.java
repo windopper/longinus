@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import net.md_5.bungee.api.ChatColor;
-import PlayerData.UserStatManager;
+import PlayerManager.PlayerStatManager;
 
 public class Statgui {
 
@@ -56,18 +56,18 @@ public class Statgui {
 	
 	public ItemStack StrItem(Player p) {
 		
-		String str = Integer.toString(UserStatManager.getinstance(p).getStr());
-		String str_2 = Integer.toString(UserStatManager.getinstance(p).getStr()+1);
+		String str = Integer.toString(PlayerStatManager.getinstance(p).getStr());
+		String str_2 = Integer.toString(PlayerStatManager.getinstance(p).getStr()+1);
 		
-		String per = stattopercentage(UserStatManager.getinstance(p).getStr());
-		String per_2 = stattopercentage(UserStatManager.getinstance(p).getStr()+1);
+		String per = stattopercentage(PlayerStatManager.getinstance(p).getStr());
+		String per_2 = stattopercentage(PlayerStatManager.getinstance(p).getStr()+1);
 		
 		
 		ItemStack item = new ItemStack(Material.IRON_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&c무기강화 Lv."+str));
 		
-		if(UserStatManager.getinstance(p).getStr()<100) {
+		if(PlayerStatManager.getinstance(p).getStr()<100) {
 			
 			meta.setLore(Arrays.asList(
 					"",
@@ -80,7 +80,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 		}
 		else {
 			
@@ -95,7 +95,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 			
 		}
 		
@@ -111,17 +111,17 @@ public class Statgui {
 	
 	public ItemStack DexItem(Player p) {
 		
-		String str = Integer.toString(UserStatManager.getinstance(p).getDex());
-		String str_2 = Integer.toString(UserStatManager.getinstance(p).getDex()+1);
+		String str = Integer.toString(PlayerStatManager.getinstance(p).getDex());
+		String str_2 = Integer.toString(PlayerStatManager.getinstance(p).getDex()+1);
 		
-		String per = stattopercentage(UserStatManager.getinstance(p).getDex());
-		String per_2 = stattopercentage(UserStatManager.getinstance(p).getDex()+1);
+		String per = stattopercentage(PlayerStatManager.getinstance(p).getDex());
+		String per_2 = stattopercentage(PlayerStatManager.getinstance(p).getDex()+1);
 		
 		ItemStack item = new ItemStack(Material.ENDER_EYE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&e감각강화 Lv."+str));
 
-		if(UserStatManager.getinstance(p).getDex()<100) {
+		if(PlayerStatManager.getinstance(p).getDex()<100) {
 			
 			meta.setLore(Arrays.asList(
 					"",
@@ -134,7 +134,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 		}
 		else {
 			
@@ -149,7 +149,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 			
 		}
 		
@@ -162,17 +162,17 @@ public class Statgui {
 	
 	public ItemStack DefItem(Player p) {
 		
-		String str = Integer.toString(UserStatManager.getinstance(p).getDef());
-		String str_2 = Integer.toString(UserStatManager.getinstance(p).getDef()+1);
+		String str = Integer.toString(PlayerStatManager.getinstance(p).getDef());
+		String str_2 = Integer.toString(PlayerStatManager.getinstance(p).getDef()+1);
 		
-		String per = stattopercentage(UserStatManager.getinstance(p).getDef());
-		String per_2 = stattopercentage(UserStatManager.getinstance(p).getDef()+1);
+		String per = stattopercentage(PlayerStatManager.getinstance(p).getDef());
+		String per_2 = stattopercentage(PlayerStatManager.getinstance(p).getDef()+1);
 		
 		ItemStack item = new ItemStack(Material.IRON_CHESTPLATE, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&5외피강화 Lv."+str));
 		
-		if(UserStatManager.getinstance(p).getDef()<100) {
+		if(PlayerStatManager.getinstance(p).getDef()<100) {
 			
 			meta.setLore(Arrays.asList(
 					"",
@@ -185,7 +185,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 		}
 		else {
 			
@@ -200,7 +200,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 			
 		}		
 
@@ -214,17 +214,17 @@ public class Statgui {
 	
 	public ItemStack AgiItem(Player p) {
 		
-		String str = Integer.toString(UserStatManager.getinstance(p).getAgi());
-		String str_2 = Integer.toString(UserStatManager.getinstance(p).getAgi()+1);
+		String str = Integer.toString(PlayerStatManager.getinstance(p).getAgi());
+		String str_2 = Integer.toString(PlayerStatManager.getinstance(p).getAgi()+1);
 		
-		String per = stattopercentage(UserStatManager.getinstance(p).getAgi());
-		String per_2 = stattopercentage(UserStatManager.getinstance(p).getAgi()+1);
+		String per = stattopercentage(PlayerStatManager.getinstance(p).getAgi());
+		String per_2 = stattopercentage(PlayerStatManager.getinstance(p).getAgi()+1);
 		
 		ItemStack item = new ItemStack(Material.SPLASH_POTION, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&b기동강화 Lv."+str));
 		
-		if(UserStatManager.getinstance(p).getAgi()<100) {
+		if(PlayerStatManager.getinstance(p).getAgi()<100) {
 			
 			meta.setLore(Arrays.asList(
 					"",
@@ -237,7 +237,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 		}
 		else {
 			
@@ -252,7 +252,7 @@ public class Statgui {
 					"§7- §3좌클릭으로 1씩 추가",
 					"§7- §3우클릭으로 5씩 추가",
 					"",
-					"§7남은 스탯 : §a"+UserStatManager.getinstance(p).getremainstat()));
+					"§7남은 스탯 : §a"+ PlayerStatManager.getinstance(p).getremainstat()));
 			
 		}
 		

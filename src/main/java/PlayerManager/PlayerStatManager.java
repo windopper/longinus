@@ -1,13 +1,13 @@
-package PlayerData;
-
-import java.util.HashMap;
+package PlayerManager;
 
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
-public class UserStatManager {
+import java.util.HashMap;
 
-	private final static HashMap<Player, UserStatManager> instance = new HashMap<>();
+public class PlayerStatManager {
+
+	private final static HashMap<Player, PlayerStatManager> instance = new HashMap<>();
 	
 	
 	private Player p;
@@ -19,7 +19,7 @@ public class UserStatManager {
 	private int exp = 0;
 	private int remainstat = 0;
 	
-	public UserStatManager(Player p) {
+	public PlayerStatManager(Player p) {
 		this.p = p;
 	}
 
@@ -29,9 +29,9 @@ public class UserStatManager {
 	removveinstance 메서드 삭제
 
 	 */
-	public static UserStatManager getinstance(Player p) {
+	public static PlayerStatManager getinstance(Player p) {
 		if(!instance.containsKey(p)) {
-			instance.put(p, new UserStatManager(p));
+			instance.put(p, new PlayerStatManager(p));
 			p.sendMessage("Statmanager succesfully initialized");
 		}
 

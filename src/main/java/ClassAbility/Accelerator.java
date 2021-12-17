@@ -21,10 +21,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import DynamicData.Damage;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealthShield;
-import PlayerData.UserManager;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 
 public class Accelerator {
 	
@@ -301,7 +301,7 @@ public class Accelerator {
 							}
 							
 							
-							int dmg = UserManager.getinstance(p).spelldmgcalculate(p, 0.5);
+							int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.5);
 							p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2);
 							Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 							
@@ -318,7 +318,7 @@ public class Accelerator {
 	}
 	public void particleacceleration(final Player p, int mana) {
 		
-		int Health = UserManager.getinstance(p).Health;
+		int Health = PlayerManager.getinstance(p).Health;
 		
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		
@@ -348,7 +348,7 @@ public class Accelerator {
 
 			}
 
-			if(PF.ACPassiveCoolDown == 80 && UserManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
+			if(PF.ACPassiveCoolDown == 80 && PlayerManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
 				PlayerEnergy.getinstance(p).setEnergyRate(2);
 				PotionEffect potion = new PotionEffect(PotionEffectType.SPEED, 2, 2);
 				p.addPotionEffect(potion, true);

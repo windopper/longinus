@@ -1,7 +1,11 @@
 package ClassAbility;
 
-import DynamicData.*;
-import PlayerData.UserManager;
+import DynamicData.Damage;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
+import Mob.*;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -81,7 +85,7 @@ public class Phlox {
 					target = e;
 					meleehit = 1;
 					
-					int dmg = UserManager.getinstance(p).meleedmgcalculate(p, 1);
+					int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
 					Damage.getinstance().taken(dmg, e, p);
 							
 					
@@ -124,7 +128,7 @@ public class Phlox {
 	public void heal(final Player p, final int mana) {
 		
 		
-		PlayerEnergy.getinstance(p).removeEnergy(mana);	
+		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		nanorobotoverload(healrobot, 80, p);
 		
 		for(Player pl : Bukkit.getOnlinePlayers()) {
@@ -142,7 +146,7 @@ public class Phlox {
 					pl.spawnParticle(Particle.HEART, head, 1, 0, 0, 0, 0, null);
 				}
 				
-				PlayerHealthShield.getinstance(p).HealthAdd(UserManager.getinstance(p).Health/20);
+				PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health/20);
 				p.getWorld().playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1, 1);
 				if(i==3) cancel();
 				i++;
@@ -184,7 +188,7 @@ public class Phlox {
 								}
 								
 								
-								PlayerHealthShield.getinstance(pl).HealthAdd(UserManager.getinstance(pl).Health/20);
+								PlayerHealthShield.getinstance(pl).HealthAdd(PlayerManager.getinstance(pl).Health/20);
 								
 								if(i==3) cancel();
 								i++;
@@ -288,7 +292,7 @@ public class Phlox {
 		
 		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5)) {
 			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && e != p) {
-				int dmg = UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
+				int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
 				EntityStatusManager.getinstance((LivingEntity)e).Stun(p, 30);
 				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 			}
@@ -335,7 +339,7 @@ public class Phlox {
 	public void PhloxPassive() {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			if(UserManager.getinstance(p).CurrentClass.equals("플록스")) {
+			if(PlayerManager.getinstance(p).CurrentClass.equals("플록스")) {
 				if(PlayerFunction.getinstance(p).PHNanoRobot == -1) PlayerFunction.getinstance(p).PHNanoRobot = 100;
 			}
 			else {
@@ -697,7 +701,7 @@ public class Phlox {
 							if(edist<2 && ebox.contains(loc.getX(), loc.getY(), loc.getZ()) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
 								laserhit.put(e, 0);
 								me.playSound(me.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = UserManager.getinstance(me).spelldmgcalculate(me, 1.5);
+								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 1.5);
 								Damage.getinstance().taken(dmg, e, me);
 							}
 						}
@@ -759,7 +763,7 @@ public class Phlox {
 							if(dist<2 && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !bombhit.containsKey(e)) {
 								bombhit.put(e, 0);
 								me.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = UserManager.getinstance(me).spelldmgcalculate(me, 3);
+								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 3);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, me);
 							}
 							

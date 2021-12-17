@@ -1,9 +1,9 @@
 package PlayerChip;
 
 import Party.PartyManager;
-import PlayerData.UserFileManager;
-import PlayerData.UserManager;
-import PlayerData.UserStatManager;
+import PlayerManager.PlayerFileManager;
+import PlayerManager.PlayerManager;
+import PlayerManager.PlayerStatManager;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -98,8 +98,9 @@ public class Maingui {
 
 	private ItemStack PlayerProfile(Player p) {
 
-		String CurrentClass = UserManager.getinstance(p).CurrentClass;
-		String Level = Integer.toString(UserStatManager.getinstance(p).getlvl());
+		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
+		String Level = Integer.toString(PlayerStatManager.getinstance(p).getlvl());
+		String EXP = Integer.toString(PlayerStatManager.getinstance(p).getexp());
 
 
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
@@ -108,7 +109,8 @@ public class Maingui {
 		meta.setDisplayName("§e§o§l"+p.getName()+"의 프로필");
 		meta.setLore(Arrays.asList("",
 				"§9- §d클래스 : "+CurrentClass,
-				"§9- §d레벨 : "+Level));
+				"§9- §d레벨 : "+Level,
+				"§9- $d경험치 : "+EXP));
 
 		item.setItemMeta(meta);
 
@@ -160,10 +162,10 @@ public class Maingui {
 		ItemMeta statmeta = statsetting.getItemMeta();
 		statmeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6스탯 관리&6"));
 		statmeta.setLore(Arrays.asList(
-				"§c무기강화 §6 Lv."+UserStatManager.getinstance(p).getStr(),
-				"§e감각강화 §6 Lv."+UserStatManager.getinstance(p).getDex(),
-				"§5외피강화 §6 Lv."+UserStatManager.getinstance(p).getDef(),
-				"§b기동강화 §6 Lv."+UserStatManager.getinstance(p).getAgi(),
+				"§c무기강화 §6 Lv."+ PlayerStatManager.getinstance(p).getStr(),
+				"§e감각강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDex(),
+				"§5외피강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDef(),
+				"§b기동강화 §6 Lv."+ PlayerStatManager.getinstance(p).getAgi(),
 				""
 				));
 		statsetting.setItemMeta(statmeta);
@@ -247,7 +249,7 @@ public class Maingui {
 	
 	public ItemStack alteraitem(Player p) {
 		
-		int gold = UserFileManager.getinstance().getGold(p);
+		int gold = PlayerFileManager.getinstance().getGold(p);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_BLOCK, 1);
 		ItemMeta meta = item.getItemMeta();

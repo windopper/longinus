@@ -1,4 +1,4 @@
-package DynamicData;
+package PlayerManager;
 
 import java.util.HashMap;
 

@@ -1,7 +1,7 @@
 package Party;
 
-import DynamicData.PlayerHealthShield;
-import PlayerData.UserManager;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
@@ -442,7 +442,7 @@ public class PartyManager {
 
     private String getObjectiveString(Player player) {
 
-        int MaxHealth = UserManager.getinstance(player).Health;
+        int MaxHealth = PlayerManager.getinstance(player).Health;
         int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
         int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
 

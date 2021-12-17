@@ -1,27 +1,24 @@
-package PlayerData;
+package PlayerManager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
-import DynamicData.PlayerFunction;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-
-import net.md_5.bungee.api.ChatColor;
 import spellinteracttest.RandomRange;
 
-public class UserManager {
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class PlayerManager {
 	
 	public static FileConfiguration config;
 	
 	private final static int DEFAULT_HEALTH = 10000;
 	
-	private static final HashMap<Player, UserManager> instance = new HashMap<>();
+	private static final HashMap<Player, PlayerManager> instance = new HashMap<>();
 
 	
 	public String AskDeleteClassName;
@@ -67,21 +64,18 @@ public class UserManager {
 	public int BootsDexreq = 0;
 	public int BootsDefreq = 0;
 	public int BootsAgireq = 0;
-	
-	
-	
-	
+
 	private Player p;
 
-	public UserManager() {}
+	public PlayerManager() {}
 	
-	public UserManager(Player p) {
+	public PlayerManager(Player p) {
 		this.p = p;
 	}
 
-	public static UserManager getinstance(@Nonnull Player p) {
+	public static PlayerManager getinstance(@Nonnull Player p) {
 		if(!instance.containsKey(p)) {
-			instance.put(p, new UserManager(p));
+			instance.put(p, new PlayerManager(p));
 			p.sendMessage("UserManager successfully initialized");
 		}
 		return instance.get(p);
@@ -221,23 +215,23 @@ public class UserManager {
 					if(split[0].equals("레벨제한")) {
 						if(count==1) {
 							HelmetLevelreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
+							if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
 						}
 						if(count==2) {
 							ChestplateLevelreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getlvl()<ChestplateLevelreq) break;
+							if(PlayerStatManager.getinstance(p).getlvl()<ChestplateLevelreq) break;
 						}
 						if(count==3) {
 							LeggingsLevelreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getlvl()<LeggingsLevelreq) break;
+							if(PlayerStatManager.getinstance(p).getlvl()<LeggingsLevelreq) break;
 						}
 						if(count==4) {
 							BootsLevelreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getlvl()<BootsLevelreq) break;
+							if(PlayerStatManager.getinstance(p).getlvl()<BootsLevelreq) break;
 						}
 						if(count==5) { 
 							WeaponLevelreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getlvl()<WeaponLevelreq) break;
+							if(PlayerStatManager.getinstance(p).getlvl()<WeaponLevelreq) break;
 						}
 						
 						
@@ -246,90 +240,90 @@ public class UserManager {
 					if(split[0].equals("무기강화최소")) {
 						if(count==1) {
 							HelmetStrreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getStr()<HelmetStrreq) break;
+							if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
 						}
 						if(count==2) {
 							ChestplateStrreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getStr()<ChestplateStrreq) break;
+							if(PlayerStatManager.getinstance(p).getStr()<ChestplateStrreq) break;
 						}
 						if(count==3) {
 							LeggingsStrreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getStr()<LeggingsStrreq) break;
+							if(PlayerStatManager.getinstance(p).getStr()<LeggingsStrreq) break;
 						}
 						if(count==4) {
 							BootsStrreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getStr()<BootsStrreq) break;
+							if(PlayerStatManager.getinstance(p).getStr()<BootsStrreq) break;
 						}
 						if(count==5) { 
 							WeaponStrreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getStr()<WeaponStrreq) break;
+							if(PlayerStatManager.getinstance(p).getStr()<WeaponStrreq) break;
 						}
 					}
 					if(split[0].equals("감각강화최소")) {
 						if(count==1) {
 							HelmetDexreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDex()<HelmetDexreq) break;
+							if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
 						}
 						if(count==2) {
 							ChestplateDexreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDex()<ChestplateDexreq) break;
+							if(PlayerStatManager.getinstance(p).getDex()<ChestplateDexreq) break;
 						}
 						if(count==3) {
 							LeggingsDexreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDex()<LeggingsDexreq) break;
+							if(PlayerStatManager.getinstance(p).getDex()<LeggingsDexreq) break;
 						}
 						if(count==4) {
 							BootsDexreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDex()<BootsDexreq) break;
+							if(PlayerStatManager.getinstance(p).getDex()<BootsDexreq) break;
 						}
 						if(count==5) { 
 							WeaponDexreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDex()<WeaponDexreq) break;
+							if(PlayerStatManager.getinstance(p).getDex()<WeaponDexreq) break;
 							
 						}
 					}
 					if(split[0].equals("외피강화최소")) {
 						if(count==1) {
 							HelmetDefreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDef()<HelmetDefreq) break;
+							if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
 						}
 						if(count==2) {
 							ChestplateDefreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDef()<ChestplateDefreq) break;
+							if(PlayerStatManager.getinstance(p).getDef()<ChestplateDefreq) break;
 						}
 						if(count==3) {
 							LeggingsDefreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDef()<LeggingsDefreq) break;
+							if(PlayerStatManager.getinstance(p).getDef()<LeggingsDefreq) break;
 						}
 						if(count==4) {
 							BootsDefreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDef()<BootsDefreq) break;
+							if(PlayerStatManager.getinstance(p).getDef()<BootsDefreq) break;
 						}
 						if(count==5) { 
 							WeaponDefreq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getDef()<WeaponDefreq) break;
+							if(PlayerStatManager.getinstance(p).getDef()<WeaponDefreq) break;
 						}
 					}
 					if(split[0].equals("기동강화최소")) {
 						if(count==1) {
 							HelmetAgireq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
+							if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
 						}
 						if(count==2) {
 							ChestplateAgireq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getAgi()<ChestplateAgireq) break;
+							if(PlayerStatManager.getinstance(p).getAgi()<ChestplateAgireq) break;
 						}
 						if(count==3) {
 							LeggingsAgireq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getAgi()<LeggingsAgireq) break;
+							if(PlayerStatManager.getinstance(p).getAgi()<LeggingsAgireq) break;
 						}
 						if(count==4) {
 							BootsAgireq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getAgi()<BootsAgireq) break;
+							if(PlayerStatManager.getinstance(p).getAgi()<BootsAgireq) break;
 						}
 						if(count==5) { 
 							WeaponAgireq = Integer.parseInt(split[2]);
-							if(UserStatManager.getinstance(p).getAgi()<WeaponAgireq) break;
+							if(PlayerStatManager.getinstance(p).getAgi()<WeaponAgireq) break;
 						}
 					}
 					
@@ -391,10 +385,10 @@ public class UserManager {
 	
 	public double statstr(Player p) {
 		
-		if(UserStatManager.getinstance(p).getStr()==0) return 1;
+		if(PlayerStatManager.getinstance(p).getStr()==0) return 1;
 		
 		double sum = 0;
-		for(int i=1; i<=UserStatManager.getinstance(p).getStr(); i++) {
+		for(int i = 1; i<= PlayerStatManager.getinstance(p).getStr(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -406,11 +400,11 @@ public class UserManager {
 	public double statdex(Player p) {
 		
 
-		if(UserStatManager.getinstance(p).getDex()==0) return 1;
+		if(PlayerStatManager.getinstance(p).getDex()==0) return 1;
 		
 		double sum = 0;
 		
-		for(int i=1; i<=UserStatManager.getinstance(p).getDex(); i++) {
+		for(int i = 1; i<= PlayerStatManager.getinstance(p).getDex(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -429,10 +423,10 @@ public class UserManager {
 	}
 	public double statdef(Player p) {
 		
-		if(UserStatManager.getinstance(p).getDef()==0) return 1;
+		if(PlayerStatManager.getinstance(p).getDef()==0) return 1;
 		
 		double sum = 0;
-		for(int i=1; i<=UserStatManager.getinstance(p).getDef(); i++) {
+		for(int i = 1; i<= PlayerStatManager.getinstance(p).getDef(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -443,10 +437,10 @@ public class UserManager {
 	}
 	public double statagi(Player p) {
 		
-		if(UserStatManager.getinstance(p).getAgi()==0) return 1;
+		if(PlayerStatManager.getinstance(p).getAgi()==0) return 1;
 		
 		double sum = 0;
-		for(int i=1; i<=UserStatManager.getinstance(p).getAgi(); i++) {
+		for(int i = 1; i<= PlayerStatManager.getinstance(p).getAgi(); i++) {
 
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -459,7 +453,7 @@ public class UserManager {
 	public int spelldmgcalculate(Player p, double spellrate) {
 
 		
-		if(UserManager.getinstance(p).CurrentClass.equals("Accelerator"))
+		if(PlayerManager.getinstance(p).CurrentClass.equals("Accelerator"))
 			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * spellrate * (SpellDamage+100)/100 * PlayerFunction.getinstance(p).ACRate);
 		
 		
@@ -469,7 +463,7 @@ public class UserManager {
 	
 	public int meleedmgcalculate(Player p, double meleerate) {
 		
-		if(UserManager.getinstance(p).CurrentClass.equals("Accelerator"))
+		if(PlayerManager.getinstance(p).CurrentClass.equals("Accelerator"))
 			return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * meleerate * PlayerFunction.getinstance(p).ACRate);
 		
 		return (int)(RandomRange.range(MinDamage, MaxDamage) * statdex(p) * statstr(p) * meleerate) ;

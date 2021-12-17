@@ -1,6 +1,11 @@
 package ClassAbility;
 
-import DynamicData.*;
+import DynamicData.Damage;
+import Mob.EntityStatusManager;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.network.syncher.DataWatcherRegistry;
@@ -63,16 +68,47 @@ public class ByV {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence --;
 		
-		PlayerHealthShield.getinstance(p).HealthAdd(PlayerHealthShield.getinstance(p).getCurrentHealth()/10);
+		PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health /10);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(p.getWorld().getName().equals(player.getWorld().getName())) {
 				if(!entitycheck.duelcheck(player, p) && player != p) {
-					PlayerHealthShield.getinstance(player).HealthAdd(PlayerHealthShield.getinstance(p).getCurrentHealth()/10);
+					PlayerHealthShield.getinstance(player).HealthAdd(PlayerManager.getinstance(p).Health/10);
 				}
 			}
 		}
-		
+
+		final Location location = p.getLocation();
+
+		new BukkitRunnable() {
+
+			double size = 0;
+			double k = 0;
+
+			@Override
+			public void run() {
+
+				for (int d = 0; d <= 45; d += 1) {
+					Location particleLoc = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ());
+					particleLoc.add(0, 0.5, 0);
+					particleLoc.setX(location.getX() + Math.cos(d) * size);
+					particleLoc.setZ(location.getZ() + Math.sin(d) * size);
+					location.getWorld().spawnParticle(Particle.CRIT_MAGIC, particleLoc, 1, 0, 0, 0, 0, null);
+
+					particleLoc = p.getLocation();
+					particleLoc.setX(p.getLocation().getX() + Math.cos(d) * 1);
+					particleLoc.setY(p.getLocation().getY() + k/100);
+					particleLoc.setZ(p.getLocation().getZ() + Math.sin(d) * 1);
+					location.getWorld().spawnParticle(Particle.GLOW, particleLoc, 1, 0, 0, 0, 0);
+				}
+
+
+
+				k+=15;
+				size += 0.5;
+				if(size >= 5) cancel();
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 		
 	}
 	public void takedown(final Player p, int mana) {
@@ -135,7 +171,7 @@ public class ByV {
 									e.setVelocity(etop);
 								}
 
-								int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
+								int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 								
 								p.getWorld().playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
@@ -215,7 +251,7 @@ public class ByV {
 
 						chainparticle(p, i, e);
 						chainvectorzerocc(e);
-						int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+						int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
 						PlayerFunction.getinstance(p).essence++;
@@ -579,7 +615,7 @@ public class ByV {
 				BoundingBox box = e.getBoundingBox();
 				double dist = eloc.distance(loc);
 				if(dist<2 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-					int dmg = PlayerData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+					int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.75);
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 20));
 					Damage.getinstance().taken(dmg, e, p);
 					return true;

@@ -1,4 +1,4 @@
-package PlayerData;
+package PlayerManager;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,7 +26,7 @@ public class SeveralMessages {
 		
 		Centermsg.CenteredMessage(p, "");
 		Centermsg.CenteredMessage(p, "");
-		Centermsg.CenteredMessage(p, "§e§l§o"+UserManager.getinstance(p).CurrentClass+"로 접속하였습니다!");
+		Centermsg.CenteredMessage(p, "§e§l§o"+ PlayerManager.getinstance(p).CurrentClass+"로 접속하였습니다!");
 		Centermsg.CenteredMessage(p, "");
 		Centermsg.CenteredMessage(p, "§7현재 위치 §9§l"+world+"   §7현재 시각 §9§l"+hour+"시 "+minute+"분");
 		Centermsg.CenteredMessage(p, "");
