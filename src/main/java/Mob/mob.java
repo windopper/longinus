@@ -1,6 +1,5 @@
 package Mob;
 
-import QuestClasses.Tutorial;
 import net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
@@ -53,9 +52,9 @@ public class mob {
 	
 	public void loop() {
 		
-		trainerbot();
-		trainerbot2();
-		Tutorial.exambot();
+		//trainerbot();
+		//trainerbot2();
+		//Tutorial.exambot();
 				
 	}
 	

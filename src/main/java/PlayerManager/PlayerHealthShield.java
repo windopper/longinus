@@ -23,8 +23,7 @@ public class PlayerHealthShield {
 	private int ShieldRegenerateCooldown = 0;
 	private int CurrentShield;
 	private int CurrentHealth; 
-	
-	
+
 	static int i=0;
 	
 	private PlayerHealthShield(Player p) {

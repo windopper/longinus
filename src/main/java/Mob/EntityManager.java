@@ -12,7 +12,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
-import spellinteracttest.Main;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -27,7 +26,7 @@ public class EntityManager {
 	private static HashMap<Entity, EntityManager> instance = new HashMap<>();
 	private static HashMap<Entity, HashMap<Entity, Location>> disguise = new HashMap<>();
 
-	private HashMap<Player, Integer> contribute = new HashMap<>();
+	private final HashMap<Player, Integer> contribute = new HashMap<>();
 	private LivingEntity teleportTo;  //텔레포트 하고자 하는 엔티티
 	private Location teleportToLoc; // 상대적인 좌표
 	private Entity e; // 마스터 엔티티
@@ -230,9 +229,15 @@ public class EntityManager {
 
 	public void setDamageValue(int var0, Player damager) {
 
-		CurrentHealth -= var0;
+		if(var0 > getCurrentHealth()) var0 = getCurrentHealth();
 
-		contribute.put(damager, var0);
+
+		if(contribute.containsKey(damager)) {
+			contribute.replace(damager, contribute.get(damager) + var0);
+		}
+		else {
+			contribute.put(damager, var0);
+		}
 
 		if(isDisguiseEntityPlayer()) {
 			Player wrapper = getDisguiseEntityPlayer();
@@ -244,11 +249,13 @@ public class EntityManager {
 
 		}
 
+		CurrentHealth -= var0;
 		DamageAfterDelay = 100;
 	}
 
 	public void setDamageValue(int var0) {
 		CurrentHealth -= var0;
+
 
 		if(isDisguiseEntityPlayer()) {
 			Player wrapper = getDisguiseEntityPlayer();
@@ -292,6 +299,7 @@ public class EntityManager {
 
 			e.setCustomName(" ");
 			e.setCustomNameVisible(false);
+			((LivingEntity) e).setHealth(((LivingEntity) e).getMaxHealth());
 
 
 			isinChunk = false;
@@ -308,16 +316,12 @@ public class EntityManager {
 				}
 			}
 			// 죽었을때
-			if(CurrentHealth < 0 || e.isDead() || !e.isValid() || !isinChunk) {
+			if(CurrentHealth <= 0 || e.isDead() || !e.isValid() || !isinChunk) {
 
 				if(mobList != null) {
 					// event call
-					Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
-						@Override
-						public void run() {
-							Bukkit.getPluginManager().callEvent(new CustomMobDeathEvent(e, mobList));
-						}
-					}, 0);
+					Bukkit.getPluginManager().callEvent(new CustomMobDeathEvent(e, mobList));
+
 				}
 
 				if(Namear !=null) {
@@ -413,19 +417,19 @@ public class EntityManager {
 
 			// teleporting armorstand and set Healthar's name
 			if(Healthar != null && DamageAfterDelay != 0) {
-				String arname = "§b[||||"+CurrentHealth+"||||]";
+				String arname = "[||||"+CurrentHealth+"||||]";
 				List<Character> arrlist = new ArrayList<>();
 				char[] arr = arname.toCharArray();
 				for(int i=0; i<arr.length; i++) {
 					arrlist.add(arr[i]);
 				}
+
 				double rate = (double) CurrentHealth / (double) MaxHealth;
 				int index = (int)(arr.length * rate);
-				if(index<=1) index = 2;
+				arrlist.add(index, '3');
 				arrlist.add(index, '§');
-				arrlist.add(index+1, '3');
 
-				String customname = "";
+				String customname = "§b";
 				for(char ch : arrlist) {
 					customname += ch;
 				}

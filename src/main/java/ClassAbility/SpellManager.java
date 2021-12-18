@@ -12,6 +12,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,10 @@ public class SpellManager {
     private final List<Double> ParticleTrailZ = new ArrayList<>();
     private final List<Double> ParticleTrailSpeed = new ArrayList<>();
     private final List<Object> ParticleTrailDustOptions = new ArrayList<>();
+
+    private Method trailMethod;
+    private Object instance;
+
 
     private final List<Particle> ParticleDest = new ArrayList<>();
     private final List<Integer> ParticleDestAmount = new ArrayList<>();
@@ -192,6 +197,12 @@ public class SpellManager {
         this.ParticleTrailSpeed.add(0d);
         this.ParticleTrailDustOptions.add(null);
     }
+    public void setTrailMethod(Method method) {
+        this.trailMethod = method;
+    }
+    public void setInstance(Object instance) {
+        this.instance = instance;
+    }
 
     public void addDestinationParticle(Particle ParticleDest,
                                        int Amount,
@@ -274,6 +285,7 @@ public class SpellManager {
         for(int i=0; i<MaximumRange / multiply; i++) {
 
             RunParticles(ParticleType.TrailParticle);
+            RunTrailMethod(loc, i);
             
             // 벽 체크
             if(WallChecker(loc)) {
@@ -318,8 +330,6 @@ public class SpellManager {
             }
             loc.add(dir);
 
-
-
         }
 
         return false;
@@ -336,6 +346,8 @@ public class SpellManager {
         }
 
         for (LivingEntity e : player.getWorld().getLivingEntities()) {
+
+
 
             Location eloc = e.getBoundingBox().getCenter().toLocation(e.getWorld());
             double dist = eloc.distance(CurrentLoc);
@@ -369,6 +381,7 @@ public class SpellManager {
         }
 
         if(HitEntityList.size() >= 1) return true;
+
 
         loc.add(dir);
 
@@ -475,6 +488,16 @@ public class SpellManager {
                             ParticleDestDustOptions.get(k));
                 }
             }
+
+        }
+    }
+
+    public void RunTrailMethod(Location loc, int i) {
+        if(trailMethod == null) return;
+        try {
+            trailMethod.invoke(instance, loc, i);
+        }
+        catch(Exception e) {
 
         }
     }

@@ -21,6 +21,8 @@ import java.util.List;
 
 public class PartyManager {
 
+    public int XPLoop = 0;
+
     private static PartyManager PartyManager;
 
     private final static HashMap<Player, PartyManager> partyInstance = new HashMap<>();
@@ -38,16 +40,24 @@ public class PartyManager {
     private List<Player> members = new ArrayList<>();
     private boolean glowingDelay = false;
 
+    private final String XPAlarmReady = "§d파티 경험치 집계중..";
+    private String XPAlarm = "";
+    private int PartyXP = 0;
+
     private PartyManager() {
 
     }
 
     private PartyManager(Player player) {
+
+        //init Partymanager
         this.master = player;
         members.add(player);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         player.setScoreboard(scoreboard);
 
+        objective.getScore(" ").setScore(1);
+        objective.getScore(XPAlarm).setScore(2);
         team.setColor(ChatColor.GREEN);
     }
 
@@ -63,6 +73,10 @@ public class PartyManager {
     public static PartyManager getinstance() {
         if(PartyManager == null) PartyManager = new PartyManager();
         return PartyManager;
+    }
+
+    public void addPartyXP(int partyXP) {
+        this.PartyXP += partyXP;
     }
 
     public void removeinstance(Player player) {
@@ -330,7 +344,7 @@ public class PartyManager {
         }
     }
 
-    public void partyObjectiveLoop() {
+    public static void partyObjectiveLoop() {
 
         for(Player p : Bukkit.getOnlinePlayers()) {
 
@@ -341,13 +355,33 @@ public class PartyManager {
                 objectiveString.put(p, getObjectiveString(p));
                 partyManager.objective.getScore(getObjectiveString(p)).setScore(0);
 
+
+                if(partyManager.PartyXP == 0 && partyManager.XPLoop == 0) {
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarm);
+                    partyManager.objective.getScore(partyManager.XPAlarmReady).setScore(2);
+                }
+                else if(partyManager.XPLoop == 0) {
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarm);
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarmReady);
+                    partyManager.XPAlarm = "§b +EXP "+partyManager.PartyXP;
+                    partyManager.objective.getScore(partyManager.XPAlarm).setScore(2);
+                    partyManager.XPLoop = 1;
+                    partyManager.PartyXP = 0;
+                }
+
                 if(!partyManager.team.hasEntry(p.getName())) {
                     partyManager.team.addEntry(p.getName());
                 }
 
+                if(partyManager.XPLoop <= 4 && partyManager.XPLoop >=1) partyManager.XPLoop++;
+                else partyManager.XPLoop = 0;
+
             }
             objectiveString.put(p, getObjectiveString(p));
         }
+
+
+
     }
 
     public void partyGlowingLoop() {
@@ -376,7 +410,7 @@ public class PartyManager {
 
                 PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 
-                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
             }
 
             if(partyInstance.containsKey(p)) {
@@ -387,19 +421,6 @@ public class PartyManager {
                 if (partyManager.glowingDelay == true) {
                     continue;
                 }
-
-//                for (Player member : partyManager.members) {
-//                    if (p == member) continue;
-//
-//                    CraftPlayer EP = (CraftPlayer) p;
-//
-//                    DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
-//                    dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-//
-//                    PlayerConnection connection = ((CraftPlayer) member).getHandle().b;
-//
-//                    connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
-//                }
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (p == player) continue;
@@ -413,7 +434,7 @@ public class PartyManager {
 
                         PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 
-                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
                     } else {
                         CraftPlayer EP = (CraftPlayer) p;
 
@@ -422,7 +443,7 @@ public class PartyManager {
 
                         PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 
-                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
                     }
                 }
             }
@@ -440,7 +461,7 @@ public class PartyManager {
         }
     }
 
-    private String getObjectiveString(Player player) {
+    private static String getObjectiveString(Player player) {
 
         int MaxHealth = PlayerManager.getinstance(player).Health;
         int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
@@ -449,7 +470,7 @@ public class PartyManager {
         String Shield = "§5§l[🛡]";
         if(CurrentShield == 0) Shield = "§8§l[🛡]";
 
-        String health = "§6[|"+CurrentHealth+"|]";
+        String health = "[|"+CurrentHealth+"|]";
         List<Character> arrlist = new ArrayList<>();
         char[] arr = health.toCharArray();
         for(int i=0; i<arr.length; i++) {
@@ -457,11 +478,10 @@ public class PartyManager {
         }
         double rate = (double) CurrentHealth / (double) MaxHealth;
         int index = (int)(arr.length * rate);
-        if(index<=1) index = 2;
         arrlist.add(index, '7');
         arrlist.add(index, '§');
 
-        String objectiveString = "";
+        String objectiveString = "§6";
 
         for(char ch : arrlist) {
             objectiveString += ch;

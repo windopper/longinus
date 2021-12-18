@@ -70,6 +70,7 @@ public class MobMechManager {
                 }
             }
             location.add(vector);
+
         }
         return null;
     }
