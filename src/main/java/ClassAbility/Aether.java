@@ -14,9 +14,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static PlayParticle.Rotate.rotateAroundAxisX;
 
 public class Aether {
 	
@@ -275,10 +278,6 @@ public class Aether {
 			}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 			
 		}
-		
-
-		
-
 	}
 	public void ShieldSwitchCharge(final Player p, int mana) {
 		
@@ -419,16 +418,14 @@ public class Aether {
 	public void laser(Player p, double radius, int particlesize, int particleamount, double spellrate) {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
-
-
 		//Bukkit.broadcastMessage(Double.toString(spellrate));
 
 		Vector dir = p.getLocation().getDirection();
 		Location loc = p.getEyeLocation();
 		loc.add(0, -0.7, 0);		
-		dir.normalize().multiply(0.4);
+		dir.normalize().multiply(0.1);
 
-		SpellManager Spell = new SpellManager(p, loc, 0.4);
+		SpellManager Spell = new SpellManager(p, loc, 0.1);
 		Spell.setMaximumRange(20);
 		Spell.setDamageRate(spellrate);
 		Spell.setWallPassable(false);
@@ -437,6 +434,15 @@ public class Aether {
 		Spell.setKnockBack(p, 1.5);
 		Spell.addDestinationSound(Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 1);
 		Spell.addDestinationParticle(Particle.EXPLOSION_LARGE, 5, 1, 1, 1, 0, null);
+		Spell.setInstance(this);
+		try {
+			Method method = this.getClass().getDeclaredMethod("summonHelix", Location.class, int.class);
+			Spell.setTrailMethod(method);
+		}
+		catch(Exception e) {
+
+		}
+
 
 		if(PF.AEImpulse <300)
 			Spell.addTrailParticle(Particle.REDSTONE, particleamount, 0.1, 0.1, 0.1, 0.5, new Particle.DustOptions(Color.RED, particlesize));
@@ -456,6 +462,21 @@ public class Aether {
 
 		PF.AEImpulse = 0;
 
+	}
+	public void summonHelix(Location location, int i) {
+
+		double xangle = Math.toRadians(90);
+		double xaxiscos = Math.cos(xangle);
+		double xaxissin = Math.sin(xangle);
+
+		double x = Math.cos(i);
+		double y = 0;
+		double z = Math.sin(i);
+		Vector v = new Vector(x, y, z);
+		v= rotateAroundAxisX(v, xaxiscos, xaxissin);
+		location.add(v.getX(), v.getY(), v.getZ());
+		location.getWorld().spawnParticle(Particle.SPELL_WITCH, location, 1, 0, 0, 0);
+		location.subtract(v.getX(), v.getY(), v.getZ());
 	}
 	
 	public void summonCircle(Location location, double size) {

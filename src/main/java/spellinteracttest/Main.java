@@ -21,6 +21,7 @@ import Party.PartyManager;
 import Party.TabCompleter;
 import PlanetSelect.planetDetect;
 import PlanetSelect.planetSelectEvent;
+import PlayParticle.PlayParticle;
 import PlayerChip.Goldgui;
 import PlayerChip.GuiEvent;
 import PlayerChip.UserAlarmManager;
@@ -504,6 +505,11 @@ public class Main extends JavaPlugin implements Listener {
 				break;
 			}
 
+			case "playparticle": {
+				(new PlayParticle()).Circle(player, 2);
+				break;
+			}
+
 			case "spyglass": {
 				player.getInventory().addItem(((new SpyGlassItemManager()).getSpyGlassItem(SpyGlassItemManager.SpyGlassPlanet.Gliese581c, 1)));
 
@@ -725,7 +731,7 @@ public class Main extends JavaPlugin implements Listener {
 			@Override
 			public void run() {
 				planetDetect.getinstance().detectArea();
-				PartyManager.getinstance().partyObjectiveLoop();
+				PartyManager.partyObjectiveLoop();
 
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
@@ -745,6 +751,7 @@ public class Main extends JavaPlugin implements Listener {
 				mob.loop();
 				mob.mobdelete();
 				loop.loop();
+
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 20);
 		

@@ -133,9 +133,10 @@ public class GlowingButterfly extends EntityZombie {
 
         if(GlowLocation != null) {
             GlowLocation.getWorld().setBlockData(GlowLocation, Material.AIR.createBlockData());
+            GlowLocation = null;
         }
 
-        GlowLocation = bee.getLocation().clone().add(0, 1, 0);
+        GlowLocation = bee.getLocation();
 
         Light light = (Light) Material.LIGHT.createBlockData();
         light.setLevel(7);

@@ -52,11 +52,9 @@ public class Gliese581cEntitySummon implements Listener {
     public void summonFoxRat(Player player) {
         Location loc = player.getEyeLocation();
         World nmsworld = ((CraftWorld) loc.getWorld()).getHandle();
-        //MouseFoot mouseFoot = new MouseFoot(nmsworld);
 
-        FoxMother fox = FoxMother.getFoxMother(EntityTypes.E, nmsworld);
+        FoxMother fox = new FoxMother(EntityTypes.E, nmsworld);
         fox.setPosition(loc.getX(), loc.getY(), loc.getZ());
-
 
         for(int i=0; i<10; i++) {
             FoxRat foxRat = new FoxRat(EntityTypes.E, nmsworld, (EntityFox) fox);

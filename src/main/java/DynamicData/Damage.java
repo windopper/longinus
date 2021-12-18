@@ -37,6 +37,7 @@ public class Damage {
 			final int dmg = (int)(damage * PlayerManager.getinstance(user).defcalculate(user));
 
 			HologramIndicator.getinstance().DamageIndicator(dmg, taker);
+			PlayerHealthShield.getinstance(user).setDamage(damage);
 
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 				@Override
@@ -71,7 +72,7 @@ public class Damage {
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, taker);
 			}
 
-			if(taker instanceof Player) EH.setDamageValue(damage, (Player) taker);
+			if(damager instanceof Player) EH.setDamageValue(damage, (Player) damager);
 			else EH.setDamageValue(damage);
 
 			HologramIndicator.getinstance().DamageIndicator(damage, taker);

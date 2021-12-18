@@ -13,7 +13,8 @@ public class MobListManager {
     public enum MobList {
 
         마우스풋("Gliese581c", 5, 20, 10, 10, 20, true, Parasite.description),
-        폭스랫("Gliese581c", 5, 200, 10,10, 20, true),
+        폭스랫("Gliese581c", 5, 3000, 170,10, 20, true),
+        폭스랫_알파("Gliese581c", 5, 30000, 10000,1500, 2000, true),
         패러싯("Gliese581c", 5, 50000, 10,2000, 3000, true),
         블러드루트("Gliese581c", 5, 200, 10, 50, 100, true),
         히든_오아시스("Gliese581c", 5, 200, 10, 10, 20, true),

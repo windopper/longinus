@@ -77,7 +77,7 @@ public class MobEventManager implements Listener {
         Entity entity = event.getEntity();
         Location eloc = entity.getLocation();
 
-        PlayerLevelManager.XPContribute(entity, mobList);
+        PlayerLevelManager.getInstance().XPContribute(entity, mobList);
 
         for(Player p : Bukkit.getOnlinePlayers()) {
 
