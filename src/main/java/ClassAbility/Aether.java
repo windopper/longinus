@@ -469,13 +469,13 @@ public class Aether {
 		double xaxiscos = Math.cos(xangle);
 		double xaxissin = Math.sin(xangle);
 
-		double x = Math.cos(i);
+		double x = Math.cos(i * Math.PI/8);
 		double y = 0;
-		double z = Math.sin(i);
+		double z = Math.sin(i * Math.PI/8);
 		Vector v = new Vector(x, y, z);
 		v= rotateAroundAxisX(v, xaxiscos, xaxissin);
 		location.add(v.getX(), v.getY(), v.getZ());
-		location.getWorld().spawnParticle(Particle.SPELL_WITCH, location, 1, 0, 0, 0);
+		location.getWorld().spawnParticle(Particle.SPELL_WITCH, location, 1, 0, 0, 0, 0);
 		location.subtract(v.getX(), v.getY(), v.getZ());
 	}
 	

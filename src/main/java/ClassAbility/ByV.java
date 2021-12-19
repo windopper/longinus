@@ -2,6 +2,7 @@ package ClassAbility;
 
 import DynamicData.Damage;
 import Mob.EntityStatusManager;
+import PlayParticle.PlayParticle;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerHealthShield;
@@ -18,9 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import static PlayParticle.PlayParticle.transform;
+import static PlayParticle.Rotate.rotateAroundAxisY;
 
 public class ByV {
 	
@@ -32,8 +32,8 @@ public class ByV {
 	public static final int punchmana = 4;
 	public static final int shockwavemana = 8;
 	
-	public final static HashMap<FallingBlock, Integer> fallingblocks = new HashMap<>();
-	public final static List<Player> whiletakedown = new ArrayList<>();
+	//public final static HashMap<FallingBlock, Integer> fallingblocks = new HashMap<>();
+	//private final static List<Player> whiletakedown = new ArrayList<>();
 	
 	private ByV() {
 		
@@ -44,23 +44,21 @@ public class ByV {
 		return ByV;
 	}
 	
-	public void removemaps(Player p) {
-		whiletakedown.remove(p);
-	}
-	
 	public void melee(final Player p) {
 
 		SpellManager Spell = new SpellManager(p, 0.2);
 		Spell.addDepartSound(Sound.BLOCK_STONE_BREAK, 1, 1);
-		Spell.addTrailParticle(Particle.SMOKE_NORMAL, 4, 0.2, 0.2, 0.2, 0, null);
+		Spell.addDepartSound(Sound.ENTITY_IRON_GOLEM_HURT, 1, 2);
 		Spell.setMaximumRange(2);
 		Spell.setEntityPassable(true);
-		Spell.setHitBoxRange(1.5);
+		Spell.setHitBoxRange(2.5);
 		Spell.setDamageRate(1);
 		Spell.setKnockBack(p, 0.5);
 		Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 		
 		PlayerFunction.getinstance(p).setMeleeDelay(20);
+
+		MeleeParticle(p);
 
 		
 	}
@@ -116,8 +114,8 @@ public class ByV {
 		PlayerFunction.getinstance(p).essence--;
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
-		if(!whiletakedown.contains(p)) {
-			whiletakedown.add(p);
+		if(!PlayerFunction.getinstance(p).takedown) {
+			PlayerFunction.getinstance(p).takedown=true;
 			new BukkitRunnable() {
 				
 				int i = 0;
@@ -180,9 +178,12 @@ public class ByV {
 						}
 						
 						takedownparticles(p);
+						PlayParticle playParticle = new PlayParticle(Particle.CRIT);
+						playParticle.CircleVerticalImpact1(p);
+						playParticle.CirCleHorizontalImpact1(p);
 						//riptideoffpacket(p);
 						
-						whiletakedown.remove(p);
+						PlayerFunction.getinstance(p).takedown=false;
 						cancel();
 					}
 					i++;
@@ -643,6 +644,78 @@ public class ByV {
 				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+	}
+
+	public void MeleeParticle(Player player) {
+
+		Location location = player.getEyeLocation();
+		Vector vec = location.getDirection().normalize().multiply(0.7);
+		Vector vec2 = location.getDirection().normalize().multiply(3.5);
+		location.add(vec2);
+		int Max = 7;
+
+		new BukkitRunnable() {
+			int t = 3;
+			@Override
+			public void run() {
+
+				for(int i=3; i<=t; i++) {
+					location.subtract(vec);
+				}
+
+				if(t > Max)
+					MeleeCircleCritParticle(player, location, (double)t/5, true);
+				MeleeCircleCritParticle(player, location, (double)t/5, false);
+
+
+				for(int i=3; i<=t; i++) {
+					location.add(vec);
+				}
+
+				if(t>Max) cancel();
+				t++;
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+	}
+
+	private void MeleeCircleCritParticle(Player player, Location location, double radius, boolean smoke) {
+		//location.setPitch(0);
+		double yaw = Math.toRadians(player.getLocation().getYaw());
+		double pitch = Math.toRadians(player.getLocation().getPitch());
+		Vector vec = location.getDirection().normalize();
+		double x = 0;
+		double y =0;
+		double z = 0;
+
+		for(int i=0; i<40; i++) {
+			double angle = 2 * Math.PI * i / 50;
+			Vector offset = vec.clone().multiply(Math.cos(angle) * radius);
+			offset.setY(Math.sin(angle) * radius);
+
+			double yangle = Math.toRadians(90);
+			double cosx = Math.cos(yangle);
+			double sinx = Math.sin(yangle);
+
+			offset = rotateAroundAxisY(offset, cosx, sinx);
+
+
+			z = 0;
+			y = radius * Math.cos(Math.PI / 20 * i);
+			x = radius * Math.sin(Math.PI / 20 * i);
+			Vector v = new Vector(x, y, z);
+			v = transform(v, yaw, pitch, 0);
+
+
+			location.add(v);
+			if(smoke) {
+				player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, location, 1, 0, 0, 0, 0);
+			}
+			else
+				player.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
+
+			// play particle at yourLocation
+			location.subtract(v);
+		}
 	}
 	
 }
