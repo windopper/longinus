@@ -1,11 +1,10 @@
 package PlayerManager;
 
-import java.util.HashMap;
-
 import org.bukkit.entity.Player;
-
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
+
+import java.util.HashMap;
 
 public class PlayerFunction implements Listener {
 	
@@ -36,6 +35,7 @@ public class PlayerFunction implements Listener {
 	/*
 	ByV Functions
 	 */
+	public boolean takedown = false;
 	public int essence = 0;
 
 	private PlayerFunction(Player p) {

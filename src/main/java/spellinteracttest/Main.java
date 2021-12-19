@@ -2,19 +2,14 @@ package spellinteracttest;
 
 import ClassAbility.Accelerator;
 import ClassAbility.Blaster;
-import ClassAbility.ByV;
 import ClassAbility.Phlox;
 import CustomEvents.PlayerCustomEventListener;
 import Duel.DuelManager;
 import DynamicData.Damage;
-import Mob.EntityManager;
-import Mob.EntityStatusManager;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
-import Mob.MobEventManager;
-import Mob.MobMechManager;
-import Mob.mob;
+import Mob.*;
 import PacketListener.PacketReader;
 import Party.EventProcess;
 import Party.PartyManager;
@@ -506,7 +501,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "playparticle": {
-				(new PlayParticle()).Circle(player, 2);
+				(new PlayParticle(Particle.CRIT)).Circle(player, 2);
 				break;
 			}
 
@@ -772,7 +767,7 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
 		Blaster.getinstance().removemaps(p);
-		ByV.getinstance().removemaps(p);
+
 
 		ClassAbility.Combination.getinstance().removemaps(p);
 
