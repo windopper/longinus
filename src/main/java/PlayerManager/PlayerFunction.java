@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import ClassAbility.Aether;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
@@ -80,11 +81,12 @@ public class PlayerFunction implements Listener {
 
 	
 	
-	public void MeleeDelayControlLoop() {
+	public void PlayerFunctionLoop() {
 		
 		if(meleedelay == melee) setMelee(0);
 		if(melee != 0) melee++;
-		
+
+		Aether.getinstance().PassiveEffect();
 	}
 
 }

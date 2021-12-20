@@ -7,8 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
-import static PlayParticle.Rotate.rotateAroundAxisX;
-import static PlayParticle.Rotate.rotateAroundAxisZ;
+import static PlayParticle.Rotate.*;
 
 public class PlayParticle {
 
@@ -25,8 +24,33 @@ public class PlayParticle {
         this.dustOptions = dustOptions;
     }
 
-
     public void Circle(Player player, double radius) {
+
+        new BukkitRunnable() {
+
+
+            @Override
+            public void run() {
+
+                for(int i=0; i<50; i++) {
+                    double x = - 3 * Math.sin(Math.toRadians(player.getLocation().getYaw() + 25 - i));
+                    double y = 0;
+                    double z = 3 * Math.cos(Math.toRadians(player.getLocation().getYaw() + 25 - i));
+
+
+
+                    player.getWorld().spawnParticle(Particle.CRIT, player.getLocation().add(x, y, z), 1, 0, 0, 0, 0);
+                }
+
+                cancel();
+
+            }
+
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+    }
+
+
+    public void TestCircle(Player player, double radius) {
 
         new BukkitRunnable(){
 
@@ -45,10 +69,16 @@ public class PlayParticle {
                     double angle, x, y, z;
                     angle = 2 * Math.PI * i / amount;
 
+                    double zangle = Math.toRadians(45);
+                    double zsin = Math.sin(zangle);
+                    double zcos = Math.cos(zangle);
+
                     z = 0;
                     y = radius * Math.cos(Math.PI / 20 * i);
                     x = radius * Math.sin(Math.PI / 20 * i);
+
                     Vector v = new Vector(x, y, z);
+                    v = rotateAroundAxisX(v, zcos, zsin);
                     v = transform(v, yaw, pitch, 0);
 
                     //loc.add(x, y, z);
@@ -158,7 +188,7 @@ public class PlayParticle {
 
     public void CirCleHorizontalImpact1(Player player) {
 
-        Location location = player.getEyeLocation();
+        Location location = player.getLocation().add(0, 0.3, 0);
 
         new BukkitRunnable() {
 
@@ -173,6 +203,27 @@ public class PlayParticle {
                 t++;
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+    }
+
+    public void CirCleHorizontalSmallImpact(Player player) {
+
+        Location location = player.getLocation().add(0, 0.3, 0);
+
+        new BukkitRunnable() {
+            int t = 0;
+            @Override
+            public void run() {
+
+                HorizontalCircle(player, location, ((double)t +1)/3 );
+                if(t>=5) {
+                    (new PlayParticle(Particle.SMOKE_NORMAL)).HorizontalCircle(player, location, 3);
+                    cancel();
+                }
+                t++;
+
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
     }
 
 
@@ -207,11 +258,9 @@ public class PlayParticle {
             double y = location.getY();
             double z = Math.sin(i) * radius;
 
-
             location.add(x, 0, z);
             Particle(location);
             location.subtract(x, 0, z);
-
         }
 
     }
@@ -261,30 +310,6 @@ public class PlayParticle {
     }
 
 
-    /**
-     * Intrinsic matrix rotation for MC coordinate system
-     * @author Michel_0
-     * @param direction The directional vector to be transformed
-     * @param yaw The desired yaw angle for rotation
-     * @param pitch The desired pitch angle for rotation
-     * @param roll The desired roll angle for rotation
-     * @return The transformed directional vector
-     */
-    public static Vector transform(Vector direction, double yaw, double pitch, double roll) {
-        double[] vec = new double[] { direction.getX(), direction.getY(), direction.getZ() };
-        direction.setX(
-                vec[0] * (Math.cos(-yaw) * Math.cos(roll) + Math.sin(-yaw) * Math.sin(pitch) * Math.sin(roll))
-                        + vec[1] * (Math.cos(roll) * Math.sin(-yaw) * Math.sin(pitch) - Math.cos(-yaw) * Math.sin(roll))
-                        + vec[2] * Math.cos(pitch) * Math.sin(-yaw));
-        direction.setY(
-                vec[0] * Math.cos(pitch) * Math.sin(roll)
-                        + vec[1] * Math.cos(pitch) * Math.cos(roll)
-                        - vec[2] * Math.sin(pitch));
-        direction.setZ(
-                vec[0] * (Math.cos(-yaw) * Math.sin(pitch) * Math.sin(roll) - Math.cos(roll) * Math.sin(-yaw))
-                        + vec[1] * (Math.cos(-yaw) * Math.cos(roll) * Math.sin(pitch) + Math.sin(-yaw) * Math.sin(roll))
-                        + vec[2] * Math.cos(-yaw) * Math.cos(pitch));
-        return direction;
-    }
+
 
 }

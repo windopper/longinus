@@ -19,8 +19,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import static PlayParticle.PlayParticle.transform;
 import static PlayParticle.Rotate.rotateAroundAxisY;
+import static PlayParticle.Rotate.transform;
 
 public class ByV {
 	

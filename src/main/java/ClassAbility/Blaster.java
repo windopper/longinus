@@ -17,7 +17,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static PlayParticle.Rotate.*;
@@ -32,7 +31,8 @@ public class Blaster {
 	public static final int energytransmana = 10;
 	public static final int magneticfieldmana = 12;
 	
-	public static final List<Player> preheat = new ArrayList<>();
+	//public static final List<Player> preheat = new ArrayList<>();
+
 	private Blaster() {
 		
 	}
@@ -43,9 +43,9 @@ public class Blaster {
 	}
 	
 	
-	public void removemaps(Player p) {
-		preheat.remove(p);
-	}
+//	public void removemaps(Player p) {
+//		preheat.remove(p);
+//	}
 	
 	@SuppressWarnings("deprecation")
 	public void melee(final Player p) {
@@ -363,20 +363,23 @@ public class Blaster {
 
 
 		Location location = player.getEyeLocation();
-		double yvec = location.getDirection().normalize().multiply(0.4).getY();
+
+		double pitch = Math.toRadians(location.getPitch());
+		double yaw = Math.toRadians(location.getYaw());
+
 		Vector eyevec = location.getDirection().normalize().multiply(-0.8);
 		location.add(eyevec);
 
 		new BukkitRunnable() {
 
 			int t = 0;
-			double RandomAnglez = (int)(Math.random() * 2) == 0 ? Math.random() * 90 + 45 : -Math.random() * 90 - 45;
-			double RandomAnglex = Math.random() * 180 -90;
-			double RandomAngley = Math.random() * 180 -90;
+			//double RandomAnglez = (int)(Math.random() * 2) == 0 ? Math.random() * 90 + 45 : -Math.random() * 90 - 45;
+			double RandomAnglex = Math.random() * -90;
+			double RandomAngley = (int)(Math.random() * 2) == 0 ? Math.random() * 45 + 45 : -Math.random() * 45 - 45;
 
 			double anglex = RandomAnglex;
 			double angley = RandomAngley;
-			double anglez = RandomAnglez;
+			//double anglez = RandomAnglez;
 			@Override
 			public void run() {
 
@@ -384,13 +387,13 @@ public class Blaster {
 				double y = 0;
 				double z = 0;
 
+
+
 				for(int i=0; i<3; i++) {
 
 					Vector vector = location.getDirection().normalize().multiply(0.4);
 
-					double Zangle = Math.toRadians(anglez);
-					double zaxiscos = Math.cos(-Zangle);
-					double zaxissin = Math.sin(-Zangle);
+					//location.add(vector);
 
 					double yangle = Math.toRadians(angley);
 					double yaxiscos = Math.cos(yangle);
@@ -400,27 +403,26 @@ public class Blaster {
 					double xaxiscos = Math.cos(xangle);
 					double xaxissin = Math.sin(xangle);
 
-					anglez /= 1.15;
-					angley /= 1.15;
-					anglex /= 1.15;
+					//anglez /= 1.15;
+					angley /= 1.10;
+					anglex /= 1.10;
 
+					y = 0;
+					x = 0;
 					if(t<10) {
-						vector.multiply(0.1 * Math.pow(t, 2));
+						z = 0.025 * Math.pow(t, 2);
 					}
 					else {
-						vector.multiply(t);
+						z = (double)t/4;
 					}
 
-					x = vector.getX();
-					y = vector.getY();
-					z = vector.getZ();
 					Vector v = new Vector(x, y, z);
-					v = rotateAroundAxisY(v, zaxiscos, zaxissin);
-					v = rotateAroundAxisZ(v, yaxiscos, yaxissin);
+					v = rotateAroundAxisY(v, yaxiscos, yaxissin);
 					v = rotateAroundAxisX(v, xaxiscos, xaxissin);
-					location.add(v.getX(), v.getY(), v.getZ());
+					v = transform(v, yaw, pitch, 0);
+					v.multiply(1);
 
-
+					location.add(v);
 					location.getWorld().spawnParticle(Particle.REDSTONE, location, 25, 0.05, 0.05, 0.05, 0
 							, new Particle.DustOptions(Color.fromRGB(210, 4, 45), 1));
 
@@ -444,9 +446,10 @@ public class Blaster {
 						}
 					}
 
-					location.subtract(v.getX(), v.getY(), v.getZ());
+					location.subtract(v);
+					//location.subtract(v);
 
-					if(t>30) cancel();
+					if(t>35) cancel();
 					t++;
 				}
 
