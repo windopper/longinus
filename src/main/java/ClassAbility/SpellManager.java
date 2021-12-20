@@ -347,8 +347,6 @@ public class SpellManager {
 
         for (LivingEntity e : player.getWorld().getLivingEntities()) {
 
-
-
             Location eloc = e.getBoundingBox().getCenter().toLocation(e.getWorld());
             double dist = eloc.distance(CurrentLoc);
             if (dist < HitBoxRange || e.getBoundingBox().contains(loc.getX(), loc.getY(), loc.getZ())) {

@@ -320,7 +320,6 @@ public class Combination {
 		if(combo.equals("L")) {
 			
 			if(PlayerFunction.getinstance(p).getMelee()==0 && PF.getMeleemode() == 0) Aether.getinstance().melee(p);
-			if(PlayerFunction.getinstance(p).getMelee()==0 && PF.getMeleemode() == 1) Aether.getinstance().melee2(p);
 
 		}
 		if(combo.equals("RL")) {
@@ -370,7 +369,7 @@ public class Combination {
 				Sound(p);
 				p.sendTitle(" ",blank+FR, 5, 20, 10);
 				energyoverload(p, combo);
-				Aether.getinstance().SwitchWeapon(p, WeaponModeChangemana);
+				Aether.getinstance().SweepWeapon(p, WeaponModeChangemana);
 			}
 			else {
 				Warning(p);

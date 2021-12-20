@@ -686,7 +686,7 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerHealthShield.getinstance(p).ShieldRegeneration();
 					PlayerEnergy.getinstance(p).OverloadCoolDown();
 					PlayerCombination.getinstance(p).KeyBind();
-					PlayerFunction.getinstance(p).MeleeDelayControlLoop();
+					PlayerFunction.getinstance(p).PlayerFunctionLoop();
 
 					EntityHealthBossBar.getinstance(p).healthBarLoop();
 					
@@ -766,8 +766,6 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerStatManager.getinstance(p).removeinstance();
 		PlayerManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
-		Blaster.getinstance().removemaps(p);
-
 
 		ClassAbility.Combination.getinstance().removemaps(p);
 
