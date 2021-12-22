@@ -1,4 +1,4 @@
-package PlayParticle;
+package PacketRecord;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -9,19 +9,22 @@ import org.bukkit.util.Vector;
 
 import static PlayParticle.Rotate.*;
 
-public class PlayParticle {
+public class PacketPlayParticle {
 
     private final Particle particle;
     private final Particle.DustOptions dustOptions;
+    private final Player showTo;
 
-    public PlayParticle(Particle particle) {
+    public PacketPlayParticle(Particle particle, Player ShowTo) {
         this.particle = particle;
         this.dustOptions = null;
+        this.showTo = ShowTo;
     }
 
-    public PlayParticle(Particle particle, Particle.DustOptions dustOptions) {
+    public PacketPlayParticle(Particle particle, Particle.DustOptions dustOptions, Player ShowTo) {
         this.particle = particle;
         this.dustOptions = dustOptions;
+        this.showTo = ShowTo;
     }
 
     public void Circle(Player player, double radius) {
@@ -39,7 +42,7 @@ public class PlayParticle {
 
 
 
-                    player.getWorld().spawnParticle(Particle.CRIT, player.getLocation().add(x, y, z), 1, 0, 0, 0, 0);
+                    showTo.spawnParticle(Particle.CRIT, player.getLocation().add(x, y, z), 1, 0, 0, 0, 0);
                 }
 
                 cancel();
@@ -216,7 +219,7 @@ public class PlayParticle {
 
                 HorizontalCircle(location, ((double)t +1)/3 );
                 if(t>=5) {
-                    (new PlayParticle(Particle.SMOKE_NORMAL)).HorizontalCircle(location, 3);
+                    (new PacketPlayParticle(Particle.SMOKE_NORMAL, showTo)).HorizontalCircle(location, 3);
                     cancel();
                 }
                 t++;
@@ -240,7 +243,7 @@ public class PlayParticle {
             double cosx = Math.cos(yangle);
             double sinx = Math.sin(yangle);
 
-            offset = Rotate.rotateAroundAxisY(offset, cosx, sinx);
+            offset = rotateAroundAxisY(offset, cosx, sinx);
 
 
             location.add(offset);
@@ -267,9 +270,9 @@ public class PlayParticle {
 
     private void Particle(Location location) {
         if (dustOptions == null)
-            location.getWorld().spawnParticle(this.particle, location, 1, 0, 0, 0, 0);
+            showTo.spawnParticle(this.particle, location, 1, 0, 0, 0, 0);
         else
-            location.getWorld().spawnParticle(this.particle, location, 1, 0, 0, 0, 0, dustOptions);
+            showTo.spawnParticle(this.particle, location, 1, 0, 0, 0, 0, dustOptions);
     }
 
 
@@ -294,11 +297,11 @@ public class PlayParticle {
                     double cosx = Math.cos(yangle);
                     double sinx = Math.sin(yangle);
 
-                    offset = Rotate.rotateAroundAxisY(offset, cosx, sinx);
+                    offset = rotateAroundAxisY(offset, cosx, sinx);
 
 
                     location.add(offset);
-                    player.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
+                    showTo.spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
                     // play particle at yourLocation
                     location.subtract(offset);
                 }
@@ -308,8 +311,5 @@ public class PlayParticle {
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
     }
-
-
-
 
 }

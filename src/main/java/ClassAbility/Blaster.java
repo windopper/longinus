@@ -1,6 +1,7 @@
 package ClassAbility;
 
 import DynamicData.Damage;
+import PlayParticle.PlayParticle;
 import PlayParticle.Shape;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static PlayParticle.Rotate.*;
@@ -25,11 +27,11 @@ public class Blaster {
 	
 	private static Blaster Blaster;
 	
-	public static final int railgunmana = 4;
-	public static final int grenadelaunchermana = 4;
-	public static final int riflemana = 4;
-	public static final int energytransmana = 10;
-	public static final int magneticfieldmana = 12;
+	public static final int TurretDropMana = 6;
+	public static final int TurretUpgradeMana = 4;
+	public static final int SelfExplosion = 4;
+	public static final int EnergyTransMana = 10;
+	public static final int Acceleration = 12;
 	
 	//public static final List<Player> preheat = new ArrayList<>();
 
@@ -55,27 +57,6 @@ public class Blaster {
 			p.getWorld().playSound(p.getLocation(), Sound.ENTITY_LLAMA_SPIT, 2, 0);
 			p.getWorld().playSound(p.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 2, 2);
 			RailGun(p);
-
-//			Location ploc = p.getEyeLocation();
-
-//			Vector pvec = ploc.getDirection();
-//			pvec.normalize();
-//			pvec.multiply(0.3);
-//			for(int i=0; i<3; i++) {
-//				ploc.add(pvec);
-//			}
-//
-//			SpellManager Spell = new SpellManager(p, ploc, 0.3);
-//			Spell.addDepartSound(Sound.ENTITY_LLAMA_SPIT, 2, 0);
-//			Spell.addDepartParticle(Particle.SMOKE_LARGE, 4, 0, 0, 0, 0, null);
-//			Spell.setMaximumRange(9);
-//			Spell.setEntityPassable(true);
-//			Spell.addTrailParticle(Particle.VILLAGER_ANGRY, 1, 0, 0, 0, 0, null);
-//			Spell.setHitBoxRange(1.5);
-//			Spell.setDamageRate(1);
-//			Spell.setBurn(60, 0.1);
-//
-//			Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 			
 			PlayerFunction.getinstance(p).setMeleeDelay(10);
 					
@@ -178,66 +159,7 @@ public class Blaster {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		magneticfield2(p);
 		return;
-		
-		
-//		Location loc = p.getLocation();
-//
-//		final int r = 10;
-//
-//		new BukkitRunnable() {
-//
-//			int i= 1;
-//			double theta = 0;
-//
-//			@SuppressWarnings("deprecation")
-//			@Override
-//			public void run() {
-//
-//				p.getWorld().playSound(p.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 2, 1);
-//
-//				double y = 0;
-//				for(double phi = 0; phi<=Math.PI; phi+=Math.PI/15) {
-//					y = r * Math.cos(phi) + 1.5;
-//	                double x = r * Math.cos(theta) * Math.sin(phi);
-//	                double z = r * Math.sin(theta) * Math.sin(phi);
-//	                loc.add(x, y, z);
-//	                loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, loc, 5, 1F, 1F, 1F, 0.5, null);
-//	                loc.getWorld().spawnParticle(Particle.CRIT, loc, 10, 1F, 1F, 1F, 0, null);
-//	                loc.subtract(x, y, z);
-//					y = r * Math.cos(phi) + 1.5;
-//	                z = r * Math.cos(theta) * Math.sin(phi);
-//	                x = r * Math.sin(theta) * Math.sin(phi);
-//	                loc.add(x, y, z);
-//	                loc.getWorld().spawnParticle(Particle.CRIT_MAGIC, loc, 5, 1F, 1F, 1F, 0.5, null);
-//	                loc.getWorld().spawnParticle(Particle.CRIT, loc, 10, 1F, 1F, 1F, 0, null);
-//	                loc.subtract(x, y, z);
-//
-//				}
-//			    for (int d = 0; d <= 45; d += 1) {
-//			        Location particleLoc = new Location(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-//			        particleLoc.setX(loc.getX() + Math.cos(d) * i);
-//			        particleLoc.setZ(loc.getZ() + Math.sin(d) * i);
-//			        loc.getWorld().spawnParticle(Particle.REDSTONE, particleLoc, 1, new Particle.DustOptions(Color.TEAL, 1));
-//			    }
-//
-//				Bukkit.getWorld(p.getWorld().toString());
-//
-//	            for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 10, 10, 10)) {
-//	            	if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
-//	            		LivingEntity le = (LivingEntity) e;
-//	            		EntityStatusManager.getinstance(le).Stun(e, 20);
-//	            	}
-//	            }
-//
-//		        if(theta >= Math.PI * 5) cancel();
-//		        theta += Math.PI /10;
-//		        if(i==10) i=0;
-//		        i++;
-//
-//			}
-//		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
-		
 	}
 
 	private void magneticfield2(Player player) {
@@ -458,7 +380,138 @@ public class Blaster {
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
 	}
-	
+
+
+	public void TurretDrop(final Player p, int mana) {
+		PlayerEnergy.getinstance(p).removeEnergy(mana);
+		TurretDropMethod(p);
+
+	}
+
+	private void TurretDropMethod(final Player p) {
+
+		Location targetloc = null;
+		Location loc = p.getEyeLocation();
+		Vector dir = loc.getDirection().normalize().multiply(0.3);
+
+		for(int i=0; i<40; i++) {
+			for(LivingEntity entity : p.getWorld().getLivingEntities()) {
+				if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, p) && p != entity) {
+					Location location = entity.getLocation();
+					BoundingBox box = entity.getBoundingBox();
+					if (location.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+						targetloc = entity.getLocation();
+						break;
+					}
+				}
+			}
+			if(targetloc != null) break;
+			if(targetloc == null && i==39) targetloc = loc;
+
+			if(loc.getBlock().getType().isSolid()) {
+				targetloc = loc;
+				break;
+			}
+			loc.add(dir);
+		}
+
+		while(!targetloc.clone().add(0, -1, 0).getBlock().getType().isSolid()) {
+			targetloc.add(0, -1, 0);
+		}
+
+
+		final List<Location> locs = new ArrayList<>();
+
+		double xangle = Math.toRadians(Math.random() * 40-20);
+		double yangle = Math.toRadians(Math.random() * 180 - 360);
+		double yaxiscos = Math.cos(yangle);
+		double yaxissin = Math.sin(yangle);
+		double xaxiscos = Math.cos(xangle);
+		double xaxissin = Math.sin(xangle);
+
+		for(int i=0; i<60; i++) {
+
+			double y = (double)i/4;
+			Vector v = new Vector(0, y, 0);
+			v = rotateAroundAxisX(v, xaxiscos, xaxissin);
+			v = rotateAroundAxisY(v, yaxiscos, yaxissin);
+			locs.add(targetloc.clone().add(v));
+
+		}
+
+		final List<Location> square = new ArrayList<>();
+		final double halfwidth = 1.5;
+		for(double i = -halfwidth; i<=halfwidth; i+=0.2) {
+			square.add(new Location(Bukkit.getWorld("world"), i, 0.2, -halfwidth));
+			square.add(new Location(Bukkit.getWorld("world"), i, 0.2, halfwidth));
+			square.add(new Location(Bukkit.getWorld("world"), halfwidth, 0.2, i));
+			square.add(new Location(Bukkit.getWorld("world"), -halfwidth, 0.2, i));
+		}
+
+		new BukkitRunnable() {
+
+			int time = 0;
+
+			double yaw = 0;
+			double yaw2 = 45;
+
+			double x = 0;
+			double y = 0;
+			double z = 0;
+
+			int kloc = 59;
+
+			@Override
+			public void run() {
+
+				for(Location loc : locs) {
+					loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
+							new Particle.DustOptions(Color.fromRGB(135, 206, 235), 1));
+				}
+
+				for(Location square : square) {
+
+					x = square.getX();
+					y = square.getY();
+					z = square.getZ();
+					Vector v = new Vector(x, y, z);
+					v = transform(v, Math.toRadians(yaw), 0,0);
+					p.getWorld().spawnParticle(Particle.REDSTONE, locs.get(0).clone().add(v), 1, 0, 0, 0,
+							new Particle.DustOptions(Color.RED, 0.5f));
+					v = transform(v, Math.toRadians(45), 0,0);
+					p.getWorld().spawnParticle(Particle.REDSTONE, locs.get(0).clone().add(v), 1, 0, 0, 0,
+							new Particle.DustOptions(Color.RED, 0.5f));
+				}
+
+
+				// 낙하
+				if(time>10) {
+					for(int i=0; i<3; i++) {
+
+						loc.getWorld().spawnParticle(Particle.FLAME, locs.get(kloc), 10, 1, 1, 1, 0);
+
+						loc.getWorld().spawnParticle(Particle.CAMPFIRE_COSY_SMOKE, locs.get(kloc), 4, 1, 1, 1, 0);
+
+
+						if(kloc>=1) kloc--;
+					}
+				}
+
+				if(time>30) {
+					PlayParticle playParticle = new PlayParticle(Particle.CRIT);
+					playParticle.CirCleHorizontalSmallImpact(locs.get(kloc).add(0, 0.3, 0));
+					p.getWorld().playSound(locs.get(kloc), Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+					p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, locs.get(kloc), 1, 0, 0, 0, 0);
+					cancel();
+				}
+				yaw += 3;
+				yaw2 += 3;
+				time++;
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
+	}
+
 	
 	
 }

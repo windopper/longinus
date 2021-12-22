@@ -76,7 +76,6 @@ public class EntityPlayerManager {
         conn.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, true));
     }
 
-
     private void sendpacket(Player player, Packet<?> packet) {
 
         PlayerConnection conn = ((CraftPlayer)player).getHandle().b;

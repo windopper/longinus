@@ -1,6 +1,6 @@
 package CustomEvents;
 
-import ClassAbility.Aether;
+import ClassAbility.Aether.Aether;
 import ClassAbility.entitycheck;
 import Duel.DuelManager;
 import Mob.EntityManager;

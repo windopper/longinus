@@ -639,11 +639,6 @@ public class Phlox {
 				}
 				if(i==0) target[0] = ploc;
 				if(i==4) target[1] = ploc;
-				
-				
-				
-				
-				
 				//	로봇 위치
 				
 				Location loc = me.getEyeLocation();
@@ -698,7 +693,7 @@ public class Phlox {
 							double edist = eloc.distance(loc);
 							
 							
-							if(edist<2 && ebox.contains(loc.getX(), loc.getY(), loc.getZ()) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
+							if((edist<2 || ebox.contains(loc.getX(), loc.getY(), loc.getZ())) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
 								laserhit.put(e, 0);
 								me.playSound(me.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
 								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 1.5);
@@ -862,6 +857,41 @@ public class Phlox {
 	        particleLoc.setZ(location.getZ() + Math.sin(d) * size);
 	        location.getWorld().spawnParticle(Particle.REDSTONE, particleLoc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.WHITE, 2));
 	    }
+	}
+
+	private void FRSkill(Player player) {
+
+		Location targetloc = null;
+
+		Location loc = player.getEyeLocation();
+		Vector dir = loc.getDirection().normalize().multiply(0.4);
+
+
+		// location settings
+		for(int i=0; i<40; i++) {
+			for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+				if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player)) {
+					Location eloc = entity.getLocation();
+					BoundingBox box = entity.getBoundingBox();
+					if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+						targetloc = entity.getLocation();
+						break;
+					}
+				}
+			}
+			if(targetloc != null) break;
+			if(loc.getBlock().getType().isSolid()) {
+				targetloc = loc;
+				break;
+			}
+			if(i==39) targetloc = loc;
+			loc.add(dir);
+		}
+
+
+
+
+
 	}
 
 }	

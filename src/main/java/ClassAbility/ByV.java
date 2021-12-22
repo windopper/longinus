@@ -19,8 +19,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import static PlayParticle.Rotate.rotateAroundAxisY;
-import static PlayParticle.Rotate.transform;
+import java.util.ArrayList;
+import java.util.List;
+
+import static PlayParticle.Rotate.*;
 
 public class ByV {
 	
@@ -155,7 +157,6 @@ public class ByV {
 						p.getWorld().playSound(ploc, Sound.BLOCK_GRASS_BREAK, 2, 1);
 						p.getWorld().playSound(ploc, Sound.ENTITY_IRON_GOLEM_DEATH, 2, 2);
 						
-						
 						for(Entity e : p.getWorld().getNearbyEntities(ploc, 5, 5, 5)) {
 							if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
 								Location eloc = e.getLocation();
@@ -272,24 +273,12 @@ public class ByV {
 	public void punch(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence--;
-
 		Location ploc = p.getEyeLocation();
-		Vector pvec = ploc.getDirection();
-		pvec.normalize();
-		pvec.multiply(2);
-		ploc.add(pvec);
-		
 		p.getWorld().playSound(ploc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 1f);
 		p.getWorld().playSound(ploc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
 
-		SpellManager Spell = new SpellManager(p);
-		Spell.setHitBoxRange(3);
-		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0);
-		Spell.setDamageRate(1.5);
-		Spell.setKnockBack(p, 2);
-		Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, ploc);
-
-		punchparticle(p, ploc);
+		RFSkill(p);
+		//punchparticle(p, ploc);
 
 	}
 	public void shockwave(final Player p, int mana) {
@@ -716,6 +705,94 @@ public class ByV {
 			// play particle at yourLocation
 			location.subtract(v);
 		}
+	}
+
+	private void RFSkill(Player p) {
+
+		final List<Entity> Hit = new ArrayList<>();
+
+		PlayParticle playParticle = new PlayParticle(Particle.CRIT);
+		playParticle.CirCleHorizontalSmallImpact(p.getLocation().add(0, 0.3, 0));
+
+		new BukkitRunnable() {
+
+			Location loc = p.getEyeLocation();
+
+			double pitch = p.getLocation().getPitch();
+			double yaw = p.getLocation().getYaw();
+
+
+			double rpitch = Math.toRadians(pitch);
+			double ryaw = Math.toRadians(yaw);
+
+			double rroll = Math.toRadians(15);
+			double rroll2 = Math.toRadians(-15);
+
+			double yaxisangle = 160;
+			int colortrans = 0;
+
+			double k =1;
+			int time = 0;
+
+			@Override
+			public void run() {
+
+				for(int i=0; i<9; i++) {
+
+					for(double j=0; j<k; j+=0.5) {
+
+						for(double y=-0.5; y<=0.5; y+=0.3) {
+
+							double x = 0;
+							double z = 1 + j;
+
+							double yangle = Math.toRadians(yaxisangle);
+							double yaxiscos = Math.cos(-yangle);
+							double yaxissin = Math.sin(-yangle);
+
+							Vector v = new Vector(x, y, z);
+							v = rotateAroundAxisY(v, yaxiscos, yaxissin);
+							v = transform(v, ryaw, rpitch, 0);
+
+							loc.add(v);
+							if(j+2>k) {
+								p.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
+										new Particle.DustOptions(Color.fromRGB(85+colortrans, 37+colortrans, 134+colortrans), 1));
+
+							}
+							if(j+0.5>k) {
+								p.getWorld().spawnParticle(Particle.CLOUD, loc, 1, 0, 0, 0, 0);
+							}
+
+							p.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+
+							for(LivingEntity entity : p.getWorld().getLivingEntities()) {
+								if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, p) && !Hit.contains(entity)) {
+									Location eloc = entity.getLocation();
+									BoundingBox box = entity.getBoundingBox();
+									if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+										int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
+										Damage.getinstance().taken(dmg, entity, p);
+										v.normalize().multiply(1);
+										EntityStatusManager.getinstance(entity).KnockBack(v);
+										Hit.add(entity);
+									}
+								}
+							}
+
+							loc.subtract(v);
+
+						}
+					}
+
+					yaxisangle -= 10;
+					colortrans += 2;
+					k+=0.1;
+				}
+				if(time>1) cancel();
+				time++;
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
 	
 }

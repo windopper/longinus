@@ -1,5 +1,7 @@
-package ClassAbility;
+package ClassAbility.Aether;
 
+import ClassAbility.SpellManager;
+import ClassAbility.entitycheck;
 import DynamicData.Damage;
 import Mob.EntityStatusManager;
 import PlayParticle.PlayParticle;
@@ -106,7 +108,7 @@ public class Aether {
 	public void ImpulseSwitchWeapon(final Player p, int mana) {
 
 		PlayParticle playParticle = new PlayParticle(Particle.CRIT);
-		playParticle.CirCleHorizontalSmallImpact(p);
+		playParticle.CirCleHorizontalSmallImpact(p.getLocation().add(0, 0.3, 0));
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 
@@ -342,8 +344,8 @@ public class Aether {
 									if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
 										int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 1);
 										Damage.getinstance().taken(dmg, entity, player);
-										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.2);
-										entity.setVelocity(knockvector);
+										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.5);
+										EntityStatusManager.getinstance(entity).KnockBack(knockvector);
 										Hit.add(entity);
 										player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
 									}
@@ -389,8 +391,8 @@ public class Aether {
 									if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
 										int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.7);
 										Damage.getinstance().taken(dmg, entity, player);
-										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.2);
-										entity.setVelocity(knockvector);
+										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.5);
+										EntityStatusManager.getinstance(entity).KnockBack(knockvector);
 										Hit.add(entity);
 										player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
 									}
@@ -436,8 +438,8 @@ public class Aether {
 									if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
 										int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.7);
 										Damage.getinstance().taken(dmg, entity, player);
-										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.2);
-										entity.setVelocity(knockvector);
+										Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.5);
+										EntityStatusManager.getinstance(entity).KnockBack(knockvector);
 										Hit.add(entity);
 										player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
 									}
@@ -525,10 +527,11 @@ public class Aether {
 						v = transform(v, ryaw, rpitch, rroll);
 
 						location.add(v);
-						player.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, location,1, 0, 0, 0, 0);
+						//player.getWorld().spawnParticle(Particle.CRIT_MAGIC, location,1, 0, 0, 0, 0);
+						player.getWorld().spawnParticle(Particle.CLOUD, location, 1, 0, 0, 0, 0);
 						player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, location,1, 0, 0, 0, 0);
 						player.getWorld().spawnParticle(Particle.REDSTONE, location,1, 0, 0, 0, 0,
-								new Particle.DustOptions(Color.RED, 1));
+								new Particle.DustOptions(Color.RED, 0.5f));
 
 
 						for(LivingEntity entity : player.getWorld().getLivingEntities()) {
@@ -538,7 +541,7 @@ public class Aether {
 								if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
 									int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, spellrate);
 									Damage.getinstance().taken(dmg, entity, player);
-									EntityStatusManager.getinstance(entity).KnockBack(player, 1);
+									EntityStatusManager.getinstance(entity).KnockBack(player, 1.5);
 									Hit.add(entity);
 									player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
 									player.getWorld().playSound(eloc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
@@ -599,6 +602,7 @@ public class Aether {
 	}
 
 	public void MeleeMethod(Player player) {
+
 		Location location = player.getEyeLocation();
 
 		new BukkitRunnable() {
@@ -677,11 +681,12 @@ public class Aether {
 	public void PassiveEffect() {
 
 		final List<Location> location = new ArrayList<>();
-		for(double i = -4; i<=4; i+=0.2) {
-			location.add(new Location(Bukkit.getWorld("world"), i, 0, -4));
-			location.add(new Location(Bukkit.getWorld("world"), i, 0, 4));
-			location.add(new Location(Bukkit.getWorld("world"), 4, 0, i));
-			location.add(new Location(Bukkit.getWorld("world"), -4, 0, i));
+		int width = 1;
+		for(double i = -width; i<=width; i+=0.2) {
+			location.add(new Location(Bukkit.getWorld("world"), i, 0, -width));
+			location.add(new Location(Bukkit.getWorld("world"), i, 0, width));
+			location.add(new Location(Bukkit.getWorld("world"), width, 0, i));
+			location.add(new Location(Bukkit.getWorld("world"), -width, 0, i));
 		}
 
 		int time = 0;
@@ -698,7 +703,7 @@ public class Aether {
 			public void run() {
 
 				for(Player player : Bukkit.getOnlinePlayers()) {
-					if(PlayerFunction.getinstance(player).AEImpulse < 600 && PlayerManager.getinstance(player).CurrentClass.equals("아이테르")) continue;
+					if(PlayerFunction.getinstance(player).AEImpulse < 600 || !PlayerManager.getinstance(player).CurrentClass.equals("아이테르")) continue;
 					for(Location loc : location) {
 
 						x = loc.getX();

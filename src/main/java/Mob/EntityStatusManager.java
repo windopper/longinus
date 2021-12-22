@@ -65,6 +65,12 @@ public class EntityStatusManager {
         }
     }
 
+    public void KnockBack(Vector knockbackvector) {
+        if(canKnockback) {
+            e.setVelocity(knockbackvector);
+        }
+    }
+
     @SuppressWarnings("deprecation")
     public void Stun(Entity damager, int tick) {
 

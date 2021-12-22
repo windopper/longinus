@@ -1,8 +1,8 @@
 package PlayerManager;
 
 import Mob.MobListManager;
-import QuestFunctions.QuestList;
 import PlayerChip.Maingui;
+import QuestFunctions.QuestList;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -46,6 +46,7 @@ public class PlayerFileManager {
 	
 	
 	public void joinedplayerlistregister(Player p) {
+
 		
 		String uuid = p.getUniqueId().toString();
 		
@@ -250,8 +251,6 @@ public class PlayerFileManager {
 				config.set("Sample."+value.getPlanet()+"."+value.name()+".count", 0);
 		});
 
-		
-		
 		p.sendMessage("Your data was successfully saved");
 		
 		try {
