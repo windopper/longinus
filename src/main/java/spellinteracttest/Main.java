@@ -1,6 +1,7 @@
 package spellinteracttest;
 
 import ClassAbility.Accelerator;
+import ClassAbility.Aether.Aether;
 import ClassAbility.Blaster;
 import ClassAbility.Phlox;
 import CustomEvents.PlayerCustomEventListener;
@@ -77,7 +78,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new GuiEvent(), this);
 		getServer().getPluginManager().registerEvents(UserChipEvent.getinstance(), this);
 		getServer().getPluginManager().registerEvents(new Event(), this);
-		getServer().getPluginManager().registerEvents(new PlayerActionEvent(), this);
+		getServer().getPluginManager().registerEvents(new PlayerActionListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerCustomEventListener(), this);
 		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
 		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
@@ -88,6 +89,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
 		getServer().getPluginManager().registerEvents(new MobEventManager(), this);
 		//getServer().getPluginManager().registerEvents(new PacketListener(), this);
+		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -475,6 +477,31 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "cakeset" : {
+				InfiniteCake.getInstance().Set(player);
+				break;
+			}
+			case "cakestop": {
+				InfiniteCake.getInstance().stop();
+				break;
+			}
+
+			case "record": {
+				if(args[1] == null) break;
+				PacketRecord.Record.getInstance().RecordStart(args[1]);
+				break;
+			}
+
+			case "play": {
+				if(args[1] == null) break;
+				(new PacketRecord.Play(player, args[1])).Play();
+			}
+
+			case "recordstop": {
+				PacketRecord.Record.getInstance().RecordStop();
+				break;
+			}
+
 			case "summonbr" : {
 				(new Gliese581cEntitySummon()).summonBloodRoot(player);
 				break;
@@ -687,13 +714,13 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerEnergy.getinstance(p).OverloadCoolDown();
 					PlayerCombination.getinstance(p).KeyBind();
 					PlayerFunction.getinstance(p).PlayerFunctionLoop();
-
 					EntityHealthBossBar.getinstance(p).healthBarLoop();
+					//PlayerWASDListener.getInstance(p).WASDListener();
 					
 				}
 				
 				PlayerInfoActionBar.actionbar();
-				
+
 				Accelerator.getinstance().Passive1();
 				Phlox.getinstance().PhloxPassive();
 				Phlox.getinstance().meleerobotcountloop();
@@ -804,6 +831,9 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerChip.UserAlarmManager.instance().register(p); // 유저 알람 파일 등록
 		
 		PlayerFileManager.getinstance().UserDetailClassCallData(p, PlayerFileManager.getinstance().getPreviousClass(p));
+
+
+		Aether.getinstance().PassiveEffect();
 	}
 
 

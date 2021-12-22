@@ -1,5 +1,7 @@
 package ClassAbility;
 
+import ClassAbility.Aether.Aether;
+import ClassAbility.Aether.AetherMelee;
 import DynamicData.Damage;
 import Mob.EntityStatusManager;
 import PlayerManager.*;
@@ -17,7 +19,7 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 
 public class Combination {
-	
+
 	private static Combination Combination;
 	 
 	public final static HashMap<Player, Integer> trainermelee = new HashMap<>();
@@ -29,6 +31,7 @@ public class Combination {
 	private final static String levelrequire = "§c아직 사용할 수 없는 스킬입니다";
 	
 	public final static String blank = "                          ";
+	public final static String blank2 = "            ";
 
 	private Combination() {
 		
@@ -38,6 +41,15 @@ public class Combination {
 		if(Combination == null) Combination = new Combination();
 		return Combination;
 	}
+
+	public enum Classes {
+		아이테르,
+		엑셀러레이터,
+		블래스터,
+		바이V,
+		플록스,
+		없음;
+	}
 	
 	
 	public void removemaps(Player p) {
@@ -45,12 +57,21 @@ public class Combination {
 	}
 	
 	public void Checkclass(String name, Player p, String combo) {
+
+		if(PacketRecord.Record.getInstance().isRecording()) {
+			PacketRecord.Record.getInstance().recordSkill(p, combo);
+			PacketRecord.Record.getInstance().recordCombo(PlayerFunction.getinstance(p).getMeleeCombo());
+		}
+
 		if(name.equals("아이테르")) Aether(p, combo);
-		if(name.equals("엑셀러레이터")) Accelerator(p, combo);
-		if(name.equals("블래스터")) Blaster(p, combo);
-		if(name.equals("바이V")) ByV(p, combo);
-		if(name.equals("플록스")) Phlox(p, combo);
-		if(name.equals("없음")) Trainer(p, combo);
+		else if(name.equals("엑셀러레이터")) Accelerator(p, combo);
+		else if(name.equals("블래스터")) Blaster(p, combo);
+		else if(name.equals("바이V")) ByV(p, combo);
+		else if(name.equals("플록스")) Phlox(p, combo);
+		else if(name.equals("없음")) Trainer(p, combo);
+
+		p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
+
 	}
 	public void Sound(Player p) {
 		p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
@@ -305,11 +326,11 @@ public class Combination {
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
-		int impulseswitchshieldmana = ClassAbility.Aether.ImpulseSwitchShieldmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int shieldswitchchargemana = ClassAbility.Aether.ShieldSwitchChargemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int WeaponModeChangemana = ClassAbility.Aether.WeaponModeChangemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int impulseswitchweaponmana = ClassAbility.Aether.ImpulseSwitchWeaponmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int impulseswitchenergymana = ClassAbility.Aether.ImpulseSwitchEnergymana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int impulseswitchshieldmana = Aether.ImpulseSwitchShieldmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int shieldswitchchargemana = Aether.ShieldSwitchChargemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int WeaponModeChangemana = Aether.WeaponModeChangemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int impulseswitchweaponmana = Aether.ImpulseSwitchWeaponmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int impulseswitchenergymana = Aether.ImpulseSwitchEnergymana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
 		
 		String RL = "§o§l충격량전환: 보호막§l§o §3§l-⚡§l"+(impulseswitchshieldmana);
 		String RR = "§o§l충격량전환: 돌진§l§o §3§l-⚡§l"+(shieldswitchchargemana);
@@ -317,9 +338,12 @@ public class Combination {
 		String RF = "§o§l충격량전환: 레이저§l§o §3§l-⚡§l"+(impulseswitchweaponmana);
 		String FF = "§o§l충격량전환: 에너지§l§o §c§l-☈§l100";
 		
-		if(combo.equals("L")) {
+		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee()==0 && PF.getMeleemode() == 0) Aether.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) {
+				(new AetherMelee(p)).Melee(combo);
+				//Aether.getinstance().melee(p);
+			}
 
 		}
 		if(combo.equals("RL")) {
@@ -442,7 +466,7 @@ public class Combination {
 		
 		if(combo.equals("L")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee() == 0) Accelerator.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMeleeDelay() == 0) Accelerator.getinstance().melee(p);
 
 		}
 		if(combo.equals("RL")) {
@@ -568,7 +592,7 @@ public class Combination {
 		
 		if(combo.equals("L")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee()==0) ByV.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) ByV.getinstance().melee(p);
 
 		}
 		if(combo.equals("RL")) {
@@ -723,7 +747,7 @@ public class Combination {
 		
 		if(combo.equals("L")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee()==0) Phlox.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) Phlox.getinstance().melee(p);
 
 		}
 		if(combo.equals("RL")) {
@@ -855,11 +879,11 @@ public class Combination {
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
-		int RLmana = ClassAbility.Blaster.railgunmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int RRmana = ClassAbility.Blaster.grenadelaunchermana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int RFmana = ClassAbility.Blaster.riflemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int FRmana = ClassAbility.Blaster.energytransmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int FFmana = ClassAbility.Blaster.magneticfieldmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int RLmana = ClassAbility.Blaster.TurretDropMana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int RRmana = ClassAbility.Blaster.TurretUpgradeMana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int RFmana = ClassAbility.Blaster.SelfExplosion -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int FRmana = ClassAbility.Blaster.EnergyTransMana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+		int FFmana = ClassAbility.Blaster.Acceleration -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
 		
 		String RL = "§o§l모드전환: 레일건§l§o §3§l-⚡§l"+(RLmana);
 		String RR = "§o§l모드전환: 유탄발사기§l§o §3§l-⚡§l"+(RRmana);
@@ -869,22 +893,22 @@ public class Combination {
 		
 		if(combo.equals("L")) {
 			
-			if(PlayerFunction.getinstance(p).getMelee()==0) Blaster.getinstance().melee(p);
+			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) Blaster.getinstance().melee(p);
 
 		}
 		if(combo.equals("RL")) {
 			
 			if(CurrentMana >= RLmana) {
-				if(PlayerFunction.getinstance(p).getMeleemode()==0) {
-					Warning(p);
-
-					p.sendTitle(" ",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
-					return;
-				}
+//				if(PlayerFunction.getinstance(p).getMeleemode()==0) {
+//					Warning(p);
+//
+//					p.sendTitle(" ",blank+"§c이미 해당 모드입니다§c", 5, 20, 10);
+//					return;
+//				}
 				Sound(p);
 				p.sendTitle(" ",blank+RL, 5, 20, 10);
 				energyoverload(p, combo);
-				Blaster.getinstance().railgun(p, RLmana);
+				Blaster.getinstance().TurretDrop(p, RLmana);
 			}
 			else {
 				if(CurrentMana < RLmana) {

@@ -1,6 +1,6 @@
 package PlayerManager;
 
-import ClassAbility.Aether;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
@@ -13,8 +13,12 @@ public class PlayerFunction implements Listener {
 	
 	private Player p;
 	private int melee = 0;
+	private int meleecombo = 1;
+	private int meleecombodelay = 0;
 	private int meleedelay = 0;
 	private int meleemode = 0;
+	private boolean meleerot = false;
+	private String meleecommand = "";
 
 	/*
 	Accelerator Functions
@@ -58,18 +62,12 @@ public class PlayerFunction implements Listener {
 		instance.remove(p);
 	}
 	
-	public int getMelee() {
-		return melee;
+	public int getMeleeDelay() {
+		return meleedelay;
 	}
-	public void increaseMelee() {
-		this.melee ++;
-	}
-	public void setMeleeDelay(int meleedelay) {
-		this.melee = 1;
+	public void  setMeleeDelay(int meleedelay) {
 		this.meleedelay = meleedelay;
-	}
-	public void setMelee(int melee) {
-		this.melee = melee;
+		this.meleecombodelay = 10;
 	}
 	public int getMeleemode() {
 		return meleemode;
@@ -77,16 +75,44 @@ public class PlayerFunction implements Listener {
 	public void setMeleemode(int meleemode) {
 		this.meleemode = meleemode;
 	}
+	public void addMeleeCommand(String command) {
+		if(command.equals("SHIFTL")) command = "§o§7[SL]";
+		else if(command.equals("L")) command = "§o§f[L]";
+		else if(command.equals("R")) command = "§o§8[R]";
+		this.meleecommand += command + " ";
+	}
+	public String getMeleecommand() {
+		return this.meleecommand;
+	}
 
+	public void addMeleeCombo() {
+		this.meleecombo++;
+		Bukkit.broadcastMessage(Integer.toString(meleecombo));
+	}
+	public void setMeleeCombo(int combo) {
+		this.meleecombo = combo;
+	}
+	public void removeMeleeCombo() {
+		if(this.meleecombo>0) this.meleecombo--;
+	}
+	public int getMeleeCombo() {
+		return meleecombo;
+	}
+	public boolean getMeleeRot() { return meleerot; }
 
-	
-	
 	public void PlayerFunctionLoop() {
-		
-		if(meleedelay == melee) setMelee(0);
-		if(melee != 0) melee++;
 
-		Aether.getinstance().PassiveEffect();
+		if(meleecombodelay == 0 && meleedelay == 0) {
+			meleecombo = 1;
+		}
+		if(meleecombo == 1) meleecommand = "";
+
+		if(meleedelay == 1) this.meleerot = !meleerot;
+		if(meleedelay != 0) meleedelay--;
+		else if(meleecombodelay != 0) meleecombodelay--;
+
+
+
 	}
 
 }

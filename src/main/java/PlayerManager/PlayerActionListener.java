@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import PlayerChip.Maingui;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -8,13 +9,22 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
-import PlayerChip.Maingui;
+public class PlayerActionListener implements Listener {
 
-public class PlayerActionEvent implements Listener {
-	
+	@EventHandler
+	public void Test(PlayerAnimationEvent e) {
+		if(e.getAnimationType() == PlayerAnimationType.ARM_SWING) {
+			if(!PlayerCombination.getinstance(e.getPlayer()).getKey1().equals("none")) e.setCancelled(true);
+			if(PlayerFunction.getinstance(e.getPlayer()).getMeleeDelay()!=0) e.setCancelled(true);
+		}
+	}
+
+
 	@EventHandler
 	public void RightClickOrLeftClick(PlayerInteractEvent e) { // 우클릭 좌클릭
 		
@@ -30,8 +40,10 @@ public class PlayerActionEvent implements Listener {
 				
 			}
 			if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
-				
-				PlayerCombination.getinstance(e.getPlayer()).setKeybind("L");	
+
+				e.setCancelled(true);
+				PlayerCombination.getinstance(e.getPlayer()).setKeybind("L");
+
 				return;
 
 			}
@@ -67,9 +79,6 @@ public class PlayerActionEvent implements Listener {
 					e.getPlayer().playSound(e.getPlayer().getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 					return;
 				}
-				
-
-				
 			}
 		}
 	}
@@ -117,6 +126,6 @@ public class PlayerActionEvent implements Listener {
 		}
 		
 	}
-	
+
 
 }

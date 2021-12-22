@@ -7,9 +7,7 @@ import EntityPlayerManager.EntityPlayerWatcher;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
 
@@ -229,7 +227,12 @@ public class EntityManager {
 
 	public void setDamageValue(int var0, Player damager) {
 
+		Location loc = e.getBoundingBox().getCenter().toLocation(e.getWorld());
+		loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc,10, 0.1, 0.1, 0.1, 0, Material.REDSTONE_BLOCK.createBlockData());
+
 		if(var0 > getCurrentHealth()) var0 = getCurrentHealth();
+
+
 
 
 		if(contribute.containsKey(damager)) {
