@@ -64,7 +64,7 @@ public class Damage {
 			taker.setLastDamageCause(new EntityDamageEvent(damager, EntityDamageEvent.DamageCause.ENTITY_ATTACK ,0.1));
 			taker.setMaximumNoDamageTicks(1);
 			taker.setNoDamageTicks(0);
-			taker.damage(0.1);
+			taker.damage(0.0001);
 			
 			EntityManager EH = EntityManager.getinstance(taker);
 
@@ -74,11 +74,11 @@ public class Damage {
 
 			if(damager instanceof Player) EH.setDamageValue(damage, (Player) damager);
 			else EH.setDamageValue(damage);
+			// 엔티티의 변화 감지
+			//EH.EntityWatcher();
 
 			HologramIndicator.getinstance().DamageIndicator(damage, taker);
 		}
-		
-		
 	}
 //	public void take(int dmg, LivingEntity takenP) {
 //

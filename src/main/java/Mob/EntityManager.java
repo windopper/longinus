@@ -13,15 +13,13 @@ import org.bukkit.entity.*;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class EntityManager {
 	
-	private static HashMap<Entity, EntityManager> instance = new HashMap<>();
+	private static ConcurrentHashMap<Entity, EntityManager> instance = new ConcurrentHashMap<Entity, EntityManager>();
 	private static HashMap<Entity, HashMap<Entity, Location>> disguise = new HashMap<>();
 
 	private final HashMap<Player, Integer> contribute = new HashMap<>();
@@ -90,8 +88,25 @@ public class EntityManager {
 		else Height = e.getHeight();
 	}
 
-	public static HashMap<Entity, EntityManager> getEntityHealthManager() {
+	public static Map<Entity, EntityManager> getEntityHealthManager() {
 		return instance;
+	}
+
+	public static int getEntityManagerInstanceSize() { return instance.size(); }
+
+	public static Set<Entity> getEntityManagerEntities() { return instance.keySet(); }
+
+	public static List<String> getEntityClassList() {
+		List<String> string = new ArrayList<>();
+		for(Entity entity : instance.keySet()) {
+			string.add(entity.getClass().getName());
+		}
+		return string;
+	}
+
+	public static boolean isRegister(Entity e) {
+		if(instance.containsKey(e)) return true;
+		return false;
 	}
 
 	// 일반적인 몹
@@ -232,9 +247,6 @@ public class EntityManager {
 
 		if(var0 > getCurrentHealth()) var0 = getCurrentHealth();
 
-
-
-
 		if(contribute.containsKey(damager)) {
 			contribute.replace(damager, contribute.get(damager) + var0);
 		}
@@ -302,8 +314,7 @@ public class EntityManager {
 
 			e.setCustomName(" ");
 			e.setCustomNameVisible(false);
-			((LivingEntity) e).setHealth(((LivingEntity) e).getMaxHealth());
-
+			//((LivingEntity) e).setHealth(((LivingEntity) e).getMaxHealth());
 
 			isinChunk = false;
 			// 엔티티 청크 체커
@@ -318,13 +329,13 @@ public class EntityManager {
 					break;
 				}
 			}
+
 			// 죽었을때
-			if(CurrentHealth <= 0 || e.isDead() || !e.isValid() || !isinChunk) {
+			if(CurrentHealth <= 0 || e.isDead() || !isinChunk) {
 
 				if(mobList != null) {
 					// event call
 					Bukkit.getPluginManager().callEvent(new CustomMobDeathEvent(e, mobList));
-
 				}
 
 				if(Namear !=null) {
@@ -335,8 +346,9 @@ public class EntityManager {
 				}
 
 				e.setCustomName(" ");
-				if(e instanceof LivingEntity)
+				if(e instanceof LivingEntity) {
 					((LivingEntity) e).setHealth(0);
+				}
 				else
 					e.remove();
 
@@ -350,18 +362,14 @@ public class EntityManager {
 							EntityPlayerWatcher.Remove(entityPlayer);
 							((CraftPlayer) disguise).getHandle().setRemoved(net.minecraft.world.entity.Entity.RemovalReason.a);
 						}
-
 						disguise.remove();
 					}
 				}
-
 				if(teleportTo != null) {
 					teleportTo.setHealth(0);
 				}
-
-
-
 				DeathAbility();
+
 				if(e instanceof LivingEntity)
 					EntityStatusManager.getinstance((LivingEntity) e).removeinstance();
 				removeinstance();
@@ -369,7 +377,7 @@ public class EntityManager {
 				return;
 			}
 
-			if(Namear == null && showNameTag) {
+			if(Namear == null && showNameTag && CustomName != "") {
 
 				Namear = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height, 0), EntityType.ARMOR_STAND);
 
@@ -385,7 +393,7 @@ public class EntityManager {
 			}
 
 			// 피해를 받았을때
-			if(((CurrentHealth < MaxHealth) && DamageAfterDelay == 100)) {
+			if(((CurrentHealth < MaxHealth) && DamageAfterDelay == 100) && CustomName != "") {
 
 				if(Namear != null) Namear.remove();
 
@@ -403,7 +411,7 @@ public class EntityManager {
 				Namear.setSilent(true);
 
 			}
-			if((Healthar == null && CurrentHealth < MaxHealth) && DamageAfterDelay == 100) {
+			if((Healthar == null && CurrentHealth < MaxHealth) && DamageAfterDelay == 100 && CustomName != "") {
 
 				Healthar = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height, 0), EntityType.ARMOR_STAND);
 				Healthar.setCustomNameVisible(true);
@@ -455,7 +463,6 @@ public class EntityManager {
 		if(patterntime == 3600) patterntime = 0;
 
 		patterntime++;
-
 
 		// disguise 엔티티 텔레포트
 		for(Entity entity : disguise.keySet()) {

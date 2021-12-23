@@ -1,7 +1,6 @@
 package PacketRecord.Skill;
 
 import ClassAbility.entitycheck;
-import DynamicData.Damage;
 import Mob.EntityStatusManager;
 import PacketRecord.PacketPlayParticle;
 import PlayerManager.PlayerFunction;
@@ -161,7 +160,6 @@ public class PacketAetherMelee {
                                 BoundingBox box = entity.getBoundingBox();
                                 if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
                                     int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
                                     Hit.add(entity);
                                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
@@ -241,7 +239,6 @@ public class PacketAetherMelee {
                                 BoundingBox box = entity.getBoundingBox();
                                 if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
                                     int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
                                     Hit.add(entity);
                                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
@@ -308,7 +305,6 @@ public class PacketAetherMelee {
                             BoundingBox box = entity.getBoundingBox();
                             if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                                 int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                Damage.getinstance().taken(dmg, entity, player);
                                 Vector knockvector = eloc.toVector().subtract(loc.toVector()).normalize().multiply(0.5);
                                 EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                 Hit.add(entity);
@@ -337,7 +333,6 @@ public class PacketAetherMelee {
                             BoundingBox box = entity.getBoundingBox();
                             if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                                 int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1.5);
-                                Damage.getinstance().taken(dmg, entity, player);
                                 Vector knockvector = eloc.toVector().subtract(loc.toVector()).normalize().multiply(0.5);
                                 EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                 Hit.add(entity);
@@ -403,7 +398,6 @@ public class PacketAetherMelee {
                             BoundingBox box = entity.getBoundingBox();
                             if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                                 int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1.5);
-                                Damage.getinstance().taken(dmg, entity, player);
                                 Vector knockvector = eloc.toVector().subtract(loc.toVector()).normalize().multiply(0.5);
                                 EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                 Hit.add(entity);
@@ -432,7 +426,6 @@ public class PacketAetherMelee {
                             BoundingBox box = entity.getBoundingBox();
                             if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                                 int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1.5);
-                                Damage.getinstance().taken(dmg, entity, player);
                                 Vector knockvector = eloc.toVector().subtract(loc.toVector()).normalize().multiply(0.5);
                                 EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                 Hit.add(entity);
@@ -507,7 +500,6 @@ public class PacketAetherMelee {
                                 BoundingBox box = entity.getBoundingBox();
                                 if(eloc.distance(location) < 2.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
                                     int dmg = PlayerManager.getinstance(player). meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.5);
                                     EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                     Hit.add(entity);
@@ -592,7 +584,6 @@ public class PacketAetherMelee {
                                 BoundingBox box = entity.getBoundingBox();
                                 if(eloc.distance(location) < 2.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
                                     int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.7);
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     Vector knockvector = eloc.toVector().subtract(location.toVector()).normalize().multiply(0.5);
                                     EntityStatusManager.getinstance(entity).KnockBack(knockvector);
                                     Hit.add(entity);
@@ -730,7 +721,6 @@ public class PacketAetherMelee {
                                 BoundingBox box = entity.getBoundingBox();
                                 if(eloc.distance(location) < 2.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
                                     int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     EntityStatusManager.getinstance(entity).KnockBack(new Vector(0, 0.7, 0));
                                     Hit.add(entity);
                                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
@@ -809,19 +799,18 @@ public class PacketAetherMelee {
                         }
 
                         for (LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if (entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
+                            if (entitycheck.Invulnerableentitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
                                 Location eloc = entity.getEyeLocation();
                                 BoundingBox box = entity.getBoundingBox();
                                 if (eloc.distance(location) < 2.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    entity.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, eloc, 1, 0, 0, 0, 0);
-                                    entity.getWorld().playSound(eloc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+
+                                    showTo.spawnParticle(Particle.EXPLOSION_LARGE, eloc, 1, 0, 0, 0, 0);
+                                    showTo.playSound(eloc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
                                     if(!entity.isOnGround()) {
                                         EntityStatusManager.getinstance(entity).KnockBack(new Vector(0, -3, 0));
                                     }
 
-                                    Damage.getinstance().taken(dmg, entity, player);
                                     Hit.add(entity);
                                     player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
                                 }
