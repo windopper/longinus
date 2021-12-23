@@ -1,6 +1,5 @@
 package PlayerManager;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
@@ -87,7 +86,6 @@ public class PlayerFunction implements Listener {
 
 	public void addMeleeCombo() {
 		this.meleecombo++;
-		Bukkit.broadcastMessage(Integer.toString(meleecombo));
 	}
 	public void setMeleeCombo(int combo) {
 		this.meleecombo = combo;
@@ -110,8 +108,6 @@ public class PlayerFunction implements Listener {
 		if(meleedelay == 1) this.meleerot = !meleerot;
 		if(meleedelay != 0) meleedelay--;
 		else if(meleecombodelay != 0) meleecombodelay--;
-
-
 
 	}
 

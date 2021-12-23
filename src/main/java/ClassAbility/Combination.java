@@ -60,7 +60,7 @@ public class Combination {
 
 		if(PacketRecord.Record.getInstance().isRecording()) {
 			PacketRecord.Record.getInstance().recordSkill(p, combo);
-			PacketRecord.Record.getInstance().recordCombo(PlayerFunction.getinstance(p).getMeleeCombo());
+			PacketRecord.Record.getInstance().recordCombo(p, PlayerFunction.getinstance(p).getMeleeCombo());
 		}
 
 		if(name.equals("아이테르")) Aether(p, combo);

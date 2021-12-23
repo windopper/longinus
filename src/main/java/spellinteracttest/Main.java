@@ -12,6 +12,7 @@ import Items.ItemManager;
 import Items.WeaponManager;
 import Mob.*;
 import PacketListener.PacketReader;
+import PacketRecord.EditEventListener;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
@@ -89,6 +90,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
 		getServer().getPluginManager().registerEvents(new MobEventManager(), this);
 		//getServer().getPluginManager().registerEvents(new PacketListener(), this);
+		getServer().getPluginManager().registerEvents(new EditEventListener(), this);
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
 
 
@@ -477,18 +479,21 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
-			case "cakeset" : {
-				InfiniteCake.getInstance().Set(player);
+			case "entitysize": {
+				Bukkit.broadcastMessage(Integer.toString(EntityManager.getEntityManagerInstanceSize()));
 				break;
 			}
-			case "cakestop": {
-				InfiniteCake.getInstance().stop();
+
+			case "entitylist": {
+				for(String string : EntityManager.getEntityClassList()) {
+					Bukkit.broadcastMessage(string);
+				}
 				break;
 			}
 
 			case "record": {
 				if(args[1] == null) break;
-				PacketRecord.Record.getInstance().RecordStart(args[1]);
+				PacketRecord.Record.getInstance().RecordStart(args[1], player.getLocation());
 				break;
 			}
 
@@ -499,6 +504,12 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "recordstop": {
 				PacketRecord.Record.getInstance().RecordStop();
+				break;
+			}
+
+			case "edit": {
+				if(args[1] == null) break;
+				(new PacketRecord.Play(player, args[1])).Edit();
 				break;
 			}
 
@@ -697,14 +708,19 @@ public class Main extends JavaPlugin implements Listener {
 				ShopNPCManager.getinstance().sendHeadRotationPacket();
 				QuestNPCManager.getinstance().sendHeadRotationPacket();
 				
-				for(World world : Bukkit.getWorlds()) {
-					for(LivingEntity entity : world.getLivingEntities()) {
-						if(entity instanceof Player) continue;
-						if(entity instanceof ArmorStand) continue;
-						if(entity.isInvulnerable()) continue;
-						EntityManager.getinstance(entity).EntityWatcher();
-						EntityStatusManager.getinstance(entity).BurnsLoop();
-					}
+//				for(World world : Bukkit.getWorlds()) {
+//					for(LivingEntity entity : world.getLivingEntities()) {
+//						if(entity instanceof Player) continue;
+//						if(entity instanceof ArmorStand) continue;
+//						if(entity.isInvulnerable()) continue;
+//						if(EntityManager.isRegister(entity)) {
+//							EntityManager.getinstance(entity).EntityWatcher();
+//							EntityStatusManager.getinstance(entity).BurnsLoop();
+//						}
+//					}
+//				}
+				for(Entity entity : EntityManager.getEntityManagerEntities()) {
+					EntityManager.getinstance(entity).EntityWatcher();
 				}
 
 				for(Player p: Bukkit.getOnlinePlayers()) {
@@ -769,6 +785,7 @@ public class Main extends JavaPlugin implements Listener {
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					PlayerEnergy.getinstance(p).Regeneration();
 				}
+
 
 				mob.loop();
 				mob.mobdelete();

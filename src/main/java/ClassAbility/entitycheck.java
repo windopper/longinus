@@ -32,4 +32,15 @@ public class entitycheck {
 		}
 		return false;
 	}
+
+
+	public static boolean Invulnerableentitycheck(Entity e) {
+		if((e instanceof Player || e instanceof LivingEntity) && !(e instanceof ArmorStand) && !(e instanceof ShulkerBullet)
+				&& !(e instanceof FallingBlock)) {
+
+			return true;
+		}
+		return false;
+	}
+
 }
