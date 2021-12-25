@@ -6,6 +6,8 @@ import net.minecraft.world.entity.animal.EntityFox;
 import net.minecraft.world.level.World;
 import org.bukkit.entity.Fox;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class PacketSummonEntity {
@@ -13,6 +15,8 @@ public class PacketSummonEntity {
     private final String entitytype;
     private final UUID uuid;
     private final World world;
+
+    public final static List<String> Type = Arrays.asList("Gliese581cMobs.FoxRat");
 
     public PacketSummonEntity(String entitytype, UUID uuid, World world) {
         this.entitytype = entitytype;

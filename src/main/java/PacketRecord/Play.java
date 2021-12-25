@@ -5,6 +5,8 @@ import PacketRecord.Skill.PacketAetherMelee;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.network.protocol.EnumProtocolDirection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
@@ -20,10 +22,7 @@ import net.minecraft.world.entity.EntityPose;
 import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.ScoreboardTeam;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
@@ -40,7 +39,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.DummyNetworkManager;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class Play {
 
@@ -51,6 +52,7 @@ public class Play {
 
 
     private Player player;
+    private final World world;
     private String filename;
     private PlayerConnection conn;
 
@@ -67,11 +69,14 @@ public class Play {
     private String titleShow = " ";
     private int titletick = 0;
 
+    private int pausetick = 0; // 일시정지 하였을때 소리 및 파티클
+
     public Play(Player player, String filename) {
         this.player = player;
         this.filename = filename;
         this.conn = ((CraftPlayer) player).getHandle().b;
         instance.put(player, this);
+        world = player.getWorld();
     }
 
     public static Play getInstance(Player player) {
@@ -144,15 +149,56 @@ public class Play {
 
         editmode = true;
         Play();
-
-
     }
 
     public void Play() {
 
 
-        File file = new File(filename+".yml");
+        File file;
+
+        try {
+            file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder().getAbsolutePath()+"\\Records", filename+".yml");
+        }
+        catch(NullPointerException e) {
+            Bukkit.broadcastMessage("없는 파일입니다");
+            return;
+        }
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+
+        // 플레이어가 영상 재생하는 사거리 안에 있는지 확인
+        if(config.contains(filename+".info.players.0")) {
+            double x = config.getDouble(filename+".info.players.0.x");
+            double y = config.getDouble(filename+".info.players.0.y");
+            double z = config.getDouble(filename+".info.players.0.z");
+
+            Location location = new Location(player.getWorld(), x, y, z);
+            if(location.distance(player.getLocation())>20) {
+
+                player.sendMessage("당신은 너무 먼곳에 있습니다");
+                TextComponent component = new TextComponent(TextComponent.fromLegacyText("여기를 클릭하여 영상 재생이 가능한 좌표로 이동가능"));
+                component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp "+player.getName()+" "+x+" "+y+" "+z));
+                player.spigot().sendMessage(component);
+                return;
+            }
+        }
+        else {
+            double x = config.getDouble(filename+".info.entities.0.x");
+            double y = config.getDouble(filename+".info.entities.0.y");
+            double z = config.getDouble(filename+".info.entities.0.z");
+
+            Location location = new Location(player.getWorld(), x, y, z);
+            if(location.distance(player.getLocation())>20) {
+
+                player.sendMessage("당신은 너무 먼곳에 있습니다");
+                TextComponent component = new TextComponent(TextComponent.fromLegacyText("여기를 클릭하여 영상 재생이 가능한 좌표로 이동가능"));
+                component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/tp "+player.getName()+" "+x+" "+y+" "+z));
+                player.spigot().sendMessage(component);
+                return;
+            }
+        }
+
+
 
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
 
@@ -167,25 +213,26 @@ public class Play {
         Bukkit.broadcastMessage("플레이 타임은 총 "+FileLength+"틱 입니다");
         this.PlayTime = FileLength;
 
-        for(String name : config.getConfigurationSection(filename+".1.players").getKeys(false)) {
-            //Bukkit.broadcastMessage(name);
+        for(String ID : config.getConfigurationSection(filename+".info.players").getKeys(false)) {
 
-            if(name.equals("entities")) continue;
+            if(ID.equals("entities")) continue;
 
-            String world = config.getString(filename+".info."+name+".world");
+            String infopath = filename+".info.players."+ID;
+            //String world = config.getString(infopath+".world");
 
-            double x = config.getDouble(filename+".1.players."+name+"."+"x");
-            double y = config.getDouble(filename+".1.players."+name+"."+"y");
-            double z = config.getDouble(filename+".1.players."+name+"."+"z");
-            float yaw = (float) config.getDouble(filename+".1.players."+name+"."+"yaw");
-            float pitch = (float) config.getDouble(filename+".1.players."+name+"."+"pitch");
+            double x = config.getDouble(infopath+".x");
+            double y = config.getDouble(infopath+".y");
+            double z = config.getDouble(infopath+".z");
+            float yaw = (float) config.getDouble(infopath+".yaw");
+            float pitch = (float) config.getDouble(infopath+".pitch");
 
-            Location location = config.getLocation(filename+".1.players."+name+".location");
-            String texture = config.getString(filename+".info."+name+".texture");
-            String signature = config.getString(filename+".info."+name+".signature");
-            ItemStack handitem = config.getItemStack(filename+".info."+name+".handitem");
+            Location location = config.getLocation(infopath+".location");
+            String texture = config.getString(infopath+".texture");
+            String signature = config.getString(infopath+".signature");
+            ItemStack handitem = config.getItemStack(infopath+".handitem");
+            String name = config.getString(infopath+".name");
 
-            WorldServer nmsWorld = ((CraftWorld) Bukkit.getWorld(world)).getHandle();
+            WorldServer nmsWorld = ((CraftWorld) world).getHandle();
             GameProfile egameProfile = new GameProfile(UUID.randomUUID(), name);
             Property eproperty = new Property("textures", texture, signature);
             egameProfile.getProperties().put("textures", eproperty);
@@ -207,27 +254,23 @@ public class Play {
 
             }
 
-            entityPlayers.put(name, entityPlayer);
+            entityPlayers.put(ID, entityPlayer);
         }
 
         // 엔티티들
-        if(config.contains(filename+".0.entities")) {
-            for(String uuid : config.getConfigurationSection(filename+".0.entities").getKeys(false)) {
-//                double x = config.getDouble(filename+".0.entities."+uuid+"."+"x");
-//                double y = config.getDouble(filename+".0.entities."+uuid+"."+"y");
-//                double z = config.getDouble(filename+".0.entities."+uuid+"."+"z");
-//                float yaw = (float) config.getDouble(filename+".0.entities."+uuid+"."+"yaw");
-//                float pitch = (float) config.getDouble(filename+".0.entities."+uuid+"."+"pitch");
-                String world = config.getString(filename+".info."+uuid+".world");
+        if(config.contains(filename+".info.entities")) {
 
-                String entitytype = config.getString(filename+".info."+uuid+".entity");
+            for(String ID : config.getConfigurationSection(filename+".info.entities").getKeys(false)) {
 
-                Entity entity = (new PacketSummonEntity(entitytype, UUID.fromString(uuid)
-                        , ((CraftWorld) Bukkit.getWorld(world)).getHandle()).getEntity());
+                String infopath = filename+".info.entities."+ID;
+                String entitytype = config.getString(infopath+".entity");
+
+                Entity entity = (new PacketSummonEntity(entitytype, UUID.randomUUID()
+                        ,((CraftWorld) world).getHandle()).getEntity());
 
                 if(entity!=null) {
-                    entities.put(uuid, entity);
-                    ((CraftWorld) Bukkit.getWorld(world)).getHandle().addEntity(entity);
+                    entities.put(ID, entity);
+                    ((CraftWorld) world).getHandle().addEntity(entity);
                 }
             }
         }
@@ -256,114 +299,186 @@ public class Play {
                 //플레이어 보여주기
                 if(config.contains(filename+"."+Integer.toString(time)+".players")) {
 
-                    for(String name : config.getConfigurationSection(filename+".1.players").getKeys(false)) {
+                    try {
+                        for(String ID : config.getConfigurationSection(filename+"."+Integer.toString(time)+".players").getKeys(false)) {
 
-                        if(name.equals("entities")) continue;
+                            if(ID.equals("entities")) continue;
 
-                        String filepath = filename+"."+Integer.toString(time)+".players."+name;
+                            String infopath = filename+".info.players."+ID;
+                            EntityPlayer entityPlayer = entityPlayers.get(ID);
+                            org.bukkit.entity.Entity eP = entityPlayer.getBukkitEntity();
+                            String filepath = filename+"."+Integer.toString(time)+".players."+ID;
+                            Location loc = eP.getLocation();
 
-                        double x = config.getDouble(filepath+".x");
-                        double y = config.getDouble(filepath+".y");
-                        double z = config.getDouble(filepath+".z");
-                        float yaw = (float) config.getDouble(filepath+".yaw");
-                        float pitch = (float) config.getDouble(filepath+".pitch");
+//                            // 되감기 대비 죽은 엔티티 살리기
+//                            if(entityPlayers.get(ID).isRemoved()) {
+//                                //((CraftWorld) world).getHandle().addEntity(entityPlayers.get(ID));
+//                                //String world = config.getString(infopath+".world");
+//
+//                                double x = config.getDouble(infopath+".x");
+//                                double y = config.getDouble(infopath+".y");
+//                                double z = config.getDouble(infopath+".z");
+//                                float yaw = (float) config.getDouble(infopath+".yaw");
+//                                float pitch = (float) config.getDouble(infopath+".pitch");
+//
+//                                Location location = config.getLocation(infopath+".location");
+//                                String texture = config.getString(infopath+".texture");
+//                                String signature = config.getString(infopath+".signature");
+//                                ItemStack handitem = config.getItemStack(infopath+".handitem");
+//                                String name = config.getString(infopath+".name");
+//
+//                                WorldServer nmsWorld = ((CraftWorld) world).getHandle();
+//                                GameProfile egameProfile = new GameProfile(UUID.randomUUID(), name);
+//                                Property eproperty = new Property("textures", texture, signature);
+//                                egameProfile.getProperties().put("textures", eproperty);
+//
+//                                EntityPlayer ePP = new EntityPlayer(nmsServer, nmsWorld, egameProfile);
+//
+//                                entityPlayer.b = new PlayerConnection(nmsServer, new DummyNetworkManager(EnumProtocolDirection.a), entityPlayer);
+//                                entityPlayer.setInvulnerable(true);
+//                                entityPlayer.setLocation(x, y, z, yaw, pitch);
+//                                nmsWorld.addEntity(entityPlayer);
+//
+//                                if(handitem != null) {
+//                                    CraftItemStack cis = CraftItemStack.asCraftCopy(handitem);
+//                                    Pair<EnumItemSlot, net.minecraft.world.item.ItemStack> pair =
+//                                            new Pair<>(EnumItemSlot.a, CraftItemStack.asNMSCopy(cis));
+//                                    Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+//                                        sendpacket(player, new PacketPlayOutEntityEquipment(ePP.getId(), Arrays.asList(pair)));
+//                                    }, 0);
+//
+//                                }
+//
+//                                entityPlayer = ePP;
+//                                entityPlayers.put(ID, entityPlayer);
+//                            }
 
-                        boolean swing = config.getBoolean(filepath+".armswing");
-                        boolean takedamage = config.getBoolean(filepath+".takedamage");
-                        boolean sneaking = config.getBoolean(filepath+".sneaking");
-                        int combo = config.getInt(filepath+".combo");
-                        String skill = config.getString(filepath+".skill");
-                        String Class = config.getString(filepath+".class");
+                            // 다음 틱에 엔티티가 없는 상태면 죽은 상태라고 간주하고 제거
+                            if(!config.contains(filename+"."+Integer.toString(time+1)+".players."+ID)) {
+                                PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                                    entityPlayers.get(ID).setRemoved(Entity.RemovalReason.a);
+                                }, 0);
+                            }
 
-                        EntityPlayer entityPlayer = entityPlayers.get(name);
-                        //entityPlayer.setPositionRotation(x, y, z, yaw, pitch);
-                        org.bukkit.entity.Entity eP = entityPlayer.getBukkitEntity();
-                        eP.teleport(new Location(player.getWorld(), x, y, z, yaw, pitch));
+                            double x = config.contains(infopath+".x") ? config.getDouble(infopath+".x") + config.getDouble(filepath+".x" )* 0.1 : config.getDouble(infopath+".x");
+                            double y = config.contains(infopath+".y") ? config.getDouble(infopath+".y") + config.getDouble(filepath+".y" )* 0.1 : config.getDouble(infopath+".y");
+                            double z = config.contains(infopath+".z") ? config.getDouble(infopath+".z") + config.getDouble(filepath+".z" )* 0.1 : config.getDouble(infopath+".z");
+                            float yaw = config.contains(infopath+".yaw") ? (float) (config.getDouble(infopath+".yaw") + config.getDouble(filepath+".yaw" )* 0.1) : (float) config.getDouble(infopath+".yaw");
+                            float pitch = config.contains(infopath+".pitch") ? (float) (config.getDouble(infopath+".pitch") + config.getDouble(filepath+".pitch" )* 0.1) : (float) config.getDouble(infopath+".pitch");
 
-                        if(swing) {
-                            sendpacket(player, new PacketPlayOutAnimation(entityPlayer, 0));
+                            boolean swing = config.getString(filepath+".s").contains("L");
+                            boolean takedamage = config.getBoolean(filepath+".td");
+                            boolean sneaking = config.getBoolean(filepath+".sn");
+                            int combo = config.getInt(filepath+".c");
+                            String skill = config.getString(filepath+".s");
+                            String Class = config.getString(infopath+".class");
+
+                            eP.teleport(new Location(world, x, y, z, yaw, pitch));
+
+                            if(swing) {
+                                sendpacket(player, new PacketPlayOutAnimation(entityPlayer, 0));
+                            }
+                            if(takedamage) {
+                                sendpacket(player, new PacketPlayOutAnimation(entityPlayer, 1));
+                                if(pausetick == 0)
+                                    player.playSound(eP.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
+                            }
+                            if(sneaking) {
+                                entityPlayer.setSneaking(true);
+                                DataWatcher dataWatcher = new DataWatcher(null);
+                                dataWatcher.register(new DataWatcherObject<>(6, DataWatcherRegistry.s), EntityPose.f);
+                                sendpacket(player, new PacketPlayOutEntityMetadata(entityPlayer.getId(), dataWatcher, true));
+                            }
+                            else {
+                                entityPlayer.setSneaking(false);
+                                DataWatcher dataWatcher = new DataWatcher(null);
+                                dataWatcher.register(new DataWatcherObject<>(6, DataWatcherRegistry.s), EntityPose.a);
+                                sendpacket(player, new PacketPlayOutEntityMetadata(entityPlayer.getId(), dataWatcher, true));
+                            }
+                            if(skill != null) {
+                                if(!skill.equals("") && pausetick % 5 == 0)
+                                    CallSkill(Class, skill, combo, entityPlayer);
+                            }
                         }
-                        if(takedamage) {
-                            sendpacket(player, new PacketPlayOutAnimation(entityPlayer, 1));
-                            player.playSound(eP.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
-                        }
-                        if(sneaking) {
-                            entityPlayer.setSneaking(true);
-                            DataWatcher dataWatcher = new DataWatcher(null);
-                            dataWatcher.register(new DataWatcherObject<>(6, DataWatcherRegistry.s), EntityPose.f);
-                            sendpacket(player, new PacketPlayOutEntityMetadata(entityPlayer.getId(), dataWatcher, true));
-                        }
-                        else {
-                            entityPlayer.setSneaking(false);
-                            DataWatcher dataWatcher = new DataWatcher(null);
-                            dataWatcher.register(new DataWatcherObject<>(6, DataWatcherRegistry.s), EntityPose.a);
-                            sendpacket(player, new PacketPlayOutEntityMetadata(entityPlayer.getId(), dataWatcher, true));
-                        }
-                        if(skill != null) {
-                            if(!skill.equals(""))
-                                CallSkill(Class, skill, combo, entityPlayer);
-                        }
+                    }
+                    catch(Exception e) {
+
                     }
                 }
 
                 // 엔티티 보여주기
                 if(config.contains(filename+"."+Integer.toString(time)+".entities")) {
 
-                    for(String uuid : config.getConfigurationSection(filename+"."+Integer.toString(time)+".entities").getKeys(false)) {
+                    try{
+                        for(String ID : config.getConfigurationSection(filename+"."+Integer.toString(time)+".entities").getKeys(false)) {
 
-                        if(!entities.containsKey(uuid)) continue;
+                            if(!entities.containsKey(ID)) continue;
 
-                        if(entities.get(uuid).isRemoved()) {
-                            String entitytype = config.getString(filename+".info."+uuid+".entity");
-                            Entity entity = (new PacketSummonEntity(entitytype, UUID.fromString(uuid)
-                                    , ((CraftWorld) player.getWorld()).getHandle()).getEntity());
-                            entities.replace(uuid, entity);
+                            // 되감기 대비 죽은 엔티티 살리기
+                            if(entities.get(ID).isRemoved()) {
+                                String entitytype = config.getString(filename+".info.entities."+ID+".entity");
+                                Entity entity = (new PacketSummonEntity(entitytype, UUID.randomUUID()
+                                        , ((CraftWorld) world).getHandle()).getEntity());
+                                entities.replace(ID, entity);
 
-                            ((CraftWorld) player.getWorld()).getHandle().addEntity(entity);
-                        }
+                                ((CraftWorld) world).getHandle().addEntity(entity);
+                            }
 
-                        Entity entity = entities.get(uuid);
+                            Entity entity = entities.get(ID);
 
-                        // 다음 틱에 엔티티가 없는 상태면 == 죽은 상태라고 간주하고 제거
-                        if(!config.contains(filename+"."+Integer.toString(time+1)+".entities."+uuid)) {
-                            PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
-                            conn.sendPacket(new PacketPlayOutEntityDestroy(entity.getId()));
-                            org.bukkit.entity.Entity eE = (org.bukkit.entity.Entity) (entity.getBukkitEntity());
-                            if(eE instanceof LivingEntity) ((LivingEntity) eE).setHealth(0);
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                            // 다음 틱에 엔티티가 없는 상태면 죽은 상태라고 간주하고 제거
+                            if(!config.contains(filename+"."+Integer.toString(time+1)+".entities."+ID)) {
+                                PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
+                                conn.sendPacket(new PacketPlayOutEntityDestroy(entity.getId()));
+                                org.bukkit.entity.Entity eE = (org.bukkit.entity.Entity) (entity.getBukkitEntity());
+                                if(eE instanceof LivingEntity) ((LivingEntity) eE).setHealth(0);
+                                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                                    entity.setRemoved(Entity.RemovalReason.a);
+                                    entity.getBukkitEntity().remove();
+                                }, 10);
+                            }
+
+                            String infopath = filename+".info.entities."+ID;
+                            String filepath = filename+"."+Integer.toString(time)+".entities."+ID;
+
+                            double x = config.contains(infopath+".x") ? config.getDouble(infopath+".x") + config.getDouble(filepath+".x" )* 0.1 : config.getDouble(infopath+".x");
+                            double y = config.contains(infopath+".y") ? config.getDouble(infopath+".y") + config.getDouble(filepath+".y" )* 0.1 : config.getDouble(infopath+".y");
+                            double z = config.contains(infopath+".z") ? config.getDouble(infopath+".z") + config.getDouble(filepath+".z" )* 0.1 : config.getDouble(infopath+".z");
+                            float yaw = config.contains(infopath+".yaw") ? (float) (config.getDouble(infopath+".yaw") + config.getDouble(filepath+".yaw" )* 0.1) : (float) config.getDouble(infopath+".yaw");
+                            float pitch = config.contains(infopath+".pitch") ? (float) (config.getDouble(infopath+".pitch") + config.getDouble(filepath+".pitch" )* 0.1) : (float) config.getDouble(infopath+".pitch");
+
+                            boolean takedamage = config.getBoolean(filepath+".takedamage");
+                            boolean death = config.getBoolean(filepath+".death");
+
+                            entity.getBukkitEntity().teleport(new Location(world, x, y, z, yaw, pitch));
+
+                            if(takedamage) {
+                                sendpacket(player, new PacketPlayOutAnimation(entity, 1));
+                                if(pausetick == 0)
+                                    player.playSound(entity.getBukkitEntity().getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
+                            }
+                            if(death) {
+                                PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
+                                conn.sendPacket(new PacketPlayOutEntityDestroy(entity.getId()));
                                 entity.setRemoved(Entity.RemovalReason.a);
                                 entity.getBukkitEntity().remove();
-                            }, 10);
+                            }
                         }
+                    }
+                    catch(Exception e) {
 
-                        String filepath = filename+"."+Integer.toString(time)+".entities."+uuid;
-
-                        double x = config.getDouble(filepath+".x");
-                        double y = config.getDouble(filepath+".y");
-                        double z = config.getDouble(filepath+".z");
-                        float yaw = (float) config.getDouble(filepath+".yaw");
-                        float pitch = (float) config.getDouble(filepath+".pitch");
-                        boolean takedamage = config.getBoolean(filepath+".takedamage");
-                        boolean death = config.getBoolean(filepath+".death");
-
-                        entity.getBukkitEntity().teleport(new Location(player.getWorld(), x, y, z, yaw, pitch));
-
-                        if(takedamage) {
-                            sendpacket(player, new PacketPlayOutAnimation(entity, 1));
-                            player.playSound(entity.getBukkitEntity().getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
-                        }
-                        if(death) {
-                            PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
-                            conn.sendPacket(new PacketPlayOutEntityDestroy(entity.getId()));
-                            entity.setRemoved(Entity.RemovalReason.a);
-                            entity.getBukkitEntity().remove();
-                        }
                     }
                 }
 
-                if(!pause)
+                if(!pause) {
                     time++;
-                if(Math.abs(tickmove)>=1 && time + tickmove >0 && time + tickmove < PlayTime-1) {
+                    pausetick = 0;
+                }
+                else
+                    pausetick++;
+
+                if(Math.abs(tickmove)>=1 && time + tickmove >=0 && time + tickmove <= PlayTime-1) {
                     time += tickmove;
                     tickmove = 0;
                 }

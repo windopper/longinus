@@ -10,9 +10,14 @@ import DynamicData.Damage;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
-import Mob.*;
+import Map.Map;
+import Mob.EntityManager;
+import Mob.MobEventManager;
+import Mob.MobMechManager;
+import Mob.mob;
 import PacketListener.PacketReader;
 import PacketRecord.EditEventListener;
+import PacketRecord.FileManage;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
@@ -57,11 +62,14 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
+import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -92,6 +100,7 @@ public class Main extends JavaPlugin implements Listener {
 		//getServer().getPluginManager().registerEvents(new PacketListener(), this);
 		getServer().getPluginManager().registerEvents(new EditEventListener(), this);
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
+		getServer().getPluginManager().registerEvents(new Map(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -493,7 +502,7 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "record": {
 				if(args[1] == null) break;
-				PacketRecord.Record.getInstance().RecordStart(args[1], player.getLocation());
+				PacketRecord.Record.getInstance().SetRecordField(player, args[1]);
 				break;
 			}
 
@@ -504,6 +513,16 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "recordstop": {
 				PacketRecord.Record.getInstance().RecordStop();
+				break;
+			}
+
+			case "recordlist" : {
+				(new PacketRecord.FileManage()).List();
+				break;
+			}
+			case "recorderase" : {
+				if(args[1] == null) break;
+				(new PacketRecord.FileManage()).Erase(args[1]);
 				break;
 			}
 
@@ -692,11 +711,23 @@ public class Main extends JavaPlugin implements Listener {
 				PlayerFunction.getinstance(player).essence = 1000;
 				break;
 			}
+			case "header": {
+				List<String> header = new ArrayList<>();
+				String blank = "                                             ";
+				player.setPlayerListHeader(blank+"\n"+"header1\n"+"header1\n"+"header1\n"+"header1\n"+"header1\n"+blank);
+				player.setPlayerListFooter(blank+"\n"+"footer\n"+"footer\n"+"footer\n"+"footer\n"+"footer\n"+"footer\n"+blank);
+				break;
+			}
+			case "map": {
+				(new Map()).getMap(player, MapView.Scale.CLOSEST);
+				break;
+			}
 		}
 		return true;
 	}
 	
 	public void loop() {
+
 		
 		new BukkitRunnable() {
 			
@@ -770,6 +801,7 @@ public class Main extends JavaPlugin implements Listener {
 			public void run() {
 				planetDetect.getinstance().detectArea();
 				PartyManager.partyObjectiveLoop();
+				Map.updateMap();
 
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
