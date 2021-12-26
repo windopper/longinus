@@ -130,7 +130,10 @@ public class QuestNPCManager {
 	public void addnpctolist() {
 
 		QuestFunctions QN = new QuestFunctions();
-		QN.addQuestNPCs();
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+			QN.addQuestNPCs();
+		}, 10);
+
 
 	}
 

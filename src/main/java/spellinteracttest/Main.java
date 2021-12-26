@@ -17,7 +17,6 @@ import Mob.MobMechManager;
 import Mob.mob;
 import PacketListener.PacketReader;
 import PacketRecord.EditEventListener;
-import PacketRecord.FileManage;
 import Party.EventProcess;
 import Party.PartyManager;
 import Party.TabCompleter;
@@ -138,7 +137,6 @@ public class Main extends JavaPlugin implements Listener {
 		loop();
 
 		QuestNPCManager.getinstance().addnpctolist();
-//
 		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
 
 

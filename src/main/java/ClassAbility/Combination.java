@@ -2,6 +2,8 @@ package ClassAbility;
 
 import ClassAbility.Aether.Aether;
 import ClassAbility.Aether.AetherMelee;
+import ClassAbility.Khaos.Khaos;
+import ClassAbility.Khaos.KhaosMelee;
 import DynamicData.Damage;
 import Mob.EntityStatusManager;
 import PlayerManager.*;
@@ -48,6 +50,7 @@ public class Combination {
 		블래스터,
 		바이V,
 		플록스,
+		카오스,
 		없음;
 	}
 	
@@ -68,6 +71,7 @@ public class Combination {
 		else if(name.equals("블래스터")) Blaster(p, combo);
 		else if(name.equals("바이V")) ByV(p, combo);
 		else if(name.equals("플록스")) Phlox(p, combo);
+		else if(name.equals("카오스")) Khaos(p, combo);
 		else if(name.equals("없음")) Trainer(p, combo);
 
 		p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
@@ -316,7 +320,22 @@ public class Combination {
 
 		}
 	}
-	
+
+	public void Khaos(Player p, String combo) {
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
+
+		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
+			if(PF.getMeleeDelay() == 0) {
+				(new KhaosMelee(p)).Melee(combo);
+			}
+		}
+		if(combo.equals("SHIFTR")) {
+			Khaos.getInstance().SHIFTR(p);
+		}
+	}
 	public void Aether(Player p, String combo) {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
@@ -569,7 +588,8 @@ public class Combination {
 		
 	}
 	
-	
+
+
 	public void ByV(Player p, String combo) {
 		
 		int lvl = PlayerStatManager.getinstance(p).getlvl();
