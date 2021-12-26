@@ -188,41 +188,17 @@ public class PlayParticle {
 
     public void CirCleHorizontalImpact1(Player player) {
 
-        Location location = player.getLocation().add(0, 0.3, 0);
+        Location location = player.getLocation().add(0, 0.4, 0);
 
-        new BukkitRunnable() {
-
-            int t = 0;
-
-            @Override
-            public void run() {
-
-                HorizontalCircle(location, ((double)t+1)/1.2);
-
-                if(t>5) cancel();
-                t++;
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+        HorizontalCircle(location, 2);
     }
 
     public void CirCleHorizontalSmallImpact(Location location) {
 
         //Location location = player.getLocation().add(0, 0.3, 0);
 
-        new BukkitRunnable() {
-            int t = 0;
-            @Override
-            public void run() {
-
-                HorizontalCircle(location, ((double)t +1)/3 );
-                if(t>=5) {
-                    (new PlayParticle(Particle.SMOKE_NORMAL)).HorizontalCircle(location, 3);
-                    cancel();
-                }
-                t++;
-
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+        HorizontalCircle(location, 2);
+        (new PlayParticle(Particle.CLOUD)).HorizontalCircle(location, 0.5);
 
     }
 
@@ -255,12 +231,12 @@ public class PlayParticle {
         for(double i = 0; i<Math.PI * 2; i+=Math.PI / 16) {
 
             double x = Math.cos(i) * radius;
-            double y = location.getY();
+            double y = 0;
             double z = Math.sin(i) * radius;
 
-            location.add(x, 0, z);
-            Particle(location);
-            location.subtract(x, 0, z);
+            Vector v = new Vector(x, y, z);
+
+            DirectionalParticle(v, location);
         }
 
     }
@@ -270,6 +246,13 @@ public class PlayParticle {
             location.getWorld().spawnParticle(this.particle, location, 1, 0, 0, 0, 0);
         else
             location.getWorld().spawnParticle(this.particle, location, 1, 0, 0, 0, 0, dustOptions);
+    }
+
+    private void DirectionalParticle(Vector vector, Location center) {
+        if (dustOptions == null)
+            center.getWorld().spawnParticle(this.particle, center, 0, vector.getX(), vector.getY(), vector.getZ(), 1);
+        else
+            center.getWorld().spawnParticle(this.particle, center, 0, vector.getX(), vector.getY(), vector.getZ(), 1, dustOptions);
     }
 
 

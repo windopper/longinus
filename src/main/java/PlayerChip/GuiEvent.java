@@ -375,7 +375,7 @@ public class GuiEvent implements Listener {
 			
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
-		if(rawslot == 12) {
+		else if(rawslot == 12) {
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
 			PlayerFileManager.getinstance().UserDetailClassCallData(p,
@@ -383,7 +383,7 @@ public class GuiEvent implements Listener {
 			
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
-		if(rawslot == 13) {
+		else if(rawslot == 13) {
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
 			PlayerFileManager.getinstance().UserDetailClassCallData(p,
@@ -391,7 +391,7 @@ public class GuiEvent implements Listener {
 			
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
-		if(rawslot == 14) {
+		else if(rawslot == 14) {
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
 			PlayerFileManager.getinstance().UserDetailClassCallData(p,
@@ -399,7 +399,7 @@ public class GuiEvent implements Listener {
 			
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
-		if(rawslot == 15) {
+		else if(rawslot == 15) {
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 			
 			PlayerFileManager.getinstance().UserDetailClassCallData(p,
@@ -407,7 +407,15 @@ public class GuiEvent implements Listener {
 			
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
-		if(rawslot == 27) {
+		else if(rawslot == 20) {
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "카오스"));
+
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+		}
+		else if(rawslot == 27) {
 			Classgui.getinstance().ClassSelectGuiOpen(p);
 		}
 		

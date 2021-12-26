@@ -82,32 +82,25 @@ public class PlayerCombination {
 		
 		
 		if(p.isSneaking() && keybind.equals("L")) {
-			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "SHIFTL");
-
-
-//			keybind = "none";
-//			key1 = "SHIFT";
-//			key2 = "L";
-//
-//			if(!sneakingleft) {
-//				sneakingleft = true;
-//			}
 
 			DelaySave = "SHIFTL";
 
 		}
-		if(!p.isSneaking() && keybind.equals("L")) {
+		else if(!p.isSneaking() && keybind.equals("L")) {
 			DelaySave = "L";
 			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
 		}
-		if(keybind.equals("R")) {
+		else if(!p.isSneaking() && keybind.equals("R")) {
 			DelaySave = "R";
 			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FL");
 		}
-		if(p.isSneaking() && !key1.equals("SHIFT") && key1.equals("F")) {
+		else if(p.isSneaking() && keybind.equals("R")) {
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "SHIFTR");
+		}
+		else if(p.isSneaking() && !key1.equals("SHIFT") && key1.equals("F")) {
 			
 		}
-		if(PlayerFunction.getinstance(p).getMeleeDelay() == 0) {
+		else if(PlayerFunction.getinstance(p).getMeleeDelay() == 0) {
 			if(!DelaySave.equals("none")) {
 				PlayerFunction.getinstance(p).addMeleeCommand(DelaySave);
 				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, DelaySave);

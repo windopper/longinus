@@ -1,7 +1,6 @@
 package PlayerChip;
 
-import java.util.Arrays;
-
+import PlayerManager.PlayerFileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,7 +10,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import PlayerManager.PlayerFileManager;
+import java.util.Arrays;
 
 public class Classgui {
 	
@@ -45,6 +44,7 @@ public class Classgui {
 		gui.setItem(13, BlasterItem(p));
 		gui.setItem(14, ByVItem(p));
 		gui.setItem(15, PhloxItem(p));
+		gui.setItem(20, KhaosItem(p));
 		gui.setItem(27, backtomenuitem());
 		
 		
@@ -106,7 +106,23 @@ public class Classgui {
 		item.setItemMeta(meta);
 		return item;
 	}
-	
+
+
+	public ItemStack KhaosItem(Player p) {
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
+		ItemMeta itemMeta = item.getItemMeta();
+		itemMeta.setDisplayName("§6§o§l클래스 : 카오스§l§o§6");
+		itemMeta.setLore(Arrays.asList(
+				"",
+				"§b클릭하여 클래스 생성하기",
+				"",
+				"§7테스트 버전 클래스",
+				"",
+				""));
+		item.setItemMeta(itemMeta);
+		return item;
+	}
+
 	public ItemStack AetherItem(Player p) {
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD, 1);
@@ -285,10 +301,11 @@ public class Classgui {
 			if(GUIlocation == 25) GUIlocation = 29;
 			
 			if(Class.split("/")[0].equals("아이테르")) gui.setItem(GUIlocation, AetherSelectItem(p, Class));
-			if(Class.split("/")[0].equals("엑셀러레이터")) gui.setItem(GUIlocation, AcceleratorSelectItem(p, Class));
-			if(Class.split("/")[0].equals("바이V")) gui.setItem(GUIlocation, ByVSelectItem(p, Class));
-			if(Class.split("/")[0].equals("블래스터")) gui.setItem(GUIlocation, BlasterSelectItem(p, Class));
-			if(Class.split("/")[0].equals("플록스")) gui.setItem(GUIlocation, PhloxSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("엑셀러레이터")) gui.setItem(GUIlocation, AcceleratorSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("바이V")) gui.setItem(GUIlocation, ByVSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("블래스터")) gui.setItem(GUIlocation, BlasterSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("플록스")) gui.setItem(GUIlocation, PhloxSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("카오스")) gui.setItem(GUIlocation, KhaosSelectItem(p, Class));
 			
 			GUIlocation ++;
 		}	
@@ -300,7 +317,25 @@ public class Classgui {
 		
 		
 	}
-	
+
+	private ItemStack KhaosSelectItem(Player p, String classname) {
+		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName("§6§o§l클래스 : 카오스§l§o§6");
+		meta.setLore(Arrays.asList(
+				"",
+				"§o§bLevel : "+lvl,
+				"",
+				"",
+				"§7좌클릭 : 클래스 선택",
+				"§7쉬프트 + 좌클릭 : 클래스 삭제"));
+
+
+		item.setItemMeta(meta);
+		return item;
+	}
 	
 	private ItemStack AetherSelectItem(Player p, String classname) {
 		
