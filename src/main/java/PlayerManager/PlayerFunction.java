@@ -66,7 +66,7 @@ public class PlayerFunction implements Listener {
 	}
 	public void  setMeleeDelay(int meleedelay) {
 		this.meleedelay = meleedelay;
-		this.meleecombodelay = 10;
+		this.meleecombodelay = 15;
 	}
 	public int getMeleemode() {
 		return meleemode;
