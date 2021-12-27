@@ -18,9 +18,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PacketReader {
-	
+
+	public final static Map<UUID, Channel> channels = new HashMap<>();
 	Channel channel;
-	public static Map<UUID, Channel> channels = new HashMap<UUID, Channel>();
 	private int count = 0;
 	private Player player;
 

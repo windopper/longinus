@@ -3,6 +3,7 @@ package spellinteracttest;
 import ClassAbility.Accelerator;
 import ClassAbility.Aether.Aether;
 import ClassAbility.Blaster;
+import ClassAbility.Cheiron.CheironMelee;
 import ClassAbility.Phlox;
 import CustomEvents.PlayerCustomEventListener;
 import Duel.DuelManager;
@@ -53,10 +54,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityTargetEvent;
-import org.bukkit.event.entity.SlimeSplitEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -100,6 +98,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new EditEventListener(), this);
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Map(), this);
+		getServer().getPluginManager().registerEvents(CheironMelee.getInstance(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -199,11 +198,6 @@ public class Main extends JavaPlugin implements Listener {
 	public void slimesplitevent(SlimeSplitEvent e) {
 		e.setCancelled(true);
 	}
-
-//	@EventHandler
-//	public void packetlistnere(PacketPlayOutWorldEvent event) {
-//		Location e = event.e().
-//	}
 	
 	@EventHandler
 	public void fallingblock(EntityChangeBlockEvent e) {
@@ -232,8 +226,6 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void Inventory(InventoryClickEvent event) { // 인벤토리 왼손키
-		
-		//Bukkit.broadcastMessage(Integer.toString(event.getSlot()));
 		
 		if(event.getSlotType() == SlotType.QUICKBAR && event.getSlot() == 40) {
 			event.setCancelled(true);
@@ -351,6 +343,7 @@ public class Main extends JavaPlugin implements Listener {
 		Player player = e.getPlayer();
 		
 	}
+
 	
 	
     public static Main getInstance() {

@@ -1,23 +1,24 @@
 package Items;
 
 
-import java.util.ArrayList;
-import java.util.UUID;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import net.md_5.bungee.api.ChatColor;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagString;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
-import net.md_5.bungee.api.ChatColor;
 import spellinteracttest.Main;
+
+import java.util.ArrayList;
+import java.util.UUID;
 public class WeaponManager {
 	
 	private final static String statlist[] = {"생명력","스킬데미지","보호막","이동속도","에너지충전"};
@@ -173,8 +174,12 @@ public class WeaponManager {
 		
 
 		
-		
-		 
+		net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+		NBTTagCompound nbtTagCompound = (nmsStack.hasTag()) ? nmsStack.getTag() : new NBTTagCompound();
+		nbtTagCompound.set("TestTag", NBTTagString.a("hihi"));
+		nmsStack.setTag(nbtTagCompound);
+
+
 		item.setItemMeta(itemmeta);
 		
 		
