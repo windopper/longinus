@@ -73,6 +73,7 @@ public class Combination {
 		else if(name.equals("플록스")) Phlox(p, combo);
 		else if(name.equals("카오스")) Khaos(p, combo);
 		else if(name.equals("없음")) Trainer(p, combo);
+		else if(name.equals("케이론")) Cheiron(p, combo);
 
 		p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
 
@@ -336,6 +337,11 @@ public class Combination {
 			Khaos.getInstance().SHIFTR(p);
 		}
 	}
+
+	public void Cheiron(Player p, String combo) {
+
+	}
+
 	public void Aether(Player p, String combo) {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);

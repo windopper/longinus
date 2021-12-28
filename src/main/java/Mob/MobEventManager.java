@@ -27,7 +27,7 @@ public class MobEventManager implements Listener {
         Entity Taker = event.getEntity();
         event.setDamage(0.1);
 
-        MobListManager.MobList mobList = EntityManager.getinstance((LivingEntity) Damager).getMobList();
+        MobListManager.MobList mobList = EntityManager.getinstance(Damager).getMobList();
 
         if(mobList == null) return;
 

@@ -39,6 +39,7 @@ import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
 import SpyGlass.SpyGlassItemManager;
 import UserStorage.Event;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
@@ -50,15 +51,20 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityTargetEvent;
+import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -102,11 +108,6 @@ public class Main extends JavaPlugin implements Listener {
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
-
-
-
-
-
 		saveConfig();
 		
 		
@@ -126,17 +127,20 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 
-		if(!Bukkit.getOnlinePlayers().isEmpty()) {
-			for(Player player : Bukkit.getOnlinePlayers()) {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+			if(!Bukkit.getOnlinePlayers().isEmpty()) {
+				for(Player player : Bukkit.getOnlinePlayers()) {
 
-				ServerJoinToDo(player);
+					ServerJoinToDo(player);
+				}
 			}
-		}
 
-		loop();
+			loop();
 
-		QuestNPCManager.getinstance().addnpctolist();
-		ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
+			QuestNPCManager.getinstance().addnpctolist();
+			ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
+		}, 20);
+
 
 
 	}
@@ -333,7 +337,6 @@ public class Main extends JavaPlugin implements Listener {
 		Player player = (Player) e.getPlayer();
 		PlayerHealthShield.getinstance(player).setCurrentHealth(PlayerManager.getinstance(player).Health);
 
-
 	}
 	
 	@EventHandler
@@ -479,6 +482,29 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "blockchange": {
+
+				(new MultiBlockChange()).test(player);
+				break;
+			}
+
+			case "smoothblockchange":{
+				(new MultiBlockChange()).SmoothMultiBlockChange(player);
+				break;
+			}
+
+			case "nbtcheck": {
+				ItemStack itemStack = player.getInventory().getItemInMainHand();
+				net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
+				NBTTagCompound tag = nmsStack.getTag();
+				for(String stats : WeaponManager.statlist) {
+					Bukkit.broadcastMessage(stats+" : "+tag.getIntArray(stats)[0]+" "+tag.getIntArray(stats)[1]+" "+
+							tag.getIntArray(stats)[2]+" ");
+				}
+
+				break;
+			}
+
 			case "entitysize": {
 				Bukkit.broadcastMessage(Integer.toString(EntityManager.getEntityManagerInstanceSize()));
 				break;
@@ -617,10 +643,11 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "item":{
-				WeaponManager data = new WeaponManager();
+				if(args[1] == null) break;
+				WeaponManager data = new WeaponManager(args[1]);
 				if(data.checkname(args[1]) == true)	{
 					Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재합니다");
-					player.getInventory().addItem(data.getitem(args[1]));
+					player.getInventory().addItem(data.getitem());
 				}
 				else {
 					Bukkit.broadcastMessage("아이템 "+args[1]+"가 존재하지 않습니다");
@@ -653,6 +680,7 @@ public class Main extends JavaPlugin implements Listener {
 				player.sendMessage("Damage:" + Integer.toString(PlayerManager.getinstance(player).MinDamage)+"-"+Integer.toString(PlayerManager.getinstance(player).MaxDamage));
 				player.sendMessage("Health: " + Integer.toString(PlayerManager.getinstance(player).Health));
 				player.sendMessage("Shield: " + Integer.toString(PlayerManager.getinstance(player).ShieldRaw));
+				player.sendMessage("WalkSpeed: " + PlayerManager.getinstance(player).WalkSpeed);
 				player.sendMessage("CurrentClass " + PlayerManager.getinstance(player).CurrentClass);
 				player.sendMessage("WeaponClass " + PlayerManager.getinstance(player).WeaponClass);
 				player.sendMessage("WeaponLevel " + PlayerManager.getinstance(player).WeaponLevelreq);
@@ -673,13 +701,13 @@ public class Main extends JavaPlugin implements Listener {
 						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getDef()));
 						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getAgi()));
 						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getlvl()));
-
-
 					}
-
-
 				}
+				break;
+			}
 
+			case "getws": {
+				Bukkit.broadcastMessage(Float.toString(player.getWalkSpeed()));
 				break;
 			}
 

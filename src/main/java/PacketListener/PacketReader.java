@@ -46,6 +46,15 @@ public class PacketReader {
 
 		});
 
+//		channel.pipeline().addAfter("decoder", "PacketInjector", new MessageToMessageDecoder<PacketPlayInBlockDig>() {
+//
+//			@Override
+//			protected void decode(ChannelHandlerContext channelHandlerContext, PacketPlayInBlockDig packetPlayInBlockDig, List<Object> list) throws Exception {
+//				list.add(packetPlayInBlockDig);
+//				bowdraw(packetPlayInBlockDig);
+//			}
+//		});
+
 
 	}
 	
@@ -71,6 +80,7 @@ public class PacketReader {
 
 		}
 	}
+
 	
 	private Object getValue(Object instance, String name) {
 

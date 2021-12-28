@@ -415,6 +415,14 @@ public class GuiEvent implements Listener {
 
 			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		}
+		else if(rawslot == 21) {
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+
+			PlayerFileManager.getinstance().UserDetailClassCallData(p,
+					PlayerFileManager.getinstance().UserDetailClassRegister(p, "케이론"));
+
+			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+		}
 		else if(rawslot == 27) {
 			Classgui.getinstance().ClassSelectGuiOpen(p);
 		}
