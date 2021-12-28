@@ -1,8 +1,9 @@
 package PlayerManager;
 
-import net.md_5.bungee.api.ChatColor;
+import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import spellinteracttest.RandomRange;
@@ -20,7 +21,6 @@ public class PlayerManager {
 	
 	private static final HashMap<Player, PlayerManager> instance = new HashMap<>();
 
-	
 	public String AskDeleteClassName;
 	public String CurrentClass = "없음";
 	public int CurrentClassNumber = 0;
@@ -84,16 +84,12 @@ public class PlayerManager {
 	public void removeinstance() {
 		instance.remove(p);
 	}
-	
-	
-	
+
 	public static void updateloop() {
 		
 		for(Player p : instance.keySet()) {
 			getinstance(p).equipmentsetting();
 		}
-		
-				
 	}
 	
 	public void setmap() {
@@ -155,9 +151,7 @@ public class PlayerManager {
 		BootsDexreq = 0;
 		BootsDefreq = 0;
 		BootsAgireq = 0;
-		
-		
-		
+
 		/*
 		 * 1 헬멧
 		 * 2 갑옷
@@ -168,190 +162,93 @@ public class PlayerManager {
 		 * 
 		 * 
 		 */
-		
+
 		for(ItemStack equipments : getplayerequipments(p)) {
-			
 			count++;
-			
+
 			if(equipments.getItemMeta() == null || equipments.getItemMeta().getLore() == null) continue;
-			
-			List<String> lores = p.getInventory().getItemInMainHand().getItemMeta().getLore();	
-			
+			net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(equipments);
+			if(!nmsStack.hasTag()) continue;
+			NBTTagCompound tag = nmsStack.getTag();
+			if(tag.getString("클래스제한").equals("")) continue;
+
 			if(count==5) {
-				
-				for(String stri : lores) { // 데미지보다 먼저 체크하는거 방지하기 위해 미리 클래스 체크
-
-					if(stri.equals("")) continue;
-					stri = ChatColor.stripColor(stri);
-					String[] spliti = stri.split(" ");
-					
-					if(spliti[0].equals("클래스제한")) { // 들고 있는 무기의 직업 체크
-						WeaponClass = spliti[2];
-						break;
-					}
-					
-				}
+				WeaponClass = tag.getString("클래스제한");
 			}
-		
-			for(String data : lores) { // 문자열 나누기
-				
-				if(data.equals("")) continue;
-				
-				data = ChatColor.stripColor(data);
-				String[] split = data.split(" ");
 
-				if(WeaponClass.equals(CurrentClass)) { // 직업이 맞아야지 무기 특성을 유저에 적용가능
-					
-					if(split[0].equals("데미지:")) { // 무기에서 데미지만 추출하기
-						String[] split_2 = split[1].split("-");
-						int mindmg = Integer.parseInt(split_2[0]);
-						int maxdmg = Integer.parseInt(split_2[1]);
-						
-						mindamage += mindmg;
-						maxdamage += maxdmg;
+			if(WeaponClass.equals(CurrentClass)) {
 
-					}
-					
-					if(split[0].equals("레벨제한")) {
-						if(count==1) {
-							HelmetLevelreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
-						}
-						if(count==2) {
-							ChestplateLevelreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getlvl()<ChestplateLevelreq) break;
-						}
-						if(count==3) {
-							LeggingsLevelreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getlvl()<LeggingsLevelreq) break;
-						}
-						if(count==4) {
-							BootsLevelreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getlvl()<BootsLevelreq) break;
-						}
-						if(count==5) { 
-							WeaponLevelreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getlvl()<WeaponLevelreq) break;
-						}
-						
-						
-							
-					}
-					if(split[0].equals("무기강화최소")) {
-						if(count==1) {
-							HelmetStrreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
-						}
-						if(count==2) {
-							ChestplateStrreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getStr()<ChestplateStrreq) break;
-						}
-						if(count==3) {
-							LeggingsStrreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getStr()<LeggingsStrreq) break;
-						}
-						if(count==4) {
-							BootsStrreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getStr()<BootsStrreq) break;
-						}
-						if(count==5) { 
-							WeaponStrreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getStr()<WeaponStrreq) break;
-						}
-					}
-					if(split[0].equals("감각강화최소")) {
-						if(count==1) {
-							HelmetDexreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
-						}
-						if(count==2) {
-							ChestplateDexreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDex()<ChestplateDexreq) break;
-						}
-						if(count==3) {
-							LeggingsDexreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDex()<LeggingsDexreq) break;
-						}
-						if(count==4) {
-							BootsDexreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDex()<BootsDexreq) break;
-						}
-						if(count==5) { 
-							WeaponDexreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDex()<WeaponDexreq) break;
-							
-						}
-					}
-					if(split[0].equals("외피강화최소")) {
-						if(count==1) {
-							HelmetDefreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
-						}
-						if(count==2) {
-							ChestplateDefreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDef()<ChestplateDefreq) break;
-						}
-						if(count==3) {
-							LeggingsDefreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDef()<LeggingsDefreq) break;
-						}
-						if(count==4) {
-							BootsDefreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDef()<BootsDefreq) break;
-						}
-						if(count==5) { 
-							WeaponDefreq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getDef()<WeaponDefreq) break;
-						}
-					}
-					if(split[0].equals("기동강화최소")) {
-						if(count==1) {
-							HelmetAgireq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
-						}
-						if(count==2) {
-							ChestplateAgireq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getAgi()<ChestplateAgireq) break;
-						}
-						if(count==3) {
-							LeggingsAgireq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getAgi()<LeggingsAgireq) break;
-						}
-						if(count==4) {
-							BootsAgireq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getAgi()<BootsAgireq) break;
-						}
-						if(count==5) { 
-							WeaponAgireq = Integer.parseInt(split[2]);
-							if(PlayerStatManager.getinstance(p).getAgi()<WeaponAgireq) break;
-						}
-					}
-					
-					
-					if(split[0].equals("생명력")) { // 생명력 추출
-						
-						health += Integer.parseInt(split[1]);
-						
-					}
-					if(split[0].equals("보호막")) { // 보호막 추출
-						int a = Integer.parseInt(split[1].replace("%", ""));
-						
-						shield += a;
-					}
-					
-					if(split[0].equals("스킬데미지")) { // 스킬데미지 추출
-						int a = Integer.parseInt(split[1].replace("%", ""));
-						
-						spelldamage += a;
-					}
-
-				}
+				String damage[] = tag.getString("데미지").split("-");
+				mindamage += Integer.parseInt(damage[0]);
+				maxdamage += Integer.parseInt(damage[1]);
 			}
-			
-			
+
+			if(count==1) {
+				HelmetLevelreq = tag.getInt("레벨제한");
+				HelmetStrreq = tag.getInt("무기강화제한");
+				HelmetDexreq = tag.getInt("감각강화제한");
+				HelmetDefreq = tag.getInt("외피강화제한");
+				HelmetAgireq = tag.getInt("기동강화제한");
+				if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
+				if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
+				if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
+				if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
+				if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
+			}
+			else if(count==2) {
+				ChestplateLevelreq = tag.getInt("레벨제한");
+				ChestplateStrreq = tag.getInt("무기강화제한");
+				ChestplateDexreq = tag.getInt("감각강화제한");
+				ChestplateDefreq = tag.getInt("외피강화제한");
+				ChestplateAgireq = tag.getInt("기동강화제한");
+				if(PlayerStatManager.getinstance(p).getlvl()<ChestplateLevelreq) break;
+				if(PlayerStatManager.getinstance(p).getStr()<ChestplateStrreq) break;
+				if(PlayerStatManager.getinstance(p).getDex()<ChestplateDexreq) break;
+				if(PlayerStatManager.getinstance(p).getDef()<ChestplateDefreq) break;
+				if(PlayerStatManager.getinstance(p).getAgi()<ChestplateAgireq) break;
+			}
+			else if(count==3) {
+				LeggingsLevelreq = tag.getInt("레벨제한");
+				LeggingsStrreq = tag.getInt("무기강화제한");
+				LeggingsDexreq = tag.getInt("감각강화제한");
+				LeggingsDefreq = tag.getInt("외피강화제한");
+				LeggingsAgireq = tag.getInt("기동강화제한");
+				if(PlayerStatManager.getinstance(p).getlvl()<LeggingsLevelreq) break;
+				if(PlayerStatManager.getinstance(p).getStr()<LeggingsStrreq) break;
+				if(PlayerStatManager.getinstance(p).getDex()<LeggingsDexreq) break;
+				if(PlayerStatManager.getinstance(p).getDef()<LeggingsDefreq) break;
+				if(PlayerStatManager.getinstance(p).getAgi()<LeggingsAgireq) break;
+			}
+			else if(count==4) {
+				HelmetLevelreq = tag.getInt("레벨제한");
+				HelmetStrreq = tag.getInt("무기강화제한");
+				HelmetDexreq = tag.getInt("감각강화제한");
+				HelmetDefreq = tag.getInt("외피강화제한");
+				HelmetAgireq = tag.getInt("기동강화제한");
+				if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
+				if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
+				if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
+				if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
+				if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
+			}
+			else if(count==5) {
+				WeaponLevelreq = tag.getInt("레벨제한");
+				WeaponStrreq = tag.getInt("무기강화제한");
+				WeaponDexreq = tag.getInt("감각강화제한");
+				WeaponDefreq = tag.getInt("외피강화제한");
+				WeaponAgireq = tag.getInt("기동강화제한");
+				if(PlayerStatManager.getinstance(p).getlvl()<WeaponLevelreq) break;
+				if(PlayerStatManager.getinstance(p).getStr()<WeaponStrreq) break;
+				if(PlayerStatManager.getinstance(p).getDex()<WeaponDexreq) break;
+				if(PlayerStatManager.getinstance(p).getDef()<WeaponDefreq) break;
+				if(PlayerStatManager.getinstance(p).getAgi()<WeaponAgireq) break;
+			}
+
+			health += getTag(tag, "생명력");
+			shield += getTag(tag, "보호막");
+			spelldamage += getTag(tag, "스킬데미지");
+			walkspeed += getTag(tag, "이동속도");
 		}
-
-
 
 		MinDamage = mindamage;
 		MaxDamage = maxdamage;
@@ -362,10 +259,36 @@ public class PlayerManager {
 		EnergyPerSecond = energypersecond;
 		ManaDecrease = manadecrease;
 		ShieldRaw =  (int)((double)shieldraw * ((double)(Shield+100)/100));
+
+
+		SetWalkSpeed();
 		
 	}
+
+	private void SetWalkSpeed() {
+
+		if(WalkSpeed > 0) {
+			if(((float)WalkSpeed + 100) / 100 * 0.2f > 1) {
+				p.setWalkSpeed(1);
+			}
+			else p.setWalkSpeed(((float)WalkSpeed + 100) / 100 * 0.2f);
+		}
+		else {
+			float ws = ((float)WalkSpeed + 100) / 100 * 0.2f < 0 ? 0 : ((float)WalkSpeed + 100) / 100 * 0.2f;
+			p.setWalkSpeed(ws);
+		}
+
+	}
 	
-	
+	public Integer getTag(NBTTagCompound nbtTagCompound, String string) {
+		int temp[] = nbtTagCompound.getIntArray(string);
+		int ratio = temp[1];
+		int min = temp[0];
+		int max = temp[2];
+		int diff = max -  min;
+		int addToMin = diff * ratio / 100;
+		return (addToMin +  min);
+	}
 	
 	
 	public List<ItemStack> getplayerequipments(Player p){

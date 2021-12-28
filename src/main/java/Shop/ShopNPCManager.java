@@ -129,7 +129,6 @@ public class ShopNPCManager {
 					 NPCFile.getString(name+".name"),
 					 NPCFile.getString(name+".texture"),
 					 NPCFile.getString(name+".signature"));
-			Bukkit.broadcastMessage("hehe");
 		}
 
 	}

@@ -97,6 +97,8 @@ public class PlayerHealthShield {
 
 	public void setDamage(int damage) {
 
+		p.damage(0.0001);
+
 		if(getShieldRegenerateStop()==0) //피해 받으면 보호막 재생이 멈춤
 			setShieldRegenerateStop();
 
