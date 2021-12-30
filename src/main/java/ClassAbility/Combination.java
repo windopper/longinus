@@ -2,35 +2,28 @@ package ClassAbility;
 
 import ClassAbility.Aether.Aether;
 import ClassAbility.Aether.AetherMelee;
+import ClassAbility.Cheiron.Cheiron;
+import ClassAbility.Cheiron.CheironMelee;
 import ClassAbility.Khaos.Khaos;
 import ClassAbility.Khaos.KhaosMelee;
-import DynamicData.Damage;
-import Mob.EntityStatusManager;
-import PlayerManager.*;
-import QuestClasses.Tutorial;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerManager;
+import PlayerManager.PlayerStatManager;
 import org.bukkit.Sound;
-import org.bukkit.entity.*;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
-
-import java.util.HashMap;
+import org.bukkit.entity.Player;
 
 public class Combination {
 
 	private static Combination Combination;
 	 
-	public final static HashMap<Player, Integer> trainermelee = new HashMap<>();
+	//public final static HashMap<Player, Integer> trainermelee = new HashMap<>();
 	
-	private final static String manaexhaustion = "§c에너지가 부족합니다§c";
-	private final static String robotexhaustion = "§c나노로봇이 부족합니다§c";
-	private final static String impulseexhaustion = "§c충격량이 부족합니다§c";
-	private final static String essenceexhaustion = "§c정수가 부족합니다§c";
-	private final static String levelrequire = "§c아직 사용할 수 없는 스킬입니다";
+	public final static String manaexhaustion = "§c에너지가 부족합니다§c";
+	public final static String robotexhaustion = "§c나노로봇이 부족합니다§c";
+	public final static String impulseexhaustion = "§c충격량이 부족합니다§c";
+	public final static String essenceexhaustion = "§c정수가 부족합니다§c";
+	public final static String levelrequire = "§c아직 사용할 수 없는 스킬입니다";
 	
 	public final static String blank = "                          ";
 	public final static String blank2 = "            ";
@@ -56,7 +49,7 @@ public class Combination {
 	
 	
 	public void removemaps(Player p) {
-		trainermelee.remove(p);
+		//trainermelee.remove(p);
 	}
 	
 	public void Checkclass(String name, Player p, String combo) {
@@ -75,17 +68,16 @@ public class Combination {
 		else if(name.equals("없음")) Trainer(p, combo);
 		else if(name.equals("케이론")) Cheiron(p, combo);
 
-		p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
-
+		//p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
 	}
+
 	public void Sound(Player p) {
 		p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1);
 	}
 	public void Warning(Player p) {
 		p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1f);
 	}
-	
-	
+
 	public void energyoverload(Player p, String combo) {
 		
 		PlayerEnergy PE = PlayerEnergy.getinstance(p);
@@ -121,205 +113,205 @@ public class Combination {
 	
 	@SuppressWarnings("deprecation")
 	public void Trainer(final Player p, String combo) {
-		
-		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
-		
-		
-		
-		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int charge = 1 - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int arrow = 1 - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		
-		String RR = "§o§l대쉬§l§o §3§l-⚡§l"+(charge);
-		String FF = "§o§l다트 던지기§l§o §3§l-⚡§l"+(arrow);
-		
-		if(combo.equals("RR")) {
-			
-			if(CurrentMana >= charge ) {
-				Sound(p);
-				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				
-				energyoverload(p, combo);
-				
-				PlayerEnergy.getinstance(p).removeEnergy(charge);
-				
-				for(Player pl : Bukkit.getOnlinePlayers()) {
-					if(!Tutorial.exambothitcount.containsKey(p))
-						pl.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-					else
-						p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-					
-				}
-				Vector dir = p.getEyeLocation().getDirection();
-				dir.normalize();
-				p.setVelocity(dir.multiply(1));
-				
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-			
-
-		}
-		else if(combo.equals("FF")) {
-			
-			if(CurrentMana >= arrow) {
-				Sound(p);
-				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				
-				energyoverload(p, combo);
-				
-				PlayerEnergy.getinstance(p).removeEnergy(arrow);
-				
-				for(Player pl : Bukkit.getOnlinePlayers()) {
-					if(!Tutorial.exambothitcount.containsKey(p))
-						pl.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ARROW_SHOOT, 1, 1);
-					else 
-						p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ARROW_SHOOT, 1, 1);
-					
-				}
-				Vector dir = p.getEyeLocation().getDirection();
-				dir.normalize();
-				dir.multiply(1.5);
-				Arrow ar = (Arrow) p.getWorld().spawnEntity(p.getEyeLocation(), EntityType.ARROW);
-				int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
-				ar.setVelocity(dir);
-				ar.setCustomName("dart"+":"+p.getName());
-				
-				ar.addScoreboardTag(p.getName());
-				
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-
-		}
-		else if(combo.equals("L")) {
-			
-			if(!trainermelee.containsKey(p)) {
-							
-				HashMap<Entity, Integer> meleehit = new HashMap<>();
-				trainermelee.put(p, 0);
-				Vector dir1 = p.getLocation().getDirection();
-				Location loc1 = p.getEyeLocation();
-				dir1.normalize();
-				dir1.multiply(0.2);
-				for(Player pl : Bukkit.getOnlinePlayers()) { // 튜토리얼 소리 통제
-					if(!Tutorial.exambothitcount.containsKey(p))
-						pl.playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-				}
-				if(Tutorial.exambothitcount.containsKey(p))
-					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-				
-				
-				for(int i=0; i<15; i++) {
-					
-					for(Player pl : Bukkit.getOnlinePlayers()) {
-						
-//						if(i==14) {
-//							pl.spawnParticle(Particle.SMOKE_NORMAL, loc1, 20, 0.5, 0.5, 0.5, 0.1, null);
+//
+//		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
+//
+//
+//
+//		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
+//		int charge = 1 - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int arrow = 1 - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//
+//		String RR = "§o§l대쉬§l§o §3§l-⚡§l"+(charge);
+//		String FF = "§o§l다트 던지기§l§o §3§l-⚡§l"+(arrow);
+//
+//		if(combo.equals("RR")) {
+//
+//			if(CurrentMana >= charge ) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RR, 5, 20, 10);
+//
+//				energyoverload(p, combo);
+//
+//				PlayerEnergy.getinstance(p).removeEnergy(charge);
+//
+//				for(Player pl : Bukkit.getOnlinePlayers()) {
+//					if(!Tutorial.exambothitcount.containsKey(p))
+//						pl.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+//					else
+//						p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+//
+//				}
+//				Vector dir = p.getEyeLocation().getDirection();
+//				dir.normalize();
+//				p.setVelocity(dir.multiply(1));
+//
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//
+//		}
+//		else if(combo.equals("FF")) {
+//
+//			if(CurrentMana >= arrow) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+FF, 5, 20, 10);
+//
+//				energyoverload(p, combo);
+//
+//				PlayerEnergy.getinstance(p).removeEnergy(arrow);
+//
+//				for(Player pl : Bukkit.getOnlinePlayers()) {
+//					if(!Tutorial.exambothitcount.containsKey(p))
+//						pl.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ARROW_SHOOT, 1, 1);
+//					else
+//						p.playSound(p.getLocation(), org.bukkit.Sound.ENTITY_ARROW_SHOOT, 1, 1);
+//
+//				}
+//				Vector dir = p.getEyeLocation().getDirection();
+//				dir.normalize();
+//				dir.multiply(1.5);
+//				Arrow ar = (Arrow) p.getWorld().spawnEntity(p.getEyeLocation(), EntityType.ARROW);
+//				int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
+//				ar.setVelocity(dir);
+//				ar.setCustomName("dart"+":"+p.getName());
+//
+//				ar.addScoreboardTag(p.getName());
+//
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//		}
+//		else if(combo.equals("L")) {
+//
+//			if(!trainermelee.containsKey(p)) {
+//
+//				HashMap<Entity, Integer> meleehit = new HashMap<>();
+//				trainermelee.put(p, 0);
+//				Vector dir1 = p.getLocation().getDirection();
+//				Location loc1 = p.getEyeLocation();
+//				dir1.normalize();
+//				dir1.multiply(0.2);
+//				for(Player pl : Bukkit.getOnlinePlayers()) { // 튜토리얼 소리 통제
+//					if(!Tutorial.exambothitcount.containsKey(p))
+//						pl.playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+//				}
+//				if(Tutorial.exambothitcount.containsKey(p))
+//					p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+//
+//
+//				for(int i=0; i<15; i++) {
+//
+//					for(Player pl : Bukkit.getOnlinePlayers()) {
+//
+////						if(i==14) {
+////							pl.spawnParticle(Particle.SMOKE_NORMAL, loc1, 20, 0.5, 0.5, 0.5, 0.1, null);
+////						}
+////						else if(i==12) {
+////							pl.spawnParticle(Particle.BLOCK_CRACK, loc1, 20, 0.5, 0.5, 0.5, 0, Material.SEA_LANTERN.createBlockData());
+////						}
+//						if(i==13) {
+//							if(!Tutorial.exambothitcount.containsKey(p))
+//								pl.spawnParticle(Particle.SWEEP_ATTACK, loc1, 10, 0.5, 0.5, 0.5, 0, null);
+//							else
+//								p.spawnParticle(Particle.SWEEP_ATTACK, loc1, 10, 0.5, 0.5, 0.5, 0, null);
+//
+//
 //						}
-//						else if(i==12) {
-//							pl.spawnParticle(Particle.BLOCK_CRACK, loc1, 20, 0.5, 0.5, 0.5, 0, Material.SEA_LANTERN.createBlockData());
+//					}
+//
+//					for(Entity e : p.getWorld().getLivingEntities()) {
+//
+//						Location eloc = e.getLocation();
+//						double dist = eloc.distance(loc1);
+//
+//						if(dist<2 || e.getBoundingBox().contains(loc1.getX(), loc1.getY(), loc1.getZ())) {
+//
+//							if(entitycheck.duelcheck(e, p) && entitycheck.entitycheck(e) && !meleehit.containsKey(e)) {
+//								p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2);
+//								meleehit.put(e, 0);
+//								LivingEntity le = (LivingEntity) e;
+//								int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
+//								Damage.getinstance().taken(dmg, le, p);
+//								EntityStatusManager.getinstance(le).KnockBack(p, 0.3);
+//
+//								if(le.getCustomName() != null) {
+//									if(le.getCustomName().equals("샌드백")) {
+//										if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {
+//											Damage.getinstance().taken(2000, (LivingEntity) p, p);
+//											p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
+//											p.playSound(p.getLocation(), "meme.tut6", 5, 1);
+//											Tutorial.trainerbothit.put(p, 1);
+//										}
+//									}
+//								}
+//
+//								if(!Tutorial.examset.containsKey(p)) {
+//
+//									if(le.getCustomName() != null) {  // 슬라임 봇 때릴 때
+//										String split[] = le.getCustomName().split("m");
+//										if(split.length == 2) {
+//											if(split[1] != null) {
+//
+//												if(Tutorial.exambothit.containsKey(p)) {// 튜토리얼 활성화?
+//
+//													int number = Integer.parseInt(split[1]);
+//
+//													if(Tutorial.exambothit.get(p)[number-1] == 0) { // 때린 봇의 번혿가 0번이면
+//
+//														Tutorial.exambothit.get(p)[number-1] = number; // 때린 봇 번호 추가
+//														Tutorial.exambothitcount.replace(p, Tutorial.exambothitcount.get(p)+1); // 횟수 추가
+//														break; // 번호 넣으면 탈출
+//													}
+//
+//
+//
+//
+//												}
+//
+//											}
+//										}
+//
+//									}
+//								}
+//
+//
+//
+//							}
 //						}
-						if(i==13) {
-							if(!Tutorial.exambothitcount.containsKey(p))
-								pl.spawnParticle(Particle.SWEEP_ATTACK, loc1, 10, 0.5, 0.5, 0.5, 0, null);
-							else 
-								p.spawnParticle(Particle.SWEEP_ATTACK, loc1, 10, 0.5, 0.5, 0.5, 0, null);
-							
-							
-						}
-					}
-					
-					for(Entity e : p.getWorld().getLivingEntities()) {
-						
-						Location eloc = e.getLocation();
-						double dist = eloc.distance(loc1);
-						
-						if(dist<2 || e.getBoundingBox().contains(loc1.getX(), loc1.getY(), loc1.getZ())) {
-							
-							if(entitycheck.duelcheck(e, p) && entitycheck.entitycheck(e) && !meleehit.containsKey(e)) {
-								p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2);
-								meleehit.put(e, 0);
-								LivingEntity le = (LivingEntity) e;
-								int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
-								Damage.getinstance().taken(dmg, le, p);
-								EntityStatusManager.getinstance(le).KnockBack(p, 0.3);
-								
-								if(le.getCustomName() != null) {
-									if(le.getCustomName().equals("샌드백")) {
-										if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {
-											Damage.getinstance().taken(2000, (LivingEntity) p, p);
-											p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
-											p.playSound(p.getLocation(), "meme.tut6", 5, 1);
-											Tutorial.trainerbothit.put(p, 1);
-										}
-									}
-								}
-								
-								if(!Tutorial.examset.containsKey(p)) {
-									
-									if(le.getCustomName() != null) {  // 슬라임 봇 때릴 때
-										String split[] = le.getCustomName().split("m");
-										if(split.length == 2) {
-											if(split[1] != null) {
-												
-												if(Tutorial.exambothit.containsKey(p)) {// 튜토리얼 활성화?
-													
-													int number = Integer.parseInt(split[1]);
-													
-													if(Tutorial.exambothit.get(p)[number-1] == 0) { // 때린 봇의 번혿가 0번이면
-														
-														Tutorial.exambothit.get(p)[number-1] = number; // 때린 봇 번호 추가
-														Tutorial.exambothitcount.replace(p, Tutorial.exambothitcount.get(p)+1); // 횟수 추가
-														break; // 번호 넣으면 탈출
-													}	
-													
-													
-													
-													
-												}
-												
-											}
-										}
-
-									}
-								}
-								
-
-								
-							}
-						}
-					}			
-					loc1.add(dir1);
-				}
-				PotionEffect potion = new PotionEffect(PotionEffectType.SLOW_DIGGING, 10, 10);
-				p.addPotionEffect(potion, true);
-				
-				new BukkitRunnable() {
-					
-					@Override
-					public void run() {
-						
-						trainermelee.replace(p, trainermelee.get(p)+1);
-						if(trainermelee.get(p) >=2) {
-							trainermelee.remove(p);
-							cancel();
-						}
-						
-					}
-				}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 10);
-			}
-			
-
-			
-			
-			
-
-		}
+//					}
+//					loc1.add(dir1);
+//				}
+//				PotionEffect potion = new PotionEffect(PotionEffectType.SLOW_DIGGING, 10, 10);
+//				p.addPotionEffect(potion, true);
+//
+//				new BukkitRunnable() {
+//
+//					@Override
+//					public void run() {
+//
+//						trainermelee.replace(p, trainermelee.get(p)+1);
+//						if(trainermelee.get(p) >=2) {
+//							trainermelee.remove(p);
+//							cancel();
+//						}
+//
+//					}
+//				}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 10);
+//			}
+//
+//
+//
+//
+//
+//
+//		}
 	}
 
 	public void Khaos(Player p, String combo) {
@@ -339,6 +331,19 @@ public class Combination {
 	}
 
 	public void Cheiron(Player p, String combo) {
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
+		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
+
+		if(combo.equals("SHIFTR") || combo.equals("R")) {
+			if(PF.getMeleeDelay() == 0) {
+				(new CheironMelee(p)).Melee(combo);
+			}
+		}
+		else if(combo.equals("LL") || combo.equals("LR")) {
+			(new Cheiron(p)).Skill(combo);
+		}
 
 	}
 
@@ -371,100 +376,103 @@ public class Combination {
 			}
 
 		}
-		if(combo.equals("RL")) {
-			
-			if(CurrentMana >= impulseswitchshieldmana ) {
-				Sound(p);
-				p.sendTitle(" ",blank+RL, 5, 20, 10);
-				energyoverload(p, combo);
-				Aether.getinstance().ImpulseSwitchShield(p, impulseswitchshieldmana);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-
+		else if(combo.equals("RR") || combo.equals("RL") || combo.equals("FR")) {
+			(new Aether(p)).Skill(combo);
 		}
-		else if(combo.equals("RR")) {
-			
-			if(lvl<10) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= shieldswitchchargemana ) {
-				Sound(p);
-				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				energyoverload(p, combo);
-				Aether.getinstance().ShieldSwitchCharge(p, shieldswitchchargemana);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-			
-
-		}
-		else if(combo.equals("FR")) {
-			
-			if(lvl<15) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= WeaponModeChangemana) {
-				Sound(p);
-				p.sendTitle(" ",blank+FR, 5, 20, 10);
-				energyoverload(p, combo);
-				Aether.getinstance().SweepWeapon(p, WeaponModeChangemana);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-
-		}
-		else if(combo.equals("RF")) {
-			
-			if(lvl<5) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= impulseswitchweaponmana) {
-				Sound(p);
-				p.sendTitle(" ",blank+RF, 5, 20, 10);
-				energyoverload(p, combo);
-				Aether.getinstance().ImpulseSwitchWeapon(p, impulseswitchweaponmana);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-
-		}
-		else if(combo.equals("FF")) {
-			
-			if(lvl<20) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(PF.AEImpulse >= 100d) {
-				Sound(p);
-				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				Aether.getinstance().ImpulseSwitchEnergy(p);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+impulseexhaustion, 5, 20, 10);
-			}
-
-		}
+//		if(combo.equals("RL")) {
+//
+//			if(CurrentMana >= impulseswitchshieldmana ) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RL, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Aether.getinstance().ImpulseSwitchShield(p, impulseswitchshieldmana);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//		}
+//		else if(combo.equals("RR")) {
+//
+//			if(lvl<10) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= shieldswitchchargemana ) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RR, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Aether.getinstance().ShieldSwitchCharge(p, shieldswitchchargemana);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//
+//		}
+//		else if(combo.equals("FR")) {
+//
+//			if(lvl<15) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= WeaponModeChangemana) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+FR, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Aether.getinstance().SweepWeapon(p, WeaponModeChangemana);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//		}
+//		else if(combo.equals("RF")) {
+//
+//			if(lvl<5) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= impulseswitchweaponmana) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RF, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Aether.getinstance().ImpulseSwitchWeapon(p, impulseswitchweaponmana);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//		}
+//		else if(combo.equals("FF")) {
+//
+//			if(lvl<20) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(PF.AEImpulse >= 100d) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+FF, 5, 20, 10);
+//				Aether.getinstance().ImpulseSwitchEnergy(p);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+impulseexhaustion, 5, 20, 10);
+//			}
+//
+//		}
 		
 		
 		

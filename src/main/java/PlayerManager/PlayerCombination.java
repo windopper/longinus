@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -72,33 +73,106 @@ public class PlayerCombination {
 	
 	
 	public void KeyBind() {
-			
-		if(sneakingleft) { // 기관총
-			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
-		}
-		if(sneakingleft && !p.isSneaking()) {
-			sneakingleft = false;
-		}
-		
-		
-		if(p.isSneaking() && keybind.equals("L")) {
 
-			DelaySave = "SHIFTL";
+		if(PlayerManager.getinstance(p).CurrentClass.equals("케이론")) {
 
+			if(key1.equals("L") && keybind.equals("R")) {
+				key1 = "none";
+				key2 = "none";
+				keycooldown = 0;
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "LR");
+			}
+			else if(key1.equals("L") && keybind.equals("L")) {
+				key1 = "none";
+				key2 = "none";
+				keycooldown = 0;
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "LL");
+			}
+			else if(key1.equals("F") && keybind.equals("L")) {
+				key1 = "none";
+				key2 = "none";
+				keycooldown = 0;
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FL");
+			}
+			else if(p.isSneaking() && keybind.equals("L")) {
+				ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "SHIFTL");
+			}
+			else if(!p.isSneaking() && keybind.equals("L")) {
+				p.playSound(p.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 2);
+				key1 = "L";
+				keycooldown = 1;
+			}
+			else if(!p.isSneaking() && keybind.equals("F")) {
+				p.playSound(p.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 2);
+				key1 = "F";
+				keycooldown = 1;
+			}
+			else if(p.isSneaking() && keybind.equals("R")) {
+				DelaySave = "SHIFTR";
+			}
+			else if(!p.isSneaking() && keybind.equals("R")) {
+				DelaySave = "R";
+			}
+			else if(PlayerFunction.getinstance(p).getMeleeDelay() == 0) {
+				if(!DelaySave.equals("none")) {
+					PlayerFunction.getinstance(p).addMeleeCommand(DelaySave);
+					ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, DelaySave);
+					DelaySave = "none";
+				}
+			}
+
+			if(keycooldown>0) { //0이상이면 증가
+				keycooldown++;
+			}
+			if(keycooldown>30 || keycooldown==0) { // 30이상이면 키 초기화
+				key1 = "none";
+				key2 = "none";
+				keymessage = "                     ";
+				keycooldown = 0;
+			}
+			keybind = "none";
+
+
+
+
+			return;
 		}
-		else if(!p.isSneaking() && keybind.equals("L")) {
-			DelaySave = "L";
-			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
+		if(key1.equals("R") && keybind.equals("L")) {
+			key1 = "none";
+			key2 = "none";
+			keycooldown = 0;
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "RL");
 		}
-		else if(!p.isSneaking() && keybind.equals("R")) {
-			DelaySave = "R";
-			//ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FL");
+		else if(key1.equals("R") && keybind.equals("R")) {
+			key1 = "none";
+			key2 = "none";
+			keycooldown = 0;
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "RR");
+		}
+		else if(key1.equals("F") && keybind.equals("R")) {
+			key1 = "none";
+			key2 = "none";
+			keycooldown = 0;
+			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "FR");
 		}
 		else if(p.isSneaking() && keybind.equals("R")) {
 			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "SHIFTR");
 		}
-		else if(p.isSneaking() && !key1.equals("SHIFT") && key1.equals("F")) {
-			
+		else if(!p.isSneaking() && keybind.equals("R")) {
+			p.playSound(p.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 2);
+			key1 = "R";
+			keycooldown = 1;
+		}
+		else if(!p.isSneaking() && keybind.equals("F")) {
+			p.playSound(p.getLocation(), Sound.BLOCK_PISTON_CONTRACT, 1, 2);
+			key1 = "F";
+			keycooldown = 1;
+		}
+		else if(p.isSneaking() && keybind.equals("L")) {
+			DelaySave = "SHIFTL";
+		}
+		else if(!p.isSneaking() && keybind.equals("L")) {
+			DelaySave = "L";
 		}
 		else if(PlayerFunction.getinstance(p).getMeleeDelay() == 0) {
 			if(!DelaySave.equals("none")) {
@@ -108,7 +182,18 @@ public class PlayerCombination {
 			}
 		}
 
-//		if(keybind.equals("L") && key1.equals("none") && !p.isSneaking()) { // 첫번째가 없고 좌클릭이 시작일때
+		if(keycooldown>0) { //0이상이면 증가
+			keycooldown++;						
+		}
+		if(keycooldown>30 || keycooldown==0) { // 30이상이면 키 초기화
+			key1 = "none";
+			key2 = "none";
+			keymessage = "                     ";
+			keycooldown = 0;
+		}
+		keybind = "none";
+
+		//		if(keybind.equals("L") && key1.equals("none") && !p.isSneaking()) { // 첫번째가 없고 좌클릭이 시작일때
 //			ClassAbility.Combination.getinstance().Checkclass(PlayerManager.getinstance(p).CurrentClass, p, "L");
 //			keybind = "none";
 //			return;
@@ -187,21 +272,6 @@ public class PlayerCombination {
 //			keycooldown = 0;
 //
 //		}
-
-		if(keycooldown>0) { //0이상이면 증가
-			keycooldown++;						
-		}
-		
-		if(keycooldown>30 || keycooldown==0) { // 30이상이면 키 초기화
-			key1 = "none";
-			key2 = "none";
-			keymessage = "                     ";
-			keycooldown = 0;
-		}
-
-		keybind = "none";
-		
-		
 
 
 	}

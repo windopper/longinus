@@ -30,6 +30,8 @@ public class Damage {
 		
 		if(taker instanceof Player) {
 			Player user = (Player) taker;
+			taker.setMaximumNoDamageTicks(10);
+			taker.setNoDamageTicks(0);
 			user.damage(0.001);
 			//플레이어 체력 & 쉴드 객체 가져오기
 			PlayerHealthShield PH = PlayerHealthShield.getinstance(user);
@@ -61,7 +63,7 @@ public class Damage {
 				}
 			}
 
-			taker.setLastDamageCause(new EntityDamageEvent(damager, EntityDamageEvent.DamageCause.ENTITY_ATTACK ,0.1));
+			taker.setLastDamageCause(new EntityDamageEvent(damager, EntityDamageEvent.DamageCause.ENTITY_ATTACK ,0.001));
 			taker.setMaximumNoDamageTicks(1);
 			taker.setNoDamageTicks(0);
 			taker.damage(0.0001);

@@ -1,19 +1,21 @@
-package CustomEvents;
+package PlayerManager;
 
 import ClassAbility.Aether.Aether;
 import ClassAbility.entitycheck;
+import CustomEvents.PlayerClassChangeEvent;
+import CustomEvents.PlayerDeathEvent;
+import CustomEvents.PlayerTakeDamageEvent;
 import Duel.DuelManager;
 import EntityPlayerManager.EntityPlayerManager;
 import EntityPlayerManager.EntityPlayerWatcher;
 import Mob.EntityManager;
-import PlayerManager.PlayerFunction;
-import PlayerManager.PlayerHealthShield;
-import PlayerManager.PlayerManager;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 
 public class PlayerCustomEventListener implements Listener {
@@ -108,17 +110,48 @@ public class PlayerCustomEventListener implements Listener {
                 double r = Math.random() * 0.05 + 0.05;
                 PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
             }
-            else if(cause == EntityDamageEvent.DamageCause.FIRE) {
-                double r = Math.random() * 0.05 + 0.02;
-                PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
-            }
+//            else if(cause == EntityDamageEvent.DamageCause.FIRE) {
+//                double r = Math.random() * 0.05 + 0.02;
+//                PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
+//            }
             else if(cause == EntityDamageEvent.DamageCause.FIRE_TICK) {
                 double r = Math.random() * 0.03 + 0.02;
                 PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
             }
-
         }
+    }
 
+//    @EventHandler
+//    public void PlayerEnvironmentsBlockDamageEvent(EntityDamageByBlockEvent event) {
+//        if(event.getEntity() instanceof Player) {
+//            Player player = (Player) event.getEntity();
+//            EntityDamageEvent.DamageCause cause = event.getCause();
+//
+//            double r = Math.random() * 0.03 + 0.02;
+//            PlayerHealthShield.getinstance(player).setDamage((int) (r * PlayerManager.getinstance(player).Health));
+//        }
+//    }
+
+
+    // 듀얼시 화살 통과 못하게 일반 상태에서는 화살 통과 가능
+    @EventHandler
+    public void PlayerHitByArrow(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        Entity entity = event.getEntity();
+        if(damager instanceof Arrow && entity instanceof Player) {
+            Arrow arrow = (Arrow) damager;
+            Entity shooter = (Entity) arrow.getShooter();
+            if(shooter instanceof Player) {
+                if(entitycheck.duelcheck((Player) entity, (Player) shooter)) {
+                    ((Player) entity).setCollidable(true);
+                }
+                else {
+                    ((Player) entity).setCollidable(true);
+                    //((Player) entity).setCollidable(false);
+                    event.setCancelled(true);
+                }
+            }
+        }
     }
 
 }

@@ -39,96 +39,98 @@ public class AetherMelee {
         if(PlayerFunction.getinstance(player).getMeleeDelay() != 0) return;
 
         if(MeleeCombo==1) {
-            WeakHorizon();
-            playerFunction.addMeleeCombo();
-            playerFunction.setMeleeDelay(10);
+            if(combo.equals("L")) {
+                WeakHorizon();
+                playerFunction.addMeleeCombo();
+                playerFunction.setMeleeDelay(10);
+            }
+
 
         }
         else if(MeleeCombo==2) {
             if(combo.equals("L")) {
-                WeakStabbing();
-                playerFunction.setMeleeCombo(1);
-
-                playerFunction.setMeleeDelay(10);
-            }
-            else if(combo.equals("SHIFTL")) {
                 WeakHorizon();
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract")
                         , () -> {
-                    WeakVerticalUp();
+                            WeakVerticalUp();
                         }, 5);
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
-
             }
-            else if(combo.equals("R")) {
-                Weak240Horizon();
+            else if(combo.equals("SHIFTL")) {
+                WeakStabbing();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
+
             }
+//            else if(combo.equals("R")) {
+//                Weak240Horizon();
+//                playerFunction.addMeleeCombo();
+//                playerFunction.setMeleeDelay(10);
+//            }
         }
         else if(MeleeCombo==3) {
             if(combo.equals("L")) {
-                StrongStabbing();
-                playerFunction.setMeleeCombo(1);
+                Weak240Horizon();
 
+                playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
             else if(combo.equals("SHIFTL")) {
-                WeakStabbing();
+                StrongStabbing();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("R")) {
-                WeakLeap();
-                Weak240Horizon();
-                playerFunction.addMeleeCombo();
-                playerFunction.setMeleeDelay(10);
-            }
+//            else if(combo.equals("R")) {
+//                WeakLeap();
+//                Weak240Horizon();
+//                playerFunction.addMeleeCombo();
+//                playerFunction.setMeleeDelay(10);
+//            }
         }
         else if(MeleeCombo==4) {
-            if(combo.equals("L")) {
-                WeakStabbing();
+            if(combo.equals("SHIFTL")) {
+                WeakHorizon();
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
-                        this::StrongStabbing, 5);
-                playerFunction.setMeleeCombo(1);
+                        this::StrongStabbing, 3);
+                playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("SHIFTL")) {
+            else if(combo.equals("L")) {
                 WeakVerticalUp();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("R")) {
-                ShowTraj();
-                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
-                    () -> {
-                    Strong240Horizon();
-                    playerFunction.setMeleeCombo(1);
-                    playerFunction.setMeleeDelay(10);
-                    }, 5);
-                playerFunction.setMeleeCombo(1);
-                playerFunction.setMeleeDelay(10);
-
-            }
+//            else if(combo.equals("R")) {
+//                ShowTraj();
+//                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
+//                    () -> {
+//                    Strong240Horizon();
+//                    playerFunction.setMeleeCombo(1);
+//                    playerFunction.setMeleeDelay(10);
+//                    }, 5);
+//                playerFunction.setMeleeCombo(1);
+//                playerFunction.setMeleeDelay(10);
+//
+//            }
         }
         else if(MeleeCombo==5) {
-            if(combo.equals("L")) {
+            if(combo.equals("SHIFTL")) {
                 WeakStabbing();
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
-                        this::StrongStabbing, 3);
+                        this::StrongStabbing, 2);
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
-                        this::StrongStabbing, 6);
+                        this::StrongStabbing, 4);
                 playerFunction.setMeleeCombo(1);
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("R")) {
+//            else if(combo.equals("R")) {
+//                StrongVerticalDown();
+//                playerFunction.setMeleeCombo(1);
+//                playerFunction.setMeleeDelay(10);
+//            }
+            else if(combo.equals("L")) {
                 StrongVerticalDown();
-                playerFunction.setMeleeCombo(1);
-                playerFunction.setMeleeDelay(10);
-            }
-            else if(combo.equals("SHIFTL")) {
-
                 playerFunction.setMeleeCombo(1);
                 playerFunction.setMeleeDelay(10);
             }

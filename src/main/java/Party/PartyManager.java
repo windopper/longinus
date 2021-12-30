@@ -401,8 +401,7 @@ public class PartyManager {
             if(flying) info |= 0x80;
 
             for(Player player : Bukkit.getOnlinePlayers()) {
-                if(p==player) continue;
-
+                //if(p==player) continue;
                 CraftPlayer EP = (CraftPlayer) p;
 
                 DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
@@ -410,7 +409,7 @@ public class PartyManager {
 
                 PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 
-                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
+                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
             }
 
             if(partyInstance.containsKey(p)) {
@@ -430,20 +429,16 @@ public class PartyManager {
                         CraftPlayer EP = (CraftPlayer) p;
 
                         DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
-                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) (0x40 | info));
-
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), info |= 0x40);
                         PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
 
-                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
                     } else {
                         CraftPlayer EP = (CraftPlayer) p;
-
                         DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
-                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) info);
-
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), info);
                         PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
-
-                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, false));
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
                     }
                 }
             }

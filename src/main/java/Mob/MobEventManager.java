@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,6 +27,8 @@ public class MobEventManager implements Listener {
         Entity Damager = event.getDamager();
         Entity Taker = event.getEntity();
         event.setDamage(0.1);
+
+        if(!EntityManager.checkinstance(Damager)) return;
 
         MobListManager.MobList mobList = EntityManager.getinstance(Damager).getMobList();
 
@@ -88,10 +91,16 @@ public class MobEventManager implements Listener {
                 if(dist<10) PlayerFunction.getinstance(p).essence++;
             }
         }
+    }
 
-
-
-
-
+    // 엔티티 화살 넉백 제한
+    @EventHandler
+    public void ArrotHit(EntityDamageByEntityEvent event) {
+        Entity damager = event.getDamager();
+        Entity entity = event.getEntity();
+        if(damager instanceof Arrow && entity instanceof LivingEntity) {
+            if(!EntityStatusManager.getinstance((LivingEntity) entity).canKnockback())
+                event.setCancelled(true);
+        }
     }
 }

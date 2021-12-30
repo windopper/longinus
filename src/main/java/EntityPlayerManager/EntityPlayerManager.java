@@ -57,6 +57,7 @@ public class EntityPlayerManager {
         entityPlayer.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(),
                 location.getPitch());
         entityPlayer.setInvulnerable(true);
+        entityPlayer.getBukkitEntity().setCollidable(false);
 
         nmsWorld.addEntity(entityPlayer);
 

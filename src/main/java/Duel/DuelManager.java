@@ -6,17 +6,19 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DuelManager {
 
     private final static HashMap<Player, DuelManager> duelInstance = new HashMap<>();
 
-    private Player me;
-    private Player target;
+    private Player me = null;
+    private Player target = null;
     private int second = 0;
     private int requestTime = 0;
     private boolean duelEnableStatus = false;
     private boolean pvpStatus = false;
+    private ConcurrentHashMap<Player, Integer> targetRequest = new ConcurrentHashMap<>();
 
     private DuelManager(Player player) {
         this.me = player;
@@ -74,26 +76,36 @@ public class DuelManager {
 
         DuelManager targetDuelManager = getDuelManager(target);
 
-        if(duelEnableStatus == true) {
+        if(duelEnableStatus) {
             commander.sendMessage("§5>> §3PVP도중에 PVP신청 명령어를 사용할 수 없습니다");
             return;
         }
-        if(targetDuelManager.duelEnableStatus == true) {
+        if(targetDuelManager.duelEnableStatus) {
             commander.sendMessage("§5>> §b"+target.getName()+"§3님은 이미 PVP중입니다");
             return;
         }
 
         // target플레이어가 이미 자신을 PVP상대로 가지고 있으면
-        if(targetDuelManager.target != null) {
-            if(targetDuelManager.target.getName().equals(commander.getName())) {
+//        if(targetDuelManager.target != null) {
+//            if(targetDuelManager.target.getName().equals(commander.getName())) {
+//
+//                this.target = target;
+//                runDuel(commander, target);
+//
+//                return;
+//            }
+//        }
+
+        if(targetDuelManager.target == null) {
+            if(targetDuelManager.targetRequest.containsKey(commander)) {
 
                 this.target = target;
+                targetDuelManager.target = commander;
                 runDuel(commander, target);
 
                 return;
             }
         }
-
 
         target.sendMessage("§5>> §b"+commander.getName()+"§3님이 당신에게 PVP를 신청하였습니다.");
         TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §6여기§3를 클릭하여 수락해 주세요"));
@@ -101,7 +113,8 @@ public class DuelManager {
         target.spigot().sendMessage(component);
         commander.sendMessage("§5>> §b"+target.getName()+"§3님에게 PVP를 신청하였습니다");
 
-        this.target = target;
+        targetRequest.put(target, 0);
+        //this.target = target;
 
     }
 
@@ -128,7 +141,6 @@ public class DuelManager {
             removeDuelManager(loser);
             removeDuelManager(this.target);
         }
-
     }
 
     public static final void duelLoop() {
@@ -139,7 +151,7 @@ public class DuelManager {
             final Player target = duels.target;
             int second = duels.second;
 
-            if(duels.duelEnableStatus == true) {
+            if(duels.duelEnableStatus) {
 
                 if(second == 0) {
                     player.sendMessage("§5>> §ePVP가 10초뒤에 시작됩니다");
@@ -156,22 +168,25 @@ public class DuelManager {
 
                 }
 
-
                 duels.second++;
 
             }
             else {
-                if(duels.requestTime == 600) {
-                    duels.removeDuelManager(player);
+
+                for(Player requests : duels.targetRequest.keySet()) {
+                    if(duels.targetRequest.get(requests) == 600) {
+                        duels.targetRequest.remove(requests);
+                        player.sendMessage("§5>> §b"+requests.getName()+"§3님에게 보낸 PVP신청이 만료되었습니다");
+                        continue;
+                    }
+                    duels.targetRequest.replace(requests, duels.targetRequest.get(requests) + 1);
                 }
-                duels.requestTime++;
+
+//                if(duels.requestTime == 600) {
+//                    duels.removeDuelManager(player);
+//                }
+//                duels.requestTime++;
             }
-
-
         }
-
     }
-
-
-
 }

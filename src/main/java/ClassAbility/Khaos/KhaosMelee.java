@@ -53,13 +53,13 @@ public class KhaosMelee {
                 playerFunction.setMeleeDelay(5);
             }
             if(combo.equals("SHIFTL")) {
-                throwns.remove(player);
-            }
-            if(combo.equals("R")) {
                 ThrowDagger();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(5);
             }
+//            if(combo.equals("R")) {
+//
+//            }
 
 
         }
@@ -70,21 +70,19 @@ public class KhaosMelee {
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("R")) {
-                if(throwns.containsKey(player)) {
-
-                }
-                else ThrowDagger();
-                playerFunction.addMeleeCombo();
-                playerFunction.setMeleeDelay(5);
-            }
+//            else if(combo.equals("R")) {
+//                if(throwns.containsKey(player)) {
+//
+//                }
+//                else ThrowDagger();
+//                playerFunction.addMeleeCombo();
+//                playerFunction.setMeleeDelay(5);
+//            }
             else if(combo.equals("SHIFTL")) {
                 Vertical();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(5);
             }
-
-
         }
         else if(MeleeCombo == 3) {
             if(combo.equals("L")) {
@@ -92,20 +90,19 @@ public class KhaosMelee {
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-            else if(combo.equals("R")) {
-                if(throwns.containsKey(player)) {
-
-                }
-                else ThrowDagger();
-                playerFunction.addMeleeCombo();
-                playerFunction.setMeleeDelay(5);
-            }
+//            else if(combo.equals("R")) {
+//                if(throwns.containsKey(player)) {
+//
+//                }
+//                else ThrowDagger();
+//                playerFunction.addMeleeCombo();
+//                playerFunction.setMeleeDelay(5);
+//            }
             else if(combo.equals("SHIFTL")) {
                 LeapVertical();
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(5);
             }
-
         }
         else if(MeleeCombo == 4) {
 

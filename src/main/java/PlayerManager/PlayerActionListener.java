@@ -35,9 +35,7 @@ public class PlayerActionListener implements Listener {
 			if(e.getAction() == Action.RIGHT_CLICK_AIR || e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				PlayerCombination.getinstance(e.getPlayer()).setKeybind("R");
 				return;
-				
-				
-				
+
 			}
 			if(e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK) {
 

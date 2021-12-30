@@ -357,7 +357,7 @@ public class Classgui {
 	private ItemStack CheironSelectItem(Player p, String classname) {
 		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
 
-		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
+		ItemStack item = new ItemStack(Material.BOW, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName("§6§o§l클래스 : 케이론§l§o§6");
 		meta.setLore(Arrays.asList(

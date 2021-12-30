@@ -57,7 +57,7 @@ public class EntityStatusManager {
     //test
     public void KnockBack(Entity damager, double knockbackvector) {
 
-        if(canKnockback == true) {
+        if(canKnockback) {
             Vector playerdir = damager.getLocation().getDirection();
             playerdir.normalize();
             Vector knockback = playerdir.multiply(knockbackvector);
@@ -73,12 +73,9 @@ public class EntityStatusManager {
 
     @SuppressWarnings("deprecation")
     public void Stun(Entity damager, int tick) {
-
-        if(canStun == true) {
-
-            PotionEffect potion = new PotionEffect(PotionEffectType.SLOW, tick, 100);
+        if(canStun) {
+            PotionEffect potion = new PotionEffect(PotionEffectType.SLOW, tick, 10);
             e.addPotionEffect(potion, true);
-
         }
     }
 

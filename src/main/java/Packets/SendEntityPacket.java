@@ -15,13 +15,13 @@ public class SendEntityPacket {
 
     public static void MaintainOriginOne(Entity target, Player wanttoshow, byte bitmask) {
 
-        Boolean onfire = false;
-        Boolean iscrouching = false;
-        Boolean issprinting = false;
-        Boolean isswimming = false;
-        Boolean isinvisible = false;
-        Boolean hasglowing = false;
-        Boolean isflyingwithelytra = false;
+        boolean onfire = false;
+        boolean iscrouching = false;
+        boolean issprinting = false;
+        boolean isswimming = false;
+        boolean isinvisible = false;
+        boolean hasglowing = false;
+        boolean isflyingwithelytra = false;
 
         if(target instanceof Player) {
             Player ptarget = (Player) target;
