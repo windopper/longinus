@@ -255,6 +255,29 @@ public class PlayParticle {
             center.getWorld().spawnParticle(this.particle, center, 0, vector.getX(), vector.getY(), vector.getZ(), 1, dustOptions);
     }
 
+    public void BowShotVerticalParticle(Location loc, double force, double radius) {
+
+        for(double i = 0; i<Math.PI*2; i+=Math.PI/32) {
+
+            double x = force * Math.cos(i);
+            double y = force * Math.sin(i);
+            double z = -2 * force;
+
+            Vector v = new Vector(x, y, z);
+
+            double xangle = Math.toRadians(90);
+            double xcos = Math.cos(xangle);
+            double xsin = Math.sin(xangle);
+
+            //v = rotateAroundAxisX(v, xcos, xsin);
+            v = transform(v, Math.toRadians(loc.getYaw()), Math.toRadians(loc.getPitch()), 0);
+
+            DirectionalParticle(v, loc);
+
+        }
+
+    }
+
 
     public void InCircle(Player player, Location location, double radius) {
         location.setPitch(0);

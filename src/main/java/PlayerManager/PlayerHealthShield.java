@@ -15,9 +15,9 @@ public class PlayerHealthShield {
 	private int shieldregentime = 8;
 	private int blastershieldregentime = 4;
 	
-	public static HashMap<Player, PlayerHealthShield> instance = new HashMap<>();
+	public static final HashMap<Player, PlayerHealthShield> instance = new HashMap<>();
 	
-	private Player p;
+	private final Player p;
 	
 	private int ShieldRegenerateStop = 0;
 	private int ShieldRegenerateCooldown = 0;
@@ -34,7 +34,6 @@ public class PlayerHealthShield {
 	
 	public static PlayerHealthShield getinstance(Player p) {
 		if(!instance.containsKey(p)) instance.put(p, new PlayerHealthShield(p));
-			
 		return instance.get(p);
 	}
 	
@@ -73,6 +72,9 @@ public class PlayerHealthShield {
 	public void setShieldRegenerateCooldown(int shieldRegenerateCooldown) {
 		ShieldRegenerateCooldown = shieldRegenerateCooldown;
 	}
+	public static void getSize() {
+		Bukkit.broadcastMessage(Integer.toString(instance.size()));
+	}
 
 	public void HealthAdd(int addhealth) {
 
@@ -97,7 +99,7 @@ public class PlayerHealthShield {
 
 	public void setDamage(int damage) {
 
-		p.damage(0.0001);
+		p.damage(0.01d);
 
 		if(getShieldRegenerateStop()==0) //피해 받으면 보호막 재생이 멈춤
 			setShieldRegenerateStop();
@@ -115,7 +117,6 @@ public class PlayerHealthShield {
 			else {
 				setCurrentShield(getCurrentShield()-damage);
 			}
-
 		}
 		// 쉴드가 없을때
 		else {
@@ -135,7 +136,15 @@ public class PlayerHealthShield {
 		
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		double Heart = p.getMaxHealth() * ((double)CurrentHealth/MaxHealth);
-		
+
+
+		if(CurrentShield>0) { // 쉴드
+			p.setAbsorptionAmount((double)CurrentShield/100);
+		}
+		else if(CurrentShield==0) {
+			p.setAbsorptionAmount(0);
+		}
+
 		if(CurrentHealth > MaxHealth) {
 			CurrentHealth = MaxHealth;
 		}
@@ -155,14 +164,6 @@ public class PlayerHealthShield {
 				}
 			}, 0);
 		}
-
-		if(CurrentShield>0) { // 쉴드
-			p.setAbsorptionAmount(CurrentShield/100);
-		}
-		else if(CurrentShield==0) {
-			p.setAbsorptionAmount(0);
-		}
-
 	}
 	
 	public void ShieldRegeneration() {

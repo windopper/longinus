@@ -1,6 +1,7 @@
 package Gliese581cMobs;
 
 import Mob.EntityManager;
+import Mob.EntityStatusManager;
 import Mob.MobListManager;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.level.EntityPlayer;
@@ -49,7 +50,12 @@ public class Parasite extends EntitySilverfish {
         this.setPosition(location.getX(), location.getY(), location.getZ());
 
         EntityManager.getinstance(craftsilverfish, mobList);
+        EntityStatusManager.getinstance(craftsilverfish).setCanKnockback(false);
     }
+
+    //TODO 좀벌레 나오면 가까운 엔티티로 이동
+    // 플레이어를 죽이면 시체 만들고 숙주가 됨
+    //
 
     @Override
     public void initPathfinder() {

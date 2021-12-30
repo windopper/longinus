@@ -1,5 +1,6 @@
 package PacketListener;
 
+import Auction.AuctionNPC;
 import QuestFunctions.QuestNPCManager;
 import Shop.RightClickNPC;
 import io.netty.channel.Channel;
@@ -75,6 +76,13 @@ public class PacketReader {
 				@Override
 				public void run() {
 					Bukkit.getPluginManager().callEvent(new RightClickNPC(player, QuestNPCManager.getQuestNPCID(entityID)));
+				}
+			}, 0);
+
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
+				@Override
+				public void run() {
+					Bukkit.getPluginManager().callEvent(new RightClickNPC(player, (new AuctionNPC()).getNPC(entityID)));
 				}
 			}, 0);
 

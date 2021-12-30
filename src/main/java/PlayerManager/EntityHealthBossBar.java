@@ -101,11 +101,18 @@ public class EntityHealthBossBar {
 
 
 	public void healthBarLoop() {
-		
-		
-		
+
 		if(BossBarCurrentShow != null && BossBarCurrentEntity != null && BossBarShowTime != 0) { // 보스바가 떠 있다면
-			
+
+			// 엔티티 체력이 0 이하면
+			if(BossBarCurrentEntity.getHealth() <=0) {
+				BossBarCurrentShow.removeAll();
+				BossBarCurrentShow = null;
+				BossBarCurrentEntity = null;
+				BossBarShowTime = 0;
+				return;
+			}
+
 			int CurrentHealth = EntityManager.getinstance(BossBarCurrentEntity).getCurrentHealth();
 			int MaxHealth = EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth();
 			
@@ -130,24 +137,16 @@ public class EntityHealthBossBar {
 			else {
 				BossBarCurrentShow.setProgress(0);
 			}
-			
-			
+
 			if(BossBarShowTime>60) { // 3초 지나면
 				BossBarCurrentShow.removeAll();
 				BossBarCurrentShow = null;
 				BossBarCurrentEntity = null;
 				BossBarShowTime = 0;
 			}
-			
-			
 			// 보스바 타이틀 재 설정
 			BossBarShowTime++;
 			
 		}
-			
-
-
-	
 	}
-
 }

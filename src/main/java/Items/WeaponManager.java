@@ -13,6 +13,7 @@ import spellinteracttest.Main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class WeaponManager {
 	
@@ -183,6 +184,7 @@ public class WeaponManager {
 			nbtTagCompound.setIntArray(stats, Registered.get(stats));
 		}
 
+		nbtTagCompound.setString("이름", itemmeta.getDisplayName());
 		nbtTagCompound.setString("데미지", config.getString(IName+"."+"데미지"));
 		nbtTagCompound.setString("클래스제한", config.getString(IName+"."+"클래스제한"));
 		nbtTagCompound.setInt("레벨제한", config.getInt(IName+"."+"레벨제한"));
@@ -190,6 +192,8 @@ public class WeaponManager {
 		nbtTagCompound.setInt("감각강화제한", config.getInt(IName+"."+"감각강화최소"));
 		nbtTagCompound.setInt("외피강화제한", config.getInt(IName+"."+"외피강화최소"));
 		nbtTagCompound.setInt("기동강화제한", config.getInt(IName+"."+"기동강화최소"));
+		nbtTagCompound.setBoolean("교환", true);
+		nbtTagCompound.setString("UUID", UUID.randomUUID().toString());
 
 		// 태그 저장
 		nmsStack.setTag(nbtTagCompound);

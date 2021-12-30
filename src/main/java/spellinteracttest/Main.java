@@ -1,13 +1,11 @@
 package spellinteracttest;
 
+import Auction.AuctionNPC;
 import ClassAbility.Accelerator;
 import ClassAbility.Aether.Aether;
-import ClassAbility.Blaster;
-import ClassAbility.Cheiron.CheironMelee;
+import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox;
-import CustomEvents.PlayerCustomEventListener;
 import Duel.DuelManager;
-import DynamicData.Damage;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
@@ -29,7 +27,6 @@ import PlayerChip.GuiEvent;
 import PlayerChip.UserAlarmManager;
 import PlayerChip.UserChipEvent;
 import PlayerManager.*;
-import QuestClasses.Tutorial;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
@@ -52,12 +49,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -104,13 +102,13 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new EditEventListener(), this);
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Map(), this);
-		getServer().getPluginManager().registerEvents(CheironMelee.getInstance(), this);
+		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
+		getServer().getPluginManager().registerEvents(new Auction.Auction(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
 		saveConfig();
-		
-		
+
 		File cfile = new File(getDataFolder(), "config.yml");
 		if (cfile.length() == 0) {
 			getConfig().options().copyDefaults(true);
@@ -139,6 +137,7 @@ public class Main extends JavaPlugin implements Listener {
 
 			QuestNPCManager.getinstance().addnpctolist();
 			ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
+			(new AuctionNPC()).Register();
 		}, 20);
 
 
@@ -161,6 +160,7 @@ public class Main extends JavaPlugin implements Listener {
 		
 		ShopNPCManager.getinstance().removeNPCPacketallplayer();
 		QuestNPCManager.getinstance().removeNPCPacketallplayer();
+		(new AuctionNPC()).RemoveAll();
 		
 		consol.sendMessage(ChatColor.YELLOW + "Plugin Offline");
 		EntityManager.DeleteAllEntity();
@@ -203,16 +203,16 @@ public class Main extends JavaPlugin implements Listener {
 		e.setCancelled(true);
 	}
 	
-	@EventHandler
-	public void fallingblock(EntityChangeBlockEvent e) {
-		Location loc = e.getBlock().getLocation();
-		Block b = loc.getBlock();
-		
-		if(b.getType() == Material.REDSTONE_ORE) return;
-		
-		loc.getBlock().setType(Material.AIR);
-		e.setCancelled(true);
-	}
+//	@EventHandler
+//	public void fallingblock(EntityChangeBlockEvent e) {
+//		Location loc = e.getBlock().getLocation();
+//		Block b = loc.getBlock();
+//
+//		if(b.getType() == Material.REDSTONE_ORE) return;
+//
+//		loc.getBlock().setType(Material.AIR);
+//		e.setCancelled(true);
+//	}
 	
 	@EventHandler
 	public void PlayerWorldChangeEvent(PlayerChangedWorldEvent e) { // 월드 이동 
@@ -224,6 +224,7 @@ public class Main extends JavaPlugin implements Listener {
 		this.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 			ShopNPCManager.getinstance().addJoinPacket(player);
 			QuestNPCManager.getinstance().addJoinPacket(player);
+			(new AuctionNPC()).Show(player);
 		}, 20);
 
 	}
@@ -250,87 +251,87 @@ public class Main extends JavaPlugin implements Listener {
 		Player player = event.getPlayer();
 	}
 
-	@EventHandler
-	public void hitentity(EntityDamageByEntityEvent e) { // 좌
-		
-		if(e.getDamager() instanceof Arrow && e.getEntity() instanceof LivingEntity) {
-			if(e.getDamager().getCustomName() != null) {
-				String split[] = e.getDamager().getCustomName().split(":");
-				
-				String skillname = split[0];
-				String name = split[1];
-				
-				if(split[1] != null) {
-					
-
-					if(e.getEntity().getCustomName() != null) {
-						
-						if(e.getEntity().getCustomName().equals("샌드백")) {  // 화살로 친에가 샌드백이면
-							for(Player p : Bukkit.getOnlinePlayers()) {
-								if(p.getName().equals(name)) {
-									if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {  // 플레이어가 1이상의 보호막을 가지고 있으면
-										Damage.getinstance().taken(2000, (LivingEntity) p, (LivingEntity) e.getEntity());
-										p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
-										p.playSound(p.getLocation(), "meme.tut6", 5, 1);
-										Tutorial.trainerbothit.put(p, 1);
-									}
-								}
-							}
-						}				
-						else if(e.getEntity().getCustomName().equals("과녁")) {  // 화살로 친에가 과녁이면
-							for(Player p : Bukkit.getOnlinePlayers()) {
-								if(p.getName().equals(name)) {								
-									Tutorial.trainerbothit.put(p, 1);
-								}
-							}
-						}
-					}
-
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						if(p.getName().equals(name)) {
-							
-							if(!Tutorial.examset.containsKey(p)) {
-								
-								if(Tutorial.exambothit.containsKey(p)) {// 튜토리얼 활성화?
-									
-									if(e.getEntity().getCustomName() != null && e.getEntity() instanceof Slime) {  // 슬라임 봇 때릴 때
-										String splitslime[] = e.getEntity().getCustomName().split("m");
-										if(splitslime[1] != null) {
-												
-												int number = Integer.parseInt(splitslime[1]);
-												
-												if(Tutorial.exambothit.get(p)[number-1] == 0) { // 때린 봇의 번혿가 0번이면
-
-													Tutorial.exambothit.get(p)[number-1] = number; // 때린 봇 번호 추가
-													Tutorial.exambothitcount.replace(p, Tutorial.exambothitcount.get(p)+1); // 횟수 추가
-													break; // 번호 넣으면 탈출
-												}						
-											}
-											
-										}
-
-								}
-							}
-										
-							if(skillname.equals("dart")) {
-								int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1);
-								Damage.getinstance().taken(dmg, (LivingEntity) e.getEntity(), p);
-							}
-							else if(skillname.equals("bomb")) {
-								
-								Blaster.getinstance().grenadelauncherbomb(e.getEntity().getLocation(), p);
-			
-							}
-							
-							
-							
-							break;
-						}
-					}	
-				}
-			}
-		}
-	}
+//	@EventHandler
+//	public void hitentity(EntityDamageByEntityEvent e) { // 좌
+//
+//		if(e.getDamager() instanceof Arrow && e.getEntity() instanceof LivingEntity) {
+//			if(e.getDamager().getCustomName() != null) {
+//				String split[] = e.getDamager().getCustomName().split(":");
+//
+//				String skillname = split[0];
+//				String name = split[1];
+//
+//				if(split[1] != null) {
+//
+//
+//					if(e.getEntity().getCustomName() != null) {
+//
+//						if(e.getEntity().getCustomName().equals("샌드백")) {  // 화살로 친에가 샌드백이면
+//							for(Player p : Bukkit.getOnlinePlayers()) {
+//								if(p.getName().equals(name)) {
+//									if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {  // 플레이어가 1이상의 보호막을 가지고 있으면
+//										Damage.getinstance().taken(2000, (LivingEntity) p, (LivingEntity) e.getEntity());
+//										p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
+//										p.playSound(p.getLocation(), "meme.tut6", 5, 1);
+//										Tutorial.trainerbothit.put(p, 1);
+//									}
+//								}
+//							}
+//						}
+//						else if(e.getEntity().getCustomName().equals("과녁")) {  // 화살로 친에가 과녁이면
+//							for(Player p : Bukkit.getOnlinePlayers()) {
+//								if(p.getName().equals(name)) {
+//									Tutorial.trainerbothit.put(p, 1);
+//								}
+//							}
+//						}
+//					}
+//
+//					for(Player p : Bukkit.getOnlinePlayers()) {
+//						if(p.getName().equals(name)) {
+//
+//							if(!Tutorial.examset.containsKey(p)) {
+//
+//								if(Tutorial.exambothit.containsKey(p)) {// 튜토리얼 활성화?
+//
+//									if(e.getEntity().getCustomName() != null && e.getEntity() instanceof Slime) {  // 슬라임 봇 때릴 때
+//										String splitslime[] = e.getEntity().getCustomName().split("m");
+//										if(splitslime[1] != null) {
+//
+//												int number = Integer.parseInt(splitslime[1]);
+//
+//												if(Tutorial.exambothit.get(p)[number-1] == 0) { // 때린 봇의 번혿가 0번이면
+//
+//													Tutorial.exambothit.get(p)[number-1] = number; // 때린 봇 번호 추가
+//													Tutorial.exambothitcount.replace(p, Tutorial.exambothitcount.get(p)+1); // 횟수 추가
+//													break; // 번호 넣으면 탈출
+//												}
+//											}
+//
+//										}
+//
+//								}
+//							}
+//
+//							if(skillname.equals("dart")) {
+//								int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1);
+//								Damage.getinstance().taken(dmg, (LivingEntity) e.getEntity(), p);
+//							}
+//							else if(skillname.equals("bomb")) {
+//
+//								Blaster.getinstance().grenadelauncherbomb(e.getEntity().getLocation(), p);
+//
+//							}
+//
+//
+//
+//							break;
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
 	
 	@EventHandler
 	public void respawn(PlayerRespawnEvent e) {
@@ -485,6 +486,11 @@ public class Main extends JavaPlugin implements Listener {
 			case "blockchange": {
 
 				(new MultiBlockChange()).test(player);
+				break;
+			}
+
+			case "absorp": {
+				player.setAbsorptionAmount(50);
 				break;
 			}
 
@@ -755,8 +761,7 @@ public class Main extends JavaPlugin implements Listener {
 				
 				PlayerManager.updateloop();
 				
-				ShopNPCManager.getinstance().sendHeadRotationPacket();
-				QuestNPCManager.getinstance().sendHeadRotationPacket();
+
 				
 //				for(World world : Bukkit.getWorlds()) {
 //					for(LivingEntity entity : world.getLivingEntities()) {
@@ -774,7 +779,6 @@ public class Main extends JavaPlugin implements Listener {
 				}
 
 				for(Player p: Bukkit.getOnlinePlayers()) {
-
 					PlayerHealthShield.getinstance(p).HealthWatcher();
 					PlayerHealthShield.getinstance(p).ShieldRegeneration();
 					PlayerEnergy.getinstance(p).OverloadCoolDown();
@@ -782,7 +786,6 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerFunction.getinstance(p).PlayerFunctionLoop();
 					EntityHealthBossBar.getinstance(p).healthBarLoop();
 					//PlayerWASDListener.getInstance(p).WASDListener();
-					
 				}
 				
 				PlayerInfoActionBar.actionbar();
@@ -795,12 +798,13 @@ public class Main extends JavaPlugin implements Listener {
 				
 				Packets.loop.packetloop();
 				
-				ArrowCheck.onGround();
+				ArrowCheck.ArrowWatcher();
 
 				MobMechManager.getInstance().RunGliese581cMobMech();
 				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
 				PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
+				Map.updateMap();
 				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
@@ -818,9 +822,13 @@ public class Main extends JavaPlugin implements Listener {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
+
+				ShopNPCManager.getinstance().sendHeadRotationPacket();
+				QuestNPCManager.getinstance().sendHeadRotationPacket();
+				(new AuctionNPC()).HeadRotation();
 				planetDetect.getinstance().detectArea();
 				PartyManager.partyObjectiveLoop();
-				Map.updateMap();
+
 
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
@@ -862,7 +870,7 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
 
-		ClassAbility.Combination.getinstance().removemaps(p);
+		//ClassAbility.Combination.getinstance().removemaps(p);
 
 		PlayerHealthShield.getinstance(p).removeinstance();
 		PlayerEnergy.getinstance(p).removeinstance();
@@ -890,6 +898,7 @@ public class Main extends JavaPlugin implements Listener {
 			//p.setResourcePack("https://www.dropbox.com/s/yavjepjt7q273mq/%EC%84%9C%EB%B2%84%ED%85%8D%EC%8A%A4%EC%B3%90.zip?dl=1");
 			ShopNPCManager.getinstance().addJoinPacket(p);
 			QuestNPCManager.getinstance().addJoinPacket(p);
+			(new AuctionNPC()).Show(p);
 			EntityManager.showEntityPlayerNPC(p);
 		}, 40); // npc 소환
 		
@@ -900,8 +909,13 @@ public class Main extends JavaPlugin implements Listener {
 		
 		PlayerFileManager.getinstance().UserDetailClassCallData(p, PlayerFileManager.getinstance().getPreviousClass(p));
 
-
 		Aether.getinstance().PassiveEffect();
+	}
+
+	public void ServerJoinToDo2(Player p) {
+//		CraftPlayer cp = ((CraftPlayer) p).getHandle();
+//		NBTTagCompound nbtTagCompound = cp.getMetadata()
+//		cp.setMetadata("hi", new Metadata);
 	}
 
 

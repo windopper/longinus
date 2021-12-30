@@ -51,6 +51,7 @@ public class EntityManager {
 		CurrentHealth = 1000;
 		MaxHealth = 1000;
 		Height = e.getHeight();
+
 	}
 
 	private EntityManager(@Nonnull Entity e, int maxhealth, String CustomName, HashMap<Entity, Location> disguises) {
@@ -308,7 +309,7 @@ public class EntityManager {
 	public HashMap<Player, Integer> getContribute() { return contribute; }
 	
 	@SuppressWarnings("deprecation")
-	public void EntityWatcher() {
+	public synchronized void EntityWatcher() {
 		
 		if(!(e instanceof Player) && (e instanceof LivingEntity) && !(e instanceof ArmorStand)) {
 
@@ -373,7 +374,6 @@ public class EntityManager {
 				if(e instanceof LivingEntity)
 					EntityStatusManager.getinstance((LivingEntity) e).removeinstance();
 				removeinstance();
-
 				return;
 			}
 
@@ -599,7 +599,6 @@ public class EntityManager {
 			if(getinstance(lE).isDisguiseEntityPlayer()) {
 				Player dP = getinstance(lE).getDisguiseEntityPlayer();
 				EntityPlayer eP = ((CraftPlayer) dP).getHandle();
-
 				EntityPlayerManager.getInstance().showTo(eP, player);
 			}
 		}
@@ -607,7 +606,7 @@ public class EntityManager {
 
 	public static void DeleteAllEntity() {
 		for(Entity lE : instance.keySet()) {
-			instance.get(lE).setCurrentHealth(-1);
+			instance.get(lE).setCurrentHealth(0);
 		}
 	}
 

@@ -70,7 +70,6 @@ public class ShopNPCManager {
 		NPC.add(npc);
 		
 		//addNPCPacket(npc);
-		
 	}
 	
 	public void addNPCPacket(EntityPlayer npc) {
