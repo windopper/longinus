@@ -1,10 +1,4 @@
-package PlayerChip;
-
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+package PlayerManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,16 +6,22 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-public class UserAlarmManager {
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+public class PlayerAlarmManager {
 	
-	private static UserAlarmManager Alarmfile;
+	private static PlayerAlarmManager Alarmfile;
 	
-	private UserAlarmManager() {
+	private PlayerAlarmManager() {
 		
 	}
 	
-	public static UserAlarmManager instance() {
-		if(Alarmfile == null) Alarmfile = new UserAlarmManager();
+	public static PlayerAlarmManager instance() {
+		if(Alarmfile == null) Alarmfile = new PlayerAlarmManager();
 		return Alarmfile;
 	}
 	

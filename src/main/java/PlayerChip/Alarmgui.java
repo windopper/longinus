@@ -3,6 +3,7 @@ package PlayerChip;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import PlayerManager.PlayerAlarmManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -41,13 +42,13 @@ public class Alarmgui {
 		
 		Inventory gui = Bukkit.createInventory(null, 54, "Alarm");
 		
-		int limit = UserAlarmManager.instance().getalarmamount(p);
+		int limit = PlayerAlarmManager.instance().getalarmamount(p);
 		
 		for(int i=0; i<limit; i++) {
 			gui.setItem(i, AlarmItems(p, i));
 		}
 		
-		if(UserAlarmManager.instance().getalarmamount(p)==0) {
+		if(PlayerAlarmManager.instance().getalarmamount(p)==0) {
 			gui.setItem(22, noalarmindicateitem());
 		}
 		
@@ -66,7 +67,7 @@ public class Alarmgui {
 		
 		ItemStack item = null;
 		
-		String alarmtype = UserAlarmManager.instance().getalarmtype(p, location);
+		String alarmtype = PlayerAlarmManager.instance().getalarmtype(p, location);
 		
 		if(alarmtype.equals("notification")) item = new ItemStack(Material.PAPER, 1);
 		if(alarmtype.equals("alterasend")) item = new ItemStack(Material.REDSTONE_BLOCK, 1);
@@ -76,7 +77,7 @@ public class Alarmgui {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6알림&6"));
 		
-		ArrayList<String> list = UserAlarmManager.instance().getalarmlist(p, location);
+		ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, location);
 		
 		int i = 0;
 		

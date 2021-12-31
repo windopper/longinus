@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="spellinteracttestV4-1.17.1" target="14" />
+      <module name="spellinteracttestV4-1.17.1" target="16" />
     </bytecodeTargetLevel>
   </component>
 </project>
