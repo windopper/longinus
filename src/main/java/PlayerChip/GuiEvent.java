@@ -3,10 +3,10 @@ package PlayerChip;
 import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
 import Party.PartyManager;
-import ReturnToBase.ReturnMech;
 import PlayerManager.PlayerFileManager;
 import PlayerManager.PlayerManager;
 import PlayerManager.PlayerStatManager;
+import ReturnToBase.ReturnMech;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -22,6 +22,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import spellinteracttest.Main;
+import PlayerManager.PlayerAlarmManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -191,7 +192,7 @@ public class GuiEvent implements Listener {
 			
 			
 			try {	
-				int currentgold = PlayerFileManager.getinstance().getGold(player);
+				long currentgold = PlayerFileManager.getinstance().getGold(player);
 				int content = Integer.parseInt(e.getMessage());
 				
 				if(currentgold < content) {
@@ -201,6 +202,7 @@ public class GuiEvent implements Listener {
 				}
 				else if(content <= 0) {
 					player.sendMessage("§c잘못된 형식입니다");
+					GoldAllowReadingChatAmount.remove(player);
 				}
 				else {
 					
@@ -211,6 +213,7 @@ public class GuiEvent implements Listener {
 			}
 			catch(NumberFormatException i) {
 				player.sendMessage("§c잘못된 형식입니다");
+				GoldAllowReadingChatAmount.remove(player);
 			}
 			
 			e.setCancelled(true);
@@ -253,12 +256,12 @@ public class GuiEvent implements Listener {
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(action == InventoryAction.PICKUP_HALF) {
-			UserAlarmManager.instance().removeallalarms(p);
+			PlayerAlarmManager.instance().removeallalarms(p);
 			Alarmgui.getinstance().AlarmGuiOpen(p);
 			
 		}
 		else if(action == InventoryAction.PICKUP_ALL) {
-			UserAlarmManager.instance().removeoldonealarm(p);
+			PlayerAlarmManager.instance().removeoldonealarm(p);
 			Alarmgui.getinstance().AlarmGuiOpen(p);
 		}
 		
@@ -540,7 +543,7 @@ public class GuiEvent implements Listener {
 	
 	public void GoldSetPlayerAmount(Player sender, Player receiver) {
 		
-		int gold = PlayerFileManager.getinstance().getGold(sender);
+		long gold = PlayerFileManager.getinstance().getGold(sender);
 		sender.sendMessage("§6"+receiver.getName()+"님에게 보낼 알테라를 입력해주세요. 현재 알테라 "+gold);
 		GoldAllowReadingChatAmount.put(sender, receiver);
 		
@@ -548,15 +551,15 @@ public class GuiEvent implements Listener {
 	}
 	
 	public void GoldSendPlayertoPlayer(Player sender, Player receiver, int gold) {
-		
-		int sendergold = PlayerFileManager.getinstance().getGold(sender);
+
+		long sendergold = PlayerFileManager.getinstance().getGold(sender);
 		PlayerFileManager.getinstance().setGold(sender, sendergold - gold);
-		
-		int receivergold = PlayerFileManager.getinstance().getGold(receiver);
+
+		long receivergold = PlayerFileManager.getinstance().getGold(receiver);
 		PlayerFileManager.getinstance().setGold(receiver, receivergold + gold);
 		
-		UserAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
-		UserAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
+		PlayerAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
+		PlayerAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
 		
 		sender.sendMessage("§a"+receiver.getName()+"님에게 성공적으로 §6"+gold+" §a알테라를 보냈습니다");
 		receiver.sendMessage("§a"+sender.getName()+"님으로 부터 §6"+gold+" §a알테라를 받았습니다");

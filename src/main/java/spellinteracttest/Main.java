@@ -24,7 +24,7 @@ import PlanetSelect.planetSelectEvent;
 import PlayParticle.PlayParticle;
 import PlayerChip.Goldgui;
 import PlayerChip.GuiEvent;
-import PlayerChip.UserAlarmManager;
+import PlayerManager.PlayerAlarmManager;
 import PlayerChip.UserChipEvent;
 import PlayerManager.*;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
@@ -42,8 +42,9 @@ import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.network.syncher.DataWatcherRegistry;
 import net.minecraft.server.network.PlayerConnection;
-import org.bukkit.*;
-import org.bukkit.block.Block;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -55,7 +56,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -671,7 +671,7 @@ public class Main extends JavaPlugin implements Listener {
 
 				args[1].replace("_", " ");
 
-				UserAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
+				PlayerAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
 				break;
 			}
 
@@ -786,6 +786,7 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerFunction.getinstance(p).PlayerFunctionLoop();
 					EntityHealthBossBar.getinstance(p).healthBarLoop();
 					//PlayerWASDListener.getInstance(p).WASDListener();
+					//(new Auction.Auction()).MarketUpdate(p);
 				}
 				
 				PlayerInfoActionBar.actionbar();
@@ -905,7 +906,7 @@ public class Main extends JavaPlugin implements Listener {
 		PacketReader reader = new PacketReader(p);
 		reader.inject(p); // npc 우클릭 감지 등록
 		
-		PlayerChip.UserAlarmManager.instance().register(p); // 유저 알람 파일 등록
+		PlayerAlarmManager.instance().register(p); // 유저 알람 파일 등록
 		
 		PlayerFileManager.getinstance().UserDetailClassCallData(p, PlayerFileManager.getinstance().getPreviousClass(p));
 

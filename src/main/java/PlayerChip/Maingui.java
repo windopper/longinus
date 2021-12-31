@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import PlayerManager.PlayerAlarmManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -180,13 +181,13 @@ public class Maingui {
 		ItemMeta alarmmeta = alarm.getItemMeta();
 		alarmmeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6유저 알림&6"));
 		
-		int amount = UserAlarmManager.instance().getalarmamount(p);
+		int amount = PlayerAlarmManager.instance().getalarmamount(p);
 		
 		if(amount ==0)
 			alarmmeta.setLore(Arrays.asList("§7알람이 없습니다§7"));
 		else if(amount ==1) {
 
-			ArrayList<String> list = UserAlarmManager.instance().getalarmlist(p, 0);
+			ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, 0);
 			
 			int i = 0;
 			
@@ -200,7 +201,7 @@ public class Maingui {
 		}
 			
 		else {
-			ArrayList<String> list = UserAlarmManager.instance().getalarmlist(p, 0);
+			ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, 0);
 			
 			int i = 0;
 			
@@ -249,7 +250,7 @@ public class Maingui {
 	
 	public ItemStack alteraitem(Player p) {
 		
-		int gold = PlayerFileManager.getinstance().getGold(p);
+		long gold = PlayerFileManager.getinstance().getGold(p);
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_BLOCK, 1);
 		ItemMeta meta = item.getItemMeta();

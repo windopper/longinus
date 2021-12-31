@@ -87,7 +87,7 @@ public class PlayerFileManager {
 		return config.getInt(classaddress+".lvl");
 	}
 	
-	public int getGold(Player p) {
+	public long getGold(Player p) {
 		
 		String uuid = p.getUniqueId().toString();
 		String address = "Gold";
@@ -95,10 +95,20 @@ public class PlayerFileManager {
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
-		return config.getInt(address);
+		return config.getLong(address);
+	}
+
+	public long getGold(String UUID) {
+
+		String address = "Gold";
+
+		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), UUID+".yml");
+		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+		return config.getLong(address);
 	}
 	
-	public boolean setGold(Player p, int amount) {
+	public synchronized boolean setGold(Player p, long amount) {
 		
 		String uuid = p.getUniqueId().toString();
 		String address = "Gold";
@@ -117,6 +127,26 @@ public class PlayerFileManager {
 		return true;
 		
 	}
+
+	public synchronized boolean setGold(String UUID, long amount) {
+
+		String address = "Gold";
+
+		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), UUID+".yml");
+		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+		config.set(address, amount);
+		try {
+			config.save(file);
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+
+
 	
 	public void addStorage(Player p) {
 		
