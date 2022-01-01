@@ -1,5 +1,6 @@
 package spellinteracttest;
 
+import Auction.Auction;
 import Auction.AuctionNPC;
 import ClassAbility.Accelerator;
 import ClassAbility.Aether.Aether;
@@ -24,7 +25,6 @@ import PlanetSelect.planetSelectEvent;
 import PlayParticle.PlayParticle;
 import PlayerChip.Goldgui;
 import PlayerChip.GuiEvent;
-import PlayerManager.PlayerAlarmManager;
 import PlayerChip.UserChipEvent;
 import PlayerManager.*;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
@@ -48,6 +48,8 @@ import org.bukkit.Particle;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Entity;
@@ -103,7 +105,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Map(), this);
 		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
-		getServer().getPluginManager().registerEvents(new Auction.Auction(), this);
+		getServer().getPluginManager().registerEvents(new Auction(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -139,8 +141,6 @@ public class Main extends JavaPlugin implements Listener {
 			ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
 			(new AuctionNPC()).Register();
 		}, 20);
-
-
 
 	}
 	
@@ -483,19 +483,17 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
-			case "blockchange": {
-
-				(new MultiBlockChange()).test(player);
-				break;
-			}
-
-			case "absorp": {
-				player.setAbsorptionAmount(50);
-				break;
-			}
-
-			case "smoothblockchange":{
-				(new MultiBlockChange()).SmoothMultiBlockChange(player);
+			case "itemmarket": {
+				File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "config.yml");
+				FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+				for(int i=0; i<500; i++) {
+					for(String s_ : config.getConfigurationSection("").getKeys(false)) {
+						WeaponManager data = new WeaponManager(s_);
+						if(data.checkname(s_))	{
+							Auction.MarketRegister(player, data.getitem(), (int) (Math.random() * 2000), 1);
+						}
+					}
+				}
 				break;
 			}
 
@@ -628,7 +626,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "getgold":{
-				PlayerFileManager.getinstance().setGold(player, Integer.parseInt(args[1]));
+				PlayerFileManager.getinstance().setGold(player, Long.parseLong(args[1]));
 				break;
 			}
 
@@ -831,6 +829,7 @@ public class Main extends JavaPlugin implements Listener {
 				PartyManager.partyObjectiveLoop();
 
 
+
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 5);
 
@@ -909,6 +908,7 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerAlarmManager.instance().register(p); // 유저 알람 파일 등록
 		
 		PlayerFileManager.getinstance().UserDetailClassCallData(p, PlayerFileManager.getinstance().getPreviousClass(p));
+		(new Auction()).noticeYourItemsWereSoldWhenJoin(p);
 
 		Aether.getinstance().PassiveEffect();
 	}

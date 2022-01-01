@@ -19,7 +19,9 @@ import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Cheiron implements Listener {
 
@@ -48,7 +50,8 @@ public class Cheiron implements Listener {
 
     private enum ENUM {
         LL(4, "§o§l방어태세§l§o §3§l-⚡§l"),
-        LR(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
+        LR(8, "§o§l전격 화살§l§o §3§l-⚡§l"),
+        FL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
 
         private int mana;
         private String title;
@@ -191,8 +194,19 @@ public class Cheiron implements Listener {
                 }
             }
         }
+    }
 
+    public void TrackingArrow() {
 
+        Location loc = player.getEyeLocation();
+        Set<Arrow> arrowSet = new HashSet<>();
 
+        for(int i=0; i<10; i++) {
+            Arrow arrow = player.getWorld().spawnArrow(loc, new Vector(0, 0, 0), 0, 0);
+            arrow.setShooter(player);
+            arrow.setGlowing(true);
+            arrow.setInvulnerable(true);
+            arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+        }
     }
 }
