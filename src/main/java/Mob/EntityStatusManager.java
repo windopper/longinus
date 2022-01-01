@@ -1,0 +1,119 @@
+package Mob;
+
+import org.bukkit.Particle;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
+
+import java.util.HashMap;
+
+public class EntityStatusManager {
+
+    private static final HashMap<LivingEntity, EntityStatusManager> instance = new HashMap<>();
+
+    private LivingEntity e;
+
+    private boolean canStun = true;
+    private boolean canKnockback = true;
+
+    private int burnstick = 0;
+    private int burnsdmg = 0;
+
+    private EntityStatusManager(LivingEntity e) {
+        this.e = e;
+    }
+
+    public static EntityStatusManager getinstance(LivingEntity e) {
+        if(!instance.containsKey(e)) instance.put(e, new EntityStatusManager(e));
+        return instance.get(e);
+    }
+
+    public void removeinstance() {
+        instance.remove(e);
+    }
+
+    public boolean canStun() {
+        return canStun;
+    }
+    public boolean canKnockback() {
+        return canKnockback;
+    }
+
+    public void setBurnsdmg(int burnsdmg) {
+        this.burnsdmg = burnsdmg;
+    }
+    public void setBurnstick(int burnstick) {
+        this.burnstick = burnstick;
+    }
+    public void setCanKnockback(boolean canKnockback) {
+        this.canKnockback = canKnockback;
+    }
+    public void setCanStun(boolean canStun) {
+        this.canStun = canStun;
+    }
+
+    //test
+    public void KnockBack(Entity damager, double knockbackvector) {
+
+        if(canKnockback) {
+            Vector playerdir = damager.getLocation().getDirection();
+            playerdir.normalize();
+            Vector knockback = playerdir.multiply(knockbackvector);
+            e.setVelocity(knockback);
+        }
+    }
+
+    public void KnockBack(Vector knockbackvector) {
+        if(canKnockback) {
+            e.setVelocity(knockbackvector);
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public void Stun(Entity damager, int tick) {
+        if(canStun) {
+            PotionEffect potion = new PotionEffect(PotionEffectType.SLOW, tick, 10);
+            e.addPotionEffect(potion, true);
+        }
+    }
+
+    public void burns(Entity p , int tick, int dmg) {
+
+        if(burnstick == 0) {
+            burnstick = tick;
+            burnsdmg = dmg;
+        }
+        else {
+            burnstick = tick;
+            if(burnsdmg<dmg) {
+                burnsdmg = dmg;
+            }
+        }
+    }
+
+
+    public void BurnsLoop()	{
+
+        if(burnstick == 0) return;
+
+        burnstick--;
+
+        if(burnstick % 20 == 0) {
+            e.getWorld().spawnParticle(Particle.FALLING_LAVA, e.getLocation(), 20, 0.5, 0.5, 0.5, 1, null);
+            //Damage.getinstance().taken(burnsdmg, e);
+        }
+
+        if(burnstick <=0) {
+            burnsdmg = 0;
+            burnstick = 0;
+        }
+
+
+    }
+
+
+
+
+}

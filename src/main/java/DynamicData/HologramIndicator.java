@@ -1,7 +1,5 @@
 package DynamicData;
 
-import java.util.Random;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -9,6 +7,8 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.Random;
 
 public class HologramIndicator {
 	
@@ -26,17 +26,11 @@ public class HologramIndicator {
 	
 	
 	public void DamageIndicator(final int r, final LivingEntity e) { // 데미지 뜨게 하기
-		
-				
-
-		
 
 		new BukkitRunnable() {
-
 			int time = 0;
 			ArmorStand as;
-			
-			
+
 			@Override
 			public void run() {
 				
@@ -58,33 +52,24 @@ public class HologramIndicator {
 					as.setCollidable(false);
 					as.setGravity(false);
 					as.setSmall(true);
+					as.setMarker(true);
 					as.setInvulnerable(true);
 					as.setCustomNameVisible(true);
 					
 				}
-				
-				
 					if(time > 20) {
-						
 						as.remove();
 						cancel();
 						return;
-						
 					}
 					
 				time++;
 
-				
-				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
 	
 	public void ShieldBroken(final LivingEntity e) { // 데미지 뜨게 하기
-		
-				
-
-		
 
 		new BukkitRunnable() {
 
@@ -116,6 +101,7 @@ public class HologramIndicator {
 					as.setVisible(false);
 					as.setGravity(false);
 					as.setSmall(true);
+					as.setMarker(true);
 					as.setInvulnerable(true);
 					as.setCustomNameVisible(true);
 					
@@ -141,11 +127,8 @@ public class HologramIndicator {
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
-	
-	
 
-	
-	public void HealIndicator(final int r, final Player p) {
+	public void HealIndicator(final int r, final Location loc) {
 		
 		new BukkitRunnable() {
 
@@ -157,8 +140,7 @@ public class HologramIndicator {
 			public void run() {
 				
 				if(time == 0) {
-					
-					Location loc = p.getLocation();
+
 					Random random = new Random();
 					double x = random.nextDouble() *2;
 					double y = random.nextDouble() *2;
@@ -178,9 +160,6 @@ public class HologramIndicator {
 					as.setCustomNameVisible(true);
 					
 				}
-				
-					
-
 					
 					if(time > 20) {
 						

@@ -1,29 +1,20 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.ShulkerBullet;
+import DynamicData.Damage;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
+import Mob.*;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Phlox {
 
@@ -94,7 +85,7 @@ public class Phlox {
 					target = e;
 					meleehit = 1;
 					
-					int dmg = UserManager.getinstance(p).meleedmgcalculate(p, 1);
+					int dmg = PlayerManager.getinstance(p).meleedmgcalculate(p, 1);
 					Damage.getinstance().taken(dmg, e, p);
 							
 					
@@ -137,7 +128,7 @@ public class Phlox {
 	public void heal(final Player p, final int mana) {
 		
 		
-		PlayerEnergy.getinstance(p).removeEnergy(mana);	
+		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		nanorobotoverload(healrobot, 80, p);
 		
 		for(Player pl : Bukkit.getOnlinePlayers()) {
@@ -155,7 +146,7 @@ public class Phlox {
 					pl.spawnParticle(Particle.HEART, head, 1, 0, 0, 0, 0, null);
 				}
 				
-				PlayerHealth.getinstance(p).HealthAdd(UserManager.getinstance(p).Health/20);
+				PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health/20);
 				p.getWorld().playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 1, 1);
 				if(i==3) cancel();
 				i++;
@@ -197,7 +188,7 @@ public class Phlox {
 								}
 								
 								
-								PlayerHealth.getinstance(pl).HealthAdd(UserManager.getinstance(pl).Health/20);
+								PlayerHealthShield.getinstance(pl).HealthAdd(PlayerManager.getinstance(pl).Health/20);
 								
 								if(i==3) cancel();
 								i++;
@@ -246,7 +237,11 @@ public class Phlox {
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
 		for(Entity e : p.getWorld().getNearbyEntities(ploc, 3, 3, 3)) {
-		
+
+			if(e instanceof LivingEntity) {
+				if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == false) continue;
+			}
+
 			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && e != p) {
 				
 				Location eloc = e.getLocation();	
@@ -297,8 +292,8 @@ public class Phlox {
 		
 		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5)) {
 			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p) && e != p) {
-				int dmg = UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
-				EntityStatus.getinstance((LivingEntity)e).Stun(p, 30);
+				int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
+				EntityStatusManager.getinstance((LivingEntity)e).Stun(p, 30);
 				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 			}
 		}
@@ -344,7 +339,7 @@ public class Phlox {
 	public void PhloxPassive() {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			if(UserManager.getinstance(p).CurrentClass.equals("플록스")) {
+			if(PlayerManager.getinstance(p).CurrentClass.equals("플록스")) {
 				if(PlayerFunction.getinstance(p).PHNanoRobot == -1) PlayerFunction.getinstance(p).PHNanoRobot = 100;
 			}
 			else {
@@ -644,11 +639,6 @@ public class Phlox {
 				}
 				if(i==0) target[0] = ploc;
 				if(i==4) target[1] = ploc;
-				
-				
-				
-				
-				
 				//	로봇 위치
 				
 				Location loc = me.getEyeLocation();
@@ -703,10 +693,10 @@ public class Phlox {
 							double edist = eloc.distance(loc);
 							
 							
-							if(edist<2 && ebox.contains(loc.getX(), loc.getY(), loc.getZ()) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
+							if((edist<2 || ebox.contains(loc.getX(), loc.getY(), loc.getZ())) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
 								laserhit.put(e, 0);
 								me.playSound(me.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = UserManager.getinstance(me).spelldmgcalculate(me, 1.5);
+								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 1.5);
 								Damage.getinstance().taken(dmg, e, me);
 							}
 						}
@@ -768,7 +758,7 @@ public class Phlox {
 							if(dist<2 && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !bombhit.containsKey(e)) {
 								bombhit.put(e, 0);
 								me.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = UserManager.getinstance(me).spelldmgcalculate(me, 3);
+								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 3);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, me);
 							}
 							
@@ -867,6 +857,41 @@ public class Phlox {
 	        particleLoc.setZ(location.getZ() + Math.sin(d) * size);
 	        location.getWorld().spawnParticle(Particle.REDSTONE, particleLoc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.WHITE, 2));
 	    }
+	}
+
+	private void FRSkill(Player player) {
+
+		Location targetloc = null;
+
+		Location loc = player.getEyeLocation();
+		Vector dir = loc.getDirection().normalize().multiply(0.4);
+
+
+		// location settings
+		for(int i=0; i<40; i++) {
+			for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+				if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player)) {
+					Location eloc = entity.getLocation();
+					BoundingBox box = entity.getBoundingBox();
+					if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+						targetloc = entity.getLocation();
+						break;
+					}
+				}
+			}
+			if(targetloc != null) break;
+			if(loc.getBlock().getType().isSolid()) {
+				targetloc = loc;
+				break;
+			}
+			if(i==39) targetloc = loc;
+			loc.add(dir);
+		}
+
+
+
+
+
 	}
 
 }	

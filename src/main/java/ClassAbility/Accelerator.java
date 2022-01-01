@@ -21,10 +21,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import DynamicData.Damage;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 
 public class Accelerator {
 	
@@ -301,7 +301,7 @@ public class Accelerator {
 							}
 							
 							
-							int dmg = UserManager.getinstance(p).spelldmgcalculate(p, 0.5);
+							int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.5);
 							p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2);
 							Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 							
@@ -318,7 +318,7 @@ public class Accelerator {
 	}
 	public void particleacceleration(final Player p, int mana) {
 		
-		int Health = UserManager.getinstance(p).Health;
+		int Health = PlayerManager.getinstance(p).Health;
 		
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		
@@ -328,11 +328,11 @@ public class Accelerator {
 		
 		PlayerFunction.getinstance(p).ACPassiveCoolDown = 80;
 		
-		if(PlayerHealth.getinstance(p).getCurrentHealth()+(int)(Health/4) > Health) {
-			PlayerHealth.getinstance(p).setCurrentHealth(Health);
+		if(PlayerHealthShield.getinstance(p).getCurrentHealth()+(int)(Health/4) > Health) {
+			PlayerHealthShield.getinstance(p).setCurrentHealth(Health);
 		}
 		else {
-			PlayerHealth.getinstance(p).setCurrentHealth(PlayerHealth.getinstance(p).getCurrentHealth()+(int)(Health/4));
+			PlayerHealthShield.getinstance(p).setCurrentHealth(PlayerHealthShield.getinstance(p).getCurrentHealth()+(int)(Health/4));
 		}
 		p.playSound(p.getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 2, 2);
 	}
@@ -348,7 +348,7 @@ public class Accelerator {
 
 			}
 
-			if(PF.ACPassiveCoolDown == 80 && UserManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
+			if(PF.ACPassiveCoolDown == 80 && PlayerManager.getinstance(p).CurrentClass.equals("엑셀러레이터")) { // 패시브가 터졌고 엑셀러레이터일때
 				PlayerEnergy.getinstance(p).setEnergyRate(2);
 				PotionEffect potion = new PotionEffect(PotionEffectType.SPEED, 2, 2);
 				p.addPotionEffect(potion, true);

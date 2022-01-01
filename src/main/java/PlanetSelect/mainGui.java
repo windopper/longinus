@@ -32,7 +32,7 @@ public class mainGui {
 
     private final ItemStack gliese581c() {
 
-        ItemStack itemStack = getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTRjYmZmYjk3MTIyMzhjOTU2OTc3ZDFiZmRhNGIzMDhlZDQ3N2JhMzEwNmMzMTMwMmMyNDA4NjJlZjc3OWEifX19");
+        ItemStack itemStack = PlanetList.Gliese581c.getPlanet();
         ItemMeta itemMeta = itemStack.getItemMeta();
         itemMeta.setDisplayName("§6>>§e> §l§oGliese581c§r §e<§6<<");
         itemMeta.setLore(Arrays.asList("§7-----------------------------",
@@ -47,7 +47,7 @@ public class mainGui {
     }
 
     private final ItemStack getSkull(String skinURL) {
-        ItemStack head = new ItemStack(Material.LEGACY_SKULL_ITEM, 1, (short)3);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
         if(skinURL.isEmpty())return head;
 
 

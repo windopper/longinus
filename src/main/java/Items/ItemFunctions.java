@@ -22,4 +22,15 @@ public class ItemFunctions {
         return itemStack;
     }
 
+    public List<String> setGrayLore(List<String> strings) {
+
+        int count = 0;
+        for(String s : strings) {
+            strings.set(count, "§8§o"+s);
+            count++;
+        }
+
+        return strings;
+    }
+
 }

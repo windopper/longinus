@@ -2,21 +2,26 @@ package QuestClasses;
 
 import Items.ItemFunctions;
 import Items.ItemManager;
-import QuestFunctions.QuestList;
 import QuestFunctions.QuestFunctions;
+import QuestFunctions.QuestList;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
+import PlayerManager.PlayerStatManager;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.entity.EnumItemSlot;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import UserData.UserStatManager;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -90,7 +95,7 @@ public class FirstMission {
         // When Progress is 0
         if(QuestStep == 0 && NPCname.equals("데이즈")) {
 
-            if(QuestList.valueOf(Questname).getLevelReq() > UserStatManager.getinstance(p).getlvl()) {
+            if(QuestList.valueOf(Questname).getLevelReq() > PlayerStatManager.getinstance(p).getlvl()) {
                 p.sendMessage("레벨부족");
             }
             else {
@@ -109,7 +114,7 @@ public class FirstMission {
                         itemFunctions.setQuestItem(itemStack);
 
                         // Swing Main hand
-                        PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
+                        PlayerConnection conn = ((CraftPlayer)p).getHandle().b;
                         PacketPlayOutAnimation packet_2 = new PacketPlayOutAnimation(NPC, 0);
                         conn.sendPacket(packet_2);
 
@@ -161,9 +166,13 @@ public class FirstMission {
                 // 종자 아이템 아르안에게 전달하기
                 if(detailStep == 1) {
 
-                    PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
-                    Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.MAINHAND,
-                            net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.BEETROOT_SEEDS, 1)));
+
+                    ItemStack stack = new ItemStack(Material.BEETROOT_SEEDS, 1);
+                    CraftItemStack cis = CraftItemStack.asCraftCopy(stack);
+
+                    PlayerConnection conn = ((CraftPlayer)p).getHandle().b;
+                    Pair<EnumItemSlot, net.minecraft.world.item.ItemStack> pair =
+                            new Pair<>(EnumItemSlot.a, CraftItemStack.asNMSCopy(cis));
 
                     PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment(NPC.getId(), Arrays.asList(pair));
                     PacketPlayOutAnimation packet_2 = new PacketPlayOutAnimation(NPC, 0);
@@ -173,7 +182,7 @@ public class FirstMission {
 
                     ItemManager.getinstance().removeItemFromPlayer("데이즈의 종자", p);
 
-                    NPC.setSlot(EnumItemSlot.MAINHAND, net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.BEETROOT_SEEDS, 1)));
+                    NPC.setSlot(EnumItemSlot.a, CraftItemStack.asNMSCopy(cis));
                     NPC.updateEquipment();
 
                 }
@@ -181,9 +190,12 @@ public class FirstMission {
                 return;
             }
 
-            PlayerConnection conn = ((CraftPlayer)p).getHandle().playerConnection;
-            Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.server.v1_16_R3.ItemStack>(EnumItemSlot.MAINHAND,
-                    net.minecraft.server.v1_16_R3.ItemStack.fromBukkitCopy(new ItemStack(Material.AIR, 1)));
+            ItemStack air = new ItemStack(Material.AIR, 1);
+            CraftItemStack craftair = CraftItemStack.asCraftCopy(air);
+
+            PlayerConnection conn = ((CraftPlayer)p).getHandle().b;
+            Pair<EnumItemSlot, net.minecraft.world.item.ItemStack> pair = new Pair<EnumItemSlot, net.minecraft.world.item.ItemStack>(EnumItemSlot.a,
+                    CraftItemStack.asNMSCopy(craftair));
             PacketPlayOutEntityEquipment packet = new PacketPlayOutEntityEquipment(NPC.getId(), Arrays.asList(pair));
 
             conn.sendPacket(packet);

@@ -2,7 +2,7 @@ package QuestFunctions;
 
 import QuestClasses.FirstMission;
 import QuestClasses.TestQuest;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 

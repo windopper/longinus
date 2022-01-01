@@ -1,10 +1,11 @@
 package QuestFunctions;
 
-import Mob.RightClickNPC;
+import Shop.RightClickNPC;
 import QuestClasses.FirstMission;
+import PlayerManager.PlayerManager;
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_16_R3.EntityArmorStand;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.world.entity.decoration.EntityArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -12,10 +13,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import UserData.UserManager;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 
 public class UserQuestManager implements EventsInterface, Listener {
@@ -55,9 +58,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 		if(ClickDelay.contains(player)) return;
 		ClickDelay.add(player);
 
-		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			ClickDelay.remove(player);
-		}, 15);
+		Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> ClickDelay.remove(player), 15);
 
 		QuestFunctions QNF = new QuestFunctions(player);
 		QuestNPCManager QNM = QuestNPCManager.getinstance();
@@ -79,7 +80,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -106,7 +107,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 	public void SetQuestNextStep(String questname, Player p) {
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -132,7 +133,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2 ,1);
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -150,7 +151,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 
 	public int getQuestStep(String questname, Player p) {
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -162,7 +163,7 @@ public class UserQuestManager implements EventsInterface, Listener {
 	public void QuestReset(Player p) {
 
 		String uuid = p.getUniqueId().toString();
-		String Class = UserManager.getinstance(p).CurrentClass+"/"+UserManager.getinstance(p).CurrentClassNumber;
+		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);

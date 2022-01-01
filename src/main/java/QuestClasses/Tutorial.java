@@ -1,16 +1,8 @@
 package QuestClasses;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
+import Mob.EntityStatusManager;
+import org.bukkit.*;
 import org.bukkit.Particle.DustOptions;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -22,7 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 
-import DynamicData.EntityStatus;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class Tutorial {
 	
@@ -160,8 +155,8 @@ public class Tutorial {
 						if(ploc.distance(jump5)<=1.5 || ploc.distance(jump4)<=1.5) {
 							p.teleport(weapon);
 							p.sendMessage("§e시험 진행 A.I:§e §f두 번째 테스트를 시작하겠습니다. 지급받은 무기로 앞에 보이는 적을 공격하십시오.§f");
-							Items.WeaponManager data = new Items.WeaponManager();
-							p.getInventory().addItem(data.getitem("검"));	
+							Items.WeaponManager data = new Items.WeaponManager("검");
+							p.getInventory().addItem(data.getitem());
 							p.stopSound("meme.tut4");
 							p.playSound(p.getLocation(),"meme.tut5", 50, 1);
 						}
@@ -439,7 +434,7 @@ public class Tutorial {
 //		
 //		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatus.getinstance(slime).setCanKnockback(false);
+		EntityStatusManager.getinstance(slime).setCanKnockback(false);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}

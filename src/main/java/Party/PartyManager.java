@@ -1,24 +1,27 @@
 package Party;
 
-import DynamicData.PlayerHealth;
-import UserData.UserManager;
-import UserData.UserStatManager;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import net.minecraft.server.network.PlayerConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
-import org.bukkit.scoreboard.Scoreboard;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class PartyManager {
+
+    public int XPLoop = 0;
 
     private static PartyManager PartyManager;
 
@@ -37,16 +40,24 @@ public class PartyManager {
     private List<Player> members = new ArrayList<>();
     private boolean glowingDelay = false;
 
+    private final String XPAlarmReady = "§d파티 경험치 집계중..";
+    private String XPAlarm = "";
+    private int PartyXP = 0;
+
     private PartyManager() {
 
     }
 
     private PartyManager(Player player) {
+
+        //init Partymanager
         this.master = player;
         members.add(player);
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         player.setScoreboard(scoreboard);
 
+        objective.getScore(" ").setScore(1);
+        objective.getScore(XPAlarm).setScore(2);
         team.setColor(ChatColor.GREEN);
     }
 
@@ -62,6 +73,10 @@ public class PartyManager {
     public static PartyManager getinstance() {
         if(PartyManager == null) PartyManager = new PartyManager();
         return PartyManager;
+    }
+
+    public void addPartyXP(int partyXP) {
+        this.PartyXP += partyXP;
     }
 
     public void removeinstance(Player player) {
@@ -154,7 +169,7 @@ public class PartyManager {
             target.sendMessage("§5>> §6"+commander.getName()+"§e님이 당신을 파티로 초대하였습니다");
             TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §b§n여기§r§e를 클릭하여 수락하거나 §b§n/파티 참가§r§e 명령어를 입력하세요"));
             component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/파티 참가"));
-            target.sendMessage(component);
+            target.spigot().sendMessage(component);
 
         }
 
@@ -165,7 +180,7 @@ public class PartyManager {
             target.sendMessage("§5>> §6"+commander.getName()+"§e님이 당신을 파티로 초대하였습니다");
             TextComponent component = new TextComponent(TextComponent.fromLegacyText("§5>> §b§n여기§r§e를 클릭하여 수락하거나 §b§n/파티 참가§r§e 명령어를 입력하세요"));
             component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/파티 참가"));
-            target.sendMessage(component);
+            target.spigot().sendMessage(component);
         }
 
     }
@@ -211,6 +226,7 @@ public class PartyManager {
                 deleteSideBar(player);
                 PM.team.removeEntry(player.getName());
                 partyInstance.remove(player);
+
                 SendMessageToMembers(PM, "§5>> §6"+player.getName()+"§e님이 파티에서 떠났습니다");
                 player.sendMessage("§5>> §e당신은 파티에서 떠났습니다");
                 return;
@@ -221,6 +237,7 @@ public class PartyManager {
             PM.team.removeEntry(player.getName());
             ChangeMaster(player, PM.members.get(0));
             partyInstance.remove(player);
+
             SendMessageToMembers(PM, "§5>> §6"+player.getName()+"§e님이 파티에서 떠났습니다");
             player.sendMessage("§5>> §e당신은 파티에서 떠났습니다");
 
@@ -327,7 +344,7 @@ public class PartyManager {
         }
     }
 
-    public void partyObjectiveLoop() {
+    public static void partyObjectiveLoop() {
 
         for(Player p : Bukkit.getOnlinePlayers()) {
 
@@ -338,36 +355,92 @@ public class PartyManager {
                 objectiveString.put(p, getObjectiveString(p));
                 partyManager.objective.getScore(getObjectiveString(p)).setScore(0);
 
+
+                if(partyManager.PartyXP == 0 && partyManager.XPLoop == 0) {
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarm);
+                    partyManager.objective.getScore(partyManager.XPAlarmReady).setScore(2);
+                }
+                else if(partyManager.XPLoop == 0) {
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarm);
+                    partyManager.scoreboard.resetScores(partyManager.XPAlarmReady);
+                    partyManager.XPAlarm = "§b +EXP "+partyManager.PartyXP;
+                    partyManager.objective.getScore(partyManager.XPAlarm).setScore(2);
+                    partyManager.XPLoop = 1;
+                    partyManager.PartyXP = 0;
+                }
+
                 if(!partyManager.team.hasEntry(p.getName())) {
                     partyManager.team.addEntry(p.getName());
                 }
 
+                if(partyManager.XPLoop <= 4 && partyManager.XPLoop >=1) partyManager.XPLoop++;
+                else partyManager.XPLoop = 0;
+
             }
             objectiveString.put(p, getObjectiveString(p));
         }
+
+
+
     }
 
     public void partyGlowingLoop() {
         for(Player p : Bukkit.getOnlinePlayers()) {
+
+            byte info = 0x00;
+            boolean sneaking = p.isSneaking();
+            boolean sprinting = p.isSprinting();
+            boolean swimming = p.isSwimming();
+            boolean invisible = p.isInvisible();
+            boolean flying = p.isGliding();
+
+            if(sneaking) info |= 0x02;
+            if(sprinting) info |= 0x08;
+            if(swimming) info |= 0x10;
+            if(invisible) info |= 0x20;
+            if(flying) info |= 0x80;
+
+            for(Player player : Bukkit.getOnlinePlayers()) {
+                //if(p==player) continue;
+                CraftPlayer EP = (CraftPlayer) p;
+
+                DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) info);
+
+                PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+
+                connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+            }
 
             if(partyInstance.containsKey(p)) {
 
                 PartyManager partyManager = partyInstance.get(p);
 
 
-                if(partyManager.glowingDelay == true) {
+                if (partyManager.glowingDelay == true) {
                     continue;
                 }
 
-                for(Player member : partyManager.members) {
-                    CraftPlayer EP = (CraftPlayer) p;
-                    DataWatcher dataWatcher = ((CraftPlayer) member).getHandle().getDataWatcher();
-                    dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), (byte) 0x40);
-                    PlayerConnection connection = ((CraftPlayer) member).getHandle().playerConnection;
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (p == player) continue;
 
-                    connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                    if (partyManager.members.contains(player)) {
+
+                        CraftPlayer EP = (CraftPlayer) p;
+
+                        DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), info |= 0x40);
+                        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                    } else {
+                        CraftPlayer EP = (CraftPlayer) p;
+                        DataWatcher dataWatcher = EP.getHandle().getDataWatcher();
+                        dataWatcher.set(new DataWatcherObject<>(0, DataWatcherRegistry.a), info);
+                        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+                        connection.sendPacket(new PacketPlayOutEntityMetadata(EP.getEntityId(), dataWatcher, true));
+                    }
                 }
-
             }
         }
 
@@ -383,16 +456,16 @@ public class PartyManager {
         }
     }
 
-    private String getObjectiveString(Player player) {
+    private static String getObjectiveString(Player player) {
 
-        int MaxHealth = UserManager.getinstance(player).Health;
-        int CurrentHealth = PlayerHealth.getinstance(player).getCurrentHealth();
-        int CurrentShield = PlayerHealth.getinstance(player).getCurrentShield();
+        int MaxHealth = PlayerManager.getinstance(player).Health;
+        int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
+        int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
 
         String Shield = "§5§l[🛡]";
         if(CurrentShield == 0) Shield = "§8§l[🛡]";
 
-        String health = "§6[|"+CurrentHealth+"|]";
+        String health = "[|"+CurrentHealth+"|]";
         List<Character> arrlist = new ArrayList<>();
         char[] arr = health.toCharArray();
         for(int i=0; i<arr.length; i++) {
@@ -400,11 +473,10 @@ public class PartyManager {
         }
         double rate = (double) CurrentHealth / (double) MaxHealth;
         int index = (int)(arr.length * rate);
-        if(index<=1) index = 2;
         arrlist.add(index, '7');
         arrlist.add(index, '§');
 
-        String objectiveString = "";
+        String objectiveString = "§6";
 
         for(char ch : arrlist) {
             objectiveString += ch;

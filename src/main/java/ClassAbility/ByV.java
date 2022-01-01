@@ -1,40 +1,28 @@
 package ClassAbility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftGuardian;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.Guardian;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import DynamicData.Damage;
+import Mob.EntityStatusManager;
+import PlayParticle.PlayParticle;
+import PlayerManager.PlayerEnergy;
+import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerHealthShield;
+import PlayerManager.PlayerManager;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
-import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import DynamicData.PlayerEnergy;
-import DynamicData.PlayerFunction;
-import DynamicData.PlayerHealth;
-import net.minecraft.server.v1_16_R3.DataWatcher;
-import net.minecraft.server.v1_16_R3.DataWatcherRegistry;
-import net.minecraft.server.v1_16_R3.EntityLiving;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityMetadata;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import static PlayParticle.Rotate.*;
 
 public class ByV {
 	
@@ -46,8 +34,8 @@ public class ByV {
 	public static final int punchmana = 4;
 	public static final int shockwavemana = 8;
 	
-	public final static HashMap<FallingBlock, Integer> fallingblocks = new HashMap<>();
-	public final static List<Player> whiletakedown = new ArrayList<>();
+	//public final static HashMap<FallingBlock, Integer> fallingblocks = new HashMap<>();
+	//private final static List<Player> whiletakedown = new ArrayList<>();
 	
 	private ByV() {
 		
@@ -58,23 +46,21 @@ public class ByV {
 		return ByV;
 	}
 	
-	public void removemaps(Player p) {
-		whiletakedown.remove(p);
-	}
-	
 	public void melee(final Player p) {
 
 		SpellManager Spell = new SpellManager(p, 0.2);
 		Spell.addDepartSound(Sound.BLOCK_STONE_BREAK, 1, 1);
-		Spell.addTrailParticle(Particle.SMOKE_NORMAL, 4, 0.2, 0.2, 0.2, 0, null);
+		Spell.addDepartSound(Sound.ENTITY_IRON_GOLEM_HURT, 1, 2);
 		Spell.setMaximumRange(2);
 		Spell.setEntityPassable(true);
-		Spell.setHitBoxRange(1.5);
+		Spell.setHitBoxRange(2.5);
 		Spell.setDamageRate(1);
 		Spell.setKnockBack(p, 0.5);
 		Spell.RunRayCast(SpellManager.MeleeOrSpell.Melee);
 		
 		PlayerFunction.getinstance(p).setMeleeDelay(20);
+
+		MeleeParticle(p);
 
 		
 	}
@@ -82,16 +68,47 @@ public class ByV {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence --;
 		
-		PlayerHealth.getinstance(p).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
+		PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health /10);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(p.getWorld().getName().equals(player.getWorld().getName())) {
 				if(!entitycheck.duelcheck(player, p) && player != p) {
-					PlayerHealth.getinstance(player).HealthAdd(PlayerHealth.getinstance(p).getCurrentHealth()/10);
+					PlayerHealthShield.getinstance(player).HealthAdd(PlayerManager.getinstance(p).Health/10);
 				}
 			}
 		}
-		
+
+		final Location location = p.getLocation();
+
+		new BukkitRunnable() {
+
+			double size = 0;
+			double k = 0;
+
+			@Override
+			public void run() {
+
+				for (int d = 0; d <= 45; d += 1) {
+					Location particleLoc = new Location(location.getWorld(), location.getX(), location.getY(), location.getZ());
+					particleLoc.add(0, 0.5, 0);
+					particleLoc.setX(location.getX() + Math.cos(d) * size);
+					particleLoc.setZ(location.getZ() + Math.sin(d) * size);
+					location.getWorld().spawnParticle(Particle.CRIT_MAGIC, particleLoc, 1, 0, 0, 0, 0, null);
+
+					particleLoc = p.getLocation();
+					particleLoc.setX(p.getLocation().getX() + Math.cos(d) * 1);
+					particleLoc.setY(p.getLocation().getY() + k/100);
+					particleLoc.setZ(p.getLocation().getZ() + Math.sin(d) * 1);
+					location.getWorld().spawnParticle(Particle.GLOW, particleLoc, 1, 0, 0, 0, 0);
+				}
+
+
+
+				k+=15;
+				size += 0.5;
+				if(size >= 5) cancel();
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 		
 	}
 	public void takedown(final Player p, int mana) {
@@ -99,8 +116,8 @@ public class ByV {
 		PlayerFunction.getinstance(p).essence--;
 		p.setVelocity(new Vector(0, 1.5, 0));
 		
-		if(!whiletakedown.contains(p)) {
-			whiletakedown.add(p);
+		if(!PlayerFunction.getinstance(p).takedown) {
+			PlayerFunction.getinstance(p).takedown=true;
 			new BukkitRunnable() {
 				
 				int i = 0;
@@ -132,11 +149,13 @@ public class ByV {
 					if(i>20 && p.isOnGround()) {
 						
 						p.setFallDistance(3);
-						
+
+						DataWatcher dataWatcher = ((CraftPlayer) p).getHandle().getDataWatcher();
+						dataWatcher.set(new DataWatcherObject<>(8, DataWatcherRegistry.a), (byte) 0x00);
+
 						Location ploc = p.getLocation();
 						p.getWorld().playSound(ploc, Sound.BLOCK_GRASS_BREAK, 2, 1);
 						p.getWorld().playSound(ploc, Sound.ENTITY_IRON_GOLEM_DEATH, 2, 2);
-						
 						
 						for(Entity e : p.getWorld().getNearbyEntities(ploc, 5, 5, 5)) {
 							if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
@@ -146,12 +165,12 @@ public class ByV {
 								Vector etop = evec.subtract(pvec);
 								etop.normalize();
 								etop.multiply(1);
-								if(EntityStatus.getinstance((LivingEntity)e).canKnockback() == true) {
+								if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == true) {
 									
 									e.setVelocity(etop);
 								}
 
-								int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 1.5);
+								int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
 								Damage.getinstance().taken(dmg, (LivingEntity) e, p);
 								
 								p.getWorld().playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
@@ -160,9 +179,12 @@ public class ByV {
 						}
 						
 						takedownparticles(p);
+						PlayParticle playParticle = new PlayParticle(Particle.CRIT);
+						playParticle.CircleVerticalImpact1(p);
+						playParticle.CirCleHorizontalImpact1(p);
 						//riptideoffpacket(p);
 						
-						whiletakedown.remove(p);
+						PlayerFunction.getinstance(p).takedown=false;
 						cancel();
 					}
 					i++;
@@ -228,10 +250,10 @@ public class ByV {
 					double dist = eloc.distance(ploc);
 					if(dist<1.2 || box.contains(ploc.getX(), ploc.getY(), ploc.getZ())) {
 						p.playSound(ploc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
+
 						chainparticle(p, i, e);
 						chainvectorzerocc(e);
-						
-						int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+						int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.75);
 						
 						Damage.getinstance().taken(dmg, e, p);
 						PlayerFunction.getinstance(p).essence++;
@@ -251,24 +273,12 @@ public class ByV {
 	public void punch(final Player p, int mana) {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence--;
-
 		Location ploc = p.getEyeLocation();
-		Vector pvec = ploc.getDirection();
-		pvec.normalize();
-		pvec.multiply(2);
-		ploc.add(pvec);
-		
 		p.getWorld().playSound(ploc, Sound.ENTITY_WITHER_SHOOT, 1.5f, 1f);
 		p.getWorld().playSound(ploc, Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
 
-		SpellManager Spell = new SpellManager(p);
-		Spell.setHitBoxRange(3);
-		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 1.5f, 0);
-		Spell.setDamageRate(1.5);
-		Spell.setKnockBack(p, 2);
-		Spell.RunRadiusRange(SpellManager.MeleeOrSpell.Spell, ploc);
-
-		punchparticle(p, ploc);
+		RFSkill(p);
+		//punchparticle(p, ploc);
 
 	}
 	public void shockwave(final Player p, int mana) {
@@ -299,16 +309,6 @@ public class ByV {
 			e.setVelocity(new Vector(0, 1, 0));
 		}
 		
-//		for(Entity e : p.getWorld().getNearbyEntities(p.getLocation(), 3, 3, 3)) {
-//			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, p)) {
-//				p.getLocation().getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 2, 0);
-//				p.playSound(p.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-//				int dmg = userdata.UserManager.getinstance(p).spelldmgcalculate(p, rate);
-//				Damage.getinstance().taken(dmg, (LivingEntity) e, p);
-//				e.setVelocity(new Vector(0, 1, 0));
-//			}
-//		}
-		
 	    for (int d = 0; d <= 45; d += 1) {
 	        Location particleLoc = new Location(p.getLocation().getWorld(), p.getLocation().getX(), p.getLocation().getY(), p.getLocation().getZ());
 	        particleLoc.setX(p.getLocation().getX() + Math.cos(d) * 3);
@@ -320,21 +320,6 @@ public class ByV {
 		
 		
 	}
-	
-//	public void ByVPassive() {
-//
-//		for(Player p : Bukkit.getOnlinePlayers()) {
-//
-//			if(userdata.UserManager.getinstance(p).CurrentClass.equals("바이V")) {
-//				if(!essence.containsKey(p)) essence.put(p, 0);
-//			}
-//			else {
-//				essence.remove(p);
-//			}
-//
-//		}
-//
-//	}
 	
 	public void takedownparticles(Player p) {
 		
@@ -383,40 +368,13 @@ public class ByV {
 	
 	
 	public void riptidepacket(Player player, int tick) {
-		
-		
-		EntityLiving entity = ((CraftPlayer) player).getHandle();
-		entity.r(tick);
-		
-	}
-	
-	public void laserpacket(Player player, Player target) {
-		
-		Guardian g = (Guardian) player.getWorld().spawnEntity(player.getLocation(), EntityType.GUARDIAN);
-		g.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 2000, 100), true);
-		
-		new BukkitRunnable() {
-			
-			int i=0;
-			
-			@Override
-			public void run() {
-				DataWatcher dw = ((CraftGuardian) g).getHandle().getDataWatcher();
-				dw.set(DataWatcherRegistry.b.a(16), target.getEntityId());
-				for(Player p : Bukkit.getOnlinePlayers()) {
-					PlayerConnection conn = ((CraftPlayer) p).getHandle().playerConnection;
-					conn.sendPacket(new PacketPlayOutEntityMetadata(g.getEntityId(), dw, true));
-				}
-				
-				if(i>60) cancel();
-				i++;
-				
-			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-		
+
+		DataWatcher dataWatcher = ((CraftPlayer) player).getHandle().getDataWatcher();
+		dataWatcher.set(new DataWatcherObject<>(8, DataWatcherRegistry.a), (byte) 0x04);
 
 		
 	}
+
 	
 	public void punchparticle(final Player p, Location cloc) {
 		
@@ -468,20 +426,14 @@ public class ByV {
 		e.setInvulnerable(true);
 		e.setInvisible(true);
 		e.setGravity(false);
-		
-		
-		
-		
+
 		new BukkitRunnable() {
 
 			int j=0;
 			
 			@Override
 			public void run() {
-				
-				
-				
-				
+
 				Location ploc = e.getEyeLocation();
 				Vector pvec = ploc.getDirection();
 				pvec.normalize();	
@@ -491,13 +443,10 @@ public class ByV {
 				if(j<5) { // 파티클
 					
 					for(int i=0; i<=k; i++) {
-						
 						chainpiece1(ploc, pvecclone, i%18, j+1);
 						ploc.add(pvec);
-						
 					}
-				}	
-				
+				}
 				if(j>6) {
 					
 					p.getWorld().playSound(ploc, Sound.ENTITY_WITHER_DEATH, 1f, 2f);
@@ -517,11 +466,8 @@ public class ByV {
 								
 					}
 					
-					
 					 // 끌고 오기
-					
-					if(EntityStatus.getinstance(target).canKnockback() == false) {
-
+					if(EntityStatusManager.getinstance(target).canKnockback() == false) {
 
 						new BukkitRunnable() {
 
@@ -537,7 +483,7 @@ public class ByV {
 
 								ppee.multiply(1.5);
 
-								target.setVelocity(ppee);
+								p.setVelocity(ppee);
 
 								if(p.getWorld().getName().equals(target.getWorld().getName())) {
 									if(p.getLocation().distance(target.getLocation())<3) {
@@ -545,7 +491,6 @@ public class ByV {
 										cancel();
 									}
 								}
-
 								if(i>60) cancel();
 								i++;
 							}
@@ -558,7 +503,7 @@ public class ByV {
 						new BukkitRunnable() {
 							
 							int i=0;
-							
+
 							@Override
 							public void run() {
 								
@@ -660,7 +605,7 @@ public class ByV {
 				BoundingBox box = e.getBoundingBox();
 				double dist = eloc.distance(loc);
 				if(dist<2 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-					int dmg = UserData.UserManager.getinstance(p).spelldmgcalculate(p, 0.75);
+					int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 0.75);
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 20));
 					Damage.getinstance().taken(dmg, e, p);
 					return true;
@@ -672,7 +617,7 @@ public class ByV {
 	
 	public void chainvectorzerocc(Entity e) {
 		
-		if(EntityStatus.getinstance((LivingEntity)e).canKnockback() == false) return;
+		if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == false) return;
 		
 		new BukkitRunnable() {
 			
@@ -686,6 +631,166 @@ public class ByV {
 				if(i>18) cancel();
 				i++;
 				
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+	}
+
+	public void MeleeParticle(Player player) {
+
+		Location location = player.getEyeLocation();
+		Vector vec = location.getDirection().normalize().multiply(0.7);
+		Vector vec2 = location.getDirection().normalize().multiply(3.5);
+		location.add(vec2);
+		int Max = 7;
+
+		new BukkitRunnable() {
+			int t = 3;
+			@Override
+			public void run() {
+
+				for(int i=3; i<=t; i++) {
+					location.subtract(vec);
+				}
+
+				if(t > Max)
+					MeleeCircleCritParticle(player, location, (double)t/5, true);
+				MeleeCircleCritParticle(player, location, (double)t/5, false);
+
+
+				for(int i=3; i<=t; i++) {
+					location.add(vec);
+				}
+
+				if(t>Max) cancel();
+				t++;
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+	}
+
+	private void MeleeCircleCritParticle(Player player, Location location, double radius, boolean smoke) {
+		//location.setPitch(0);
+		double yaw = Math.toRadians(player.getLocation().getYaw());
+		double pitch = Math.toRadians(player.getLocation().getPitch());
+		Vector vec = location.getDirection().normalize();
+		double x = 0;
+		double y =0;
+		double z = 0;
+
+		for(int i=0; i<40; i++) {
+			double angle = 2 * Math.PI * i / 50;
+			Vector offset = vec.clone().multiply(Math.cos(angle) * radius);
+			offset.setY(Math.sin(angle) * radius);
+
+			double yangle = Math.toRadians(90);
+			double cosx = Math.cos(yangle);
+			double sinx = Math.sin(yangle);
+
+			offset = rotateAroundAxisY(offset, cosx, sinx);
+
+
+			z = 0;
+			y = radius * Math.cos(Math.PI / 20 * i);
+			x = radius * Math.sin(Math.PI / 20 * i);
+			Vector v = new Vector(x, y, z);
+			v = transform(v, yaw, pitch, 0);
+
+
+			location.add(v);
+			if(smoke) {
+				player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, location, 1, 0, 0, 0, 0);
+			}
+			else
+				player.getWorld().spawnParticle(Particle.CRIT, location, 1, 0, 0, 0, 0);
+
+			// play particle at yourLocation
+			location.subtract(v);
+		}
+	}
+
+	private void RFSkill(Player p) {
+
+		final List<Entity> Hit = new ArrayList<>();
+
+		PlayParticle playParticle = new PlayParticle(Particle.CRIT);
+		playParticle.CirCleHorizontalSmallImpact(p.getLocation().add(0, 0.3, 0));
+
+		new BukkitRunnable() {
+
+			Location loc = p.getEyeLocation();
+
+			double pitch = p.getLocation().getPitch();
+			double yaw = p.getLocation().getYaw();
+
+
+			double rpitch = Math.toRadians(pitch);
+			double ryaw = Math.toRadians(yaw);
+
+			double rroll = Math.toRadians(15);
+			double rroll2 = Math.toRadians(-15);
+
+			double yaxisangle = 160;
+			int colortrans = 0;
+
+			double k =1;
+			int time = 0;
+
+			@Override
+			public void run() {
+
+				for(int i=0; i<9; i++) {
+
+					for(double j=0; j<k; j+=0.5) {
+
+						for(double y=-0.5; y<=0.5; y+=0.3) {
+
+							double x = 0;
+							double z = 1 + j;
+
+							double yangle = Math.toRadians(yaxisangle);
+							double yaxiscos = Math.cos(-yangle);
+							double yaxissin = Math.sin(-yangle);
+
+							Vector v = new Vector(x, y, z);
+							v = rotateAroundAxisY(v, yaxiscos, yaxissin);
+							v = transform(v, ryaw, rpitch, 0);
+
+							loc.add(v);
+							if(j+2>k) {
+								p.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,
+										new Particle.DustOptions(Color.fromRGB(85+colortrans, 37+colortrans, 134+colortrans), 1));
+
+							}
+							if(j+0.5>k) {
+								p.getWorld().spawnParticle(Particle.CLOUD, loc, 1, 0, 0, 0, 0);
+							}
+
+							p.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+
+							for(LivingEntity entity : p.getWorld().getLivingEntities()) {
+								if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, p) && !Hit.contains(entity)) {
+									Location eloc = entity.getLocation();
+									BoundingBox box = entity.getBoundingBox();
+									if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+										int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1.5);
+										Damage.getinstance().taken(dmg, entity, p);
+										v.normalize().multiply(1);
+										EntityStatusManager.getinstance(entity).KnockBack(v);
+										Hit.add(entity);
+									}
+								}
+							}
+
+							loc.subtract(v);
+
+						}
+					}
+
+					yaxisangle -= 10;
+					colortrans += 2;
+					k+=0.1;
+				}
+				if(time>1) cancel();
+				time++;
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}

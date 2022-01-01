@@ -1,14 +1,18 @@
 package ClassAbility;
 
 import DynamicData.Damage;
-import DynamicData.EntityStatus;
-import org.bukkit.*;
+import Mob.EntityStatusManager;
+import PlayerManager.PlayerManager;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import UserData.UserManager;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +54,10 @@ public class SpellManager {
     private final List<Double> ParticleTrailZ = new ArrayList<>();
     private final List<Double> ParticleTrailSpeed = new ArrayList<>();
     private final List<Object> ParticleTrailDustOptions = new ArrayList<>();
+
+    private Method trailMethod;
+    private Object instance;
+
 
     private final List<Particle> ParticleDest = new ArrayList<>();
     private final List<Integer> ParticleDestAmount = new ArrayList<>();
@@ -189,6 +197,12 @@ public class SpellManager {
         this.ParticleTrailSpeed.add(0d);
         this.ParticleTrailDustOptions.add(null);
     }
+    public void setTrailMethod(Method method) {
+        this.trailMethod = method;
+    }
+    public void setInstance(Object instance) {
+        this.instance = instance;
+    }
 
     public void addDestinationParticle(Particle ParticleDest,
                                        int Amount,
@@ -271,15 +285,15 @@ public class SpellManager {
         for(int i=0; i<MaximumRange / multiply; i++) {
 
             RunParticles(ParticleType.TrailParticle);
+            RunTrailMethod(loc, i);
             
             // 벽 체크
-            if(WallChecker(loc) == true) {
+            if(WallChecker(loc)) {
 
                 RunParticles(ParticleType.DestinationParticle);
                 RunSounds(SoundType.DestinationSound);
                 return true;
             }
-
             // 엔티티 체크
             for (LivingEntity e : player.getWorld().getLivingEntities()) {
 
@@ -298,13 +312,13 @@ public class SpellManager {
                             RunSounds(SoundType.DestinationSound);
                         }
                         if(StunTick != 0)
-                            EntityStatus.getinstance(e).Stun(player, StunTick);
+                            EntityStatusManager.getinstance(e).Stun(player, StunTick);
 
                         if(BurnTick != 0)
-                            EntityStatus.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
+                            EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
                         if(KnockBackStandard != null)
-                            EntityStatus.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
+                            EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
                         HitEntityList.add(e);
                         Damage.getinstance().taken(dmg, e, player);
@@ -315,8 +329,6 @@ public class SpellManager {
                 if(EntityPassable == false && HitEntityList.size() >= 1) return true;
             }
             loc.add(dir);
-
-
 
         }
 
@@ -349,13 +361,13 @@ public class SpellManager {
                     RunSounds(SoundType.DestinationSound, CurrentLoc);
 
                     if(StunTick != 0)
-                        EntityStatus.getinstance(e).Stun(player, StunTick);
+                        EntityStatusManager.getinstance(e).Stun(player, StunTick);
 
                     if(KnockBackStandard != null)
-                        EntityStatus.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
+                        EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
                     if(BurnTick != 0)
-                        EntityStatus.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
+                        EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
                     HitEntityList.add(e);
                     Damage.getinstance().taken(dmg, e, player);
@@ -367,6 +379,7 @@ public class SpellManager {
         }
 
         if(HitEntityList.size() >= 1) return true;
+
 
         loc.add(dir);
 
@@ -477,6 +490,16 @@ public class SpellManager {
         }
     }
 
+    public void RunTrailMethod(Location loc, int i) {
+        if(trailMethod == null) return;
+        try {
+            trailMethod.invoke(instance, loc, i);
+        }
+        catch(Exception e) {
+
+        }
+    }
+
     private void RunSounds(SoundType Type) {
         if(Type.equals(SoundType.DepartureSound)) {
             for(Player p : Bukkit.getOnlinePlayers()) {
@@ -511,10 +534,10 @@ public class SpellManager {
         }
     }
 
-    private int getDamage(MeleeOrSpell meleeorspell) {
+    private Integer getDamage(MeleeOrSpell meleeorspell) {
 
-        int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? UserManager.getinstance(player).meleedmgcalculate(player, DamageRate)
-                : UserManager.getinstance(player).spelldmgcalculate(player, DamageRate);
+        int dmg = meleeorspell.equals(MeleeOrSpell.Melee) ? PlayerManager.getinstance(player).meleedmgcalculate(player, DamageRate)
+                : PlayerManager.getinstance(player).spelldmgcalculate(player, DamageRate);
         dmg = (int)(dmg * multiplyDamage);
         dmg += (int)addDamage;
         return dmg;
@@ -522,7 +545,7 @@ public class SpellManager {
 
     public boolean WallChecker(Location loc) {
         // 벽 체크
-        if(WallPassable == false && loc.getBlock().isSolid()) {
+        if(WallPassable == false && !loc.getBlock().isPassable()) {
             return true;
         }
         return false;
