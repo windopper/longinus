@@ -576,8 +576,6 @@ public class KhaosMelee {
             }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"),0, 1);
 //        }, 1);
 
-
-
     }
 
     public void TeleportToDagger() {

@@ -325,8 +325,8 @@ public class Combination {
 				(new KhaosMelee(p)).Melee(combo);
 			}
 		}
-		if(combo.equals("SHIFTR")) {
-			Khaos.getInstance().SHIFTR(p);
+		if(combo.equals("SHIFTR") || combo.equals("RL")) {
+			(new Khaos(p)).Skill(combo);
 		}
 	}
 
