@@ -1,5 +1,7 @@
 package Auction;
 
+import SQL.PlayerAltera;
+import SQL.PlayerMarket;
 import Shop.RightClickNPC;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.nbt.NBTTagCompound;
@@ -37,6 +39,8 @@ public class Auction implements Listener {
     private final static Set<Player> OnSearching = new HashSet<>();
     private final static ConcurrentHashMap<Player, ItemStack> preRegisterItem = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Player, Long> preRegisterAltera = new ConcurrentHashMap<>();
+
+    private final static long saleLimit = 60000;
 
     @EventHandler
     public void NPCRightClicked(RightClickNPC event) {
@@ -241,22 +245,23 @@ public class Auction implements Listener {
 
             Connection con = (new SQL.sqlData()).getConnection();
             Statement statement = con.createStatement();
-            ResultSet set = statement.executeQuery("Select * from longinus.mainmarket");
+            ResultSet set = statement.executeQuery("select * from longinus.mainmarket");
 
             while (set.next()) {
                 long date = set.getLong("milli");
-                long remain = date + 1209600000 - System.currentTimeMillis();
+                long remain = date + saleLimit - System.currentTimeMillis();
                 if(remain<0) {
-                    statement.executeQuery("delete from longinus.mainmarket where uuid = '"+set.getString("uuid")+"'");
-                    //(new SQL.sqlData()).QueryDeleteItemFromMarket(set.getString("uuid"));
+                    //String selleruuid = set.getString("seller");
+                    statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+set.getString("uuid")+"'");
                 }
             }
+
             statement.close();
             set.close();
             con.close();
         }
         catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -318,8 +323,6 @@ public class Auction implements Listener {
                 catch(Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
             else {
             }
@@ -388,8 +391,8 @@ public class Auction implements Listener {
         NBTTagCompound nbtTagCompound = nmsStack.getTag();
         String Iuuid = nbtTagCompound.getString("UUID");
 
-        File UserFile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-        FileConfiguration UserConfig = YamlConfiguration.loadConfiguration(UserFile);
+//        File UserFile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
+//        FileConfiguration UserConfig = YamlConfiguration.loadConfiguration(UserFile);
 
         String pattern = "yyyyMMddHHmmssSSS";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, Locale.KOREA);
@@ -398,18 +401,20 @@ public class Auction implements Listener {
         String path = "mainMarket."+date;
         (new SQL.sqlData()).QueryRegisterMarket(Iuuid, altera, (new SQL.Converter()).encodeItem(itemStack), count, player.getUniqueId().toString());
 
-        path = "mainMarket."+date;
-        UserConfig.set(path+".item", itemStack);
-        UserConfig.set(path+".count", count);
-        UserConfig.set(path+".uuid", Iuuid);
-        UserConfig.set(path+".altera", altera);
-        UserConfig.set(path+".millis", System.currentTimeMillis());
-        try {
-            UserConfig.save(UserFile);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
+        (new SQL.PlayerMarket(player)).registerItem(date, itemStack, count, Iuuid, altera, System.currentTimeMillis());
+
+//        path = "mainMarket."+date;
+//        UserConfig.set(path+".item", itemStack);
+//        UserConfig.set(path+".count", count);
+//        UserConfig.set(path+".uuid", Iuuid);
+//        UserConfig.set(path+".altera", altera);
+//        UserConfig.set(path+".millis", System.currentTimeMillis());
+//        try {
+//            UserConfig.save(UserFile);
+//        }
+//        catch(Exception e) {
+//            e.printStackTrace();
+//        }
         MarketUpdate();
     }
 
@@ -441,17 +446,27 @@ public class Auction implements Listener {
 
                         try {
 
-                            File file_ = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(),
-                                    set.getString("seller")+".yml");
-                            FileConfiguration config_ = YamlConfiguration.loadConfiguration(file_);
-
-                            // 판매자의 파일에 접근
-                            for(String s_ : config_.getConfigurationSection("mainMarket").getKeys(false)) {
-                                if(config_.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
-                                    config_.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
+                            YamlConfiguration yaml = (new PlayerMarket(set.getString("seller"))).getMarketItemsFile();
+                            for(String s_ : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                                if(yaml.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
+                                    yaml.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
                                     break;
                                 }
                             }
+
+                            (new PlayerMarket(set.getString("seller"))).sendToSQLServer(yaml);
+
+//                            File file_ = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(),
+//                                    set.getString("seller")+".yml");
+//                            FileConfiguration config_ = YamlConfiguration.loadConfiguration(file_);
+//
+//                            // 판매자의 파일에 접근
+//                            for(String s_ : config_.getConfigurationSection("mainMarket").getKeys(false)) {
+//                                if(config_.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
+//                                    config_.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
+//                                    break;
+//                                }
+//                            }
 
                             UUID selleruuid = UUID.fromString(set.getString("seller"));
                             for(Player p_ : Bukkit.getOnlinePlayers()) {
@@ -460,8 +475,7 @@ public class Auction implements Listener {
                                     break;
                                 }
                             }
-
-                            config_.save(file_);
+                            //config_.save(file_);
                         }
                         catch(Exception e) {
                             player.sendMessage("§c예기치 않은 오류가 발생했습니다");
@@ -478,7 +492,7 @@ public class Auction implements Listener {
 
                         (new SQL.sqlData()).QueryLogMarket(altera, item, item.getAmount(), set.getString("seller"),
                                 player.getUniqueId().toString(), set.getString("selltime"));
-                        registerItemAverage(item, altera);
+                        //registerItemAverage(item, altera);
 
                         int z = statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+Iuuid+"'");
 //
@@ -508,51 +522,38 @@ public class Auction implements Listener {
 
     private void getAlteraFromMySalesStand(Player player, ItemStack itemStack) {
 
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        PlayerMarket pM = new PlayerMarket(player);
+        PlayerAltera pA = new PlayerAltera(player);
+
+        YamlConfiguration yaml = pM.getMarketItemsFile();
 
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         String UUID = nmsStack.getTag().getString("UUID");
 
-        try {
-            if(config.contains("mainMarket")) {
-                for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                    ItemStack itemStack_ = config.getItemStack("mainMarket."+s+".item");
-                    net.minecraft.world.item.ItemStack nmsStack_ = CraftItemStack.asNMSCopy(itemStack_);
-                    if(nmsStack_.getTag().getString("UUID").equals(UUID)) {
-
-                        long altera = config.getLong("mainMarket."+s+".altera");
-                        long sumAltera = 0;
-
-                        try {
-                            sumAltera = Math.addExact(config.getLong("Gold"), altera);
-                        }
-                        catch(ArithmeticException e) {
-                            sumAltera = Long.MAX_VALUE;
-                        }
-
-                        config.set("mainMarket."+s, null);
-                        config.set("Gold", config.getLong("Gold")+altera);
-                        config.save(file);
-                        player.sendMessage("§a알테라 수령 완료! +"+altera+" §7보유 알테라: "
-                                +config.getLong("Gold"));
-                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
-
-                        break;
-                    }
+        for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+            ItemStack itemStack_ = yaml.getItemStack("mainMarket."+s+".item");
+            net.minecraft.world.item.ItemStack nmsStack_ = CraftItemStack.asNMSCopy(itemStack_);
+            if(nmsStack_.getTag().getString("UUID").equals(UUID)); {
+                long altera = yaml.getLong("mainMarket."+s+".altera");
+                long sumAltera = 0;
+                try {
+                    sumAltera = Math.addExact(pA.getAltera(), altera);
                 }
+                catch(ArithmeticException e) {
+                    sumAltera = Long.MAX_VALUE;
+                }
+                yaml.set("mainMarket."+s, null);
+                pM.sendToSQLServer(yaml);
+
+                pA.setAltera(sumAltera);
+                player.sendMessage("§a알테라 수령 완료! +"+altera+" §7보유 알테라: "
+                        +pA.getAltera());
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
+
+                break;
             }
         }
-        catch(Exception e) {
 
-        }
-
-//        try {
-//            config.save(file);
-//        }
-//        catch(Exception e) {
-//
-//        }
 
         Window.mySellList(player);
     }
@@ -567,18 +568,19 @@ public class Auction implements Listener {
         }
         try {
 
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+//            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
+//            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
             String UUID = nmsStack.getTag().getString("UUID");
 
-            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                if(config.getString("mainMarket."+s+".uuid").equals(UUID)) {
-                    config.set("mainMarket."+s, null);
-                    break;
-                }
-            }
+            (new PlayerMarket(player)).deleteItem(UUID);
+//            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
+//                if(config.getString("mainMarket."+s+".uuid").equals(UUID)) {
+//                    config.set("mainMarket."+s, null);
+//                    break;
+//                }
+//            }
 
             try {
                 Connection conn = (new SQL.sqlData()).getConnection();
@@ -598,71 +600,71 @@ public class Auction implements Listener {
                 e.printStackTrace();
             }
 
-            config.save(file);
+            //config.save(file);
         }
         catch(Exception e) {
 
         }
-
         Window.mySellList(player);
         MarketUpdate();
     }
 
-    private void registerItemAverage(ItemStack itemStack, long altera) {
-
-        String itemName = itemStack.getItemMeta().getDisplayName();
-
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
-        if(!file.exists()) {
-            try{
-                file.createNewFile();
-            }
-            catch(Exception e) {
-
-            }
-        }
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-
-        if(config.contains("itemAverage."+itemName)) {
-            List<Long> list = config.getLongList("itemAverage."+itemName);
-            list.add(0, altera);
-            while(list.size() > 10) {
-                list.remove(10);
-            }
-            config.set("itemAverage."+itemName, list);
-        }
-        else {
-            List<Long> list = new ArrayList<>();
-            list.add(altera);
-            config.set("itemAverage."+itemName, list);
-        }
-
-        try {
-            config.save(file);
-        }
-        catch(Exception e) {
-
-        }
-    }
+//    private void registerItemAverage(ItemStack itemStack, long altera) {
+//
+//        String itemName = itemStack.getItemMeta().getDisplayName();
+//
+//        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
+//        if(!file.exists()) {
+//            try{
+//                file.createNewFile();
+//            }
+//            catch(Exception e) {
+//
+//            }
+//        }
+//        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+//
+//
+//        if(config.contains("itemAverage."+itemName)) {
+//            List<Long> list = config.getLongList("itemAverage."+itemName);
+//            list.add(0, altera);
+//            while(list.size() > 10) {
+//                list.remove(10);
+//            }
+//            config.set("itemAverage."+itemName, list);
+//        }
+//        else {
+//            List<Long> list = new ArrayList<>();
+//            list.add(altera);
+//            config.set("itemAverage."+itemName, list);
+//        }
+//
+//        try {
+//            config.save(file);
+//        }
+//        catch(Exception e) {
+//
+//        }
+//    }
 
     public void noticeYourItemsWereSoldWhenJoin(Player player) {
 
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
         int count = 0;
+        PlayerMarket pM = new PlayerMarket(player);
+        YamlConfiguration yaml = pM.getMarketItemsFile();
 
-        if(config.contains("mainMarket")) {
-            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                ItemStack itemStack = config.getItemStack("mainMarket."+s+".item");
+        try {
+            for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                ItemStack itemStack = yaml.getItemStack("mainMarket."+s+".item");
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 if(itemMeta.getDisplayName().contains("판매 완료!")) {
                     count++;
                 }
             }
         }
+        catch(NullPointerException e) {
 
+        }
         if(count != 0) {
             player.sendMessage("§5>> §6"+count+"§a개의 아이템이 판매되었습니다! 마켓플레이스에서 알테라를 수령해 주세요");
         }
@@ -742,49 +744,14 @@ public class Auction implements Listener {
                         min = set.getLong("min(altera)");
                         max = set.getLong("max(altera)");
                     }
-//                    ResultSet set_ = stmt_.executeQuery("select max(altera) from longinus.mainmarketlog where name = '+itemName+' order by buytime desc limit 0, 10");
-//                    if(set_.next()) {
-//                        max = set_.getLong("max(altera)");
-//                    }
-//                    ResultSet set__ = stmt__.executeQuery("select min(altera) from longinus.mainmarketlog where name = '+itemName+' order by buytime desc limit 0, 10");
-//                    if(set__.next()) {
-//                        min = set__.getLong("min(altera)");
-//                    }
-//
-//                    set__.close();
-//                    set_.close();
+
                     set.close();
-//                    stmt__.close();
-//                    stmt_.close();
                     stmt.close();
                     conn.close();
                 }
                 catch(Exception e) {
                     e.printStackTrace();
                 }
-
-//                File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
-//                if(!file.exists()) {
-//                    try{
-//                        file.createNewFile();
-//                    }
-//                    catch(Exception e) {
-//
-//                    }
-//                }
-//                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-//
-//                if(config.contains("itemAverage." + itemName)) {
-//                    long sum = 0;
-//                    for(long i : config.getLongList("itemAverage." + itemName)) {
-//                        sum += i;
-//                    }
-//                    average = sum / config.getLongList("itemAverage." + itemName).size();
-//
-//
-//                    min = Collections.min(config.getLongList("itemAverage." + itemName));
-//                    max = Collections.max(config.getLongList("itemAverage." + itemName));
-//                }
             }
 
             ItemStack itemStack = new ItemStack(Material.DIAMOND_BLOCK, 1);
@@ -877,12 +844,11 @@ public class Auction implements Listener {
 
         void Register(Player player) {
 
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            YamlConfiguration yaml = (new PlayerMarket(player)).getMarketItemsFile();
 
-            if(config.contains("mainMarket")) {
+            if(yaml.getConfigurationSection("mainMarket") != null) {
                 int j=0;
-                for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
+                for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
                     j++;
                 }
                 if(j>=5) {
@@ -908,51 +874,55 @@ public class Auction implements Listener {
         static void mySellList(Player player) {
             Inventory inv = Bukkit.createInventory(null, 27, "판매 중인 아이템");
 
-            String uuid = player.getUniqueId().toString();
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            PlayerMarket pM = new PlayerMarket(player);
+
+            YamlConfiguration yaml = pM.getMarketItemsFile();
 
             List<Long> paths = new ArrayList<>();
 
-            if(!config.contains("mainMarket")) {
-                player.openInventory(inv);
-                return;
-            }
-            for(String i : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                paths.add(Long.parseLong(i));
+            if(yaml.getConfigurationSection("mainMarket") != null) {
+                for(String i : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                    paths.add(Long.parseLong(i));
+                }
             }
 
             try {
                 for(int i=11; i<=15; i++) {
-                    String path = "mainMarket."+paths.get(i-11);
-                    if(config.contains(path)) {
-                        ItemStack itemStack = config.getItemStack(path+".item");
+                    if(paths.size() == i-11) break;
+                    String path = Long.toString(paths.get(i-11));
+                    if(yaml.contains("mainMarket."+path)) {
+                        ItemStack itemStack = yaml.getItemStack("mainMarket."+path+".item");
                         if(itemStack == null) inv.setItem(i, new ItemStack(Material.AIR, 1));
                         else {
                             ItemMeta itemMeta = itemStack.getItemMeta();
-                            long millis = config.getLong("mainMarket."+paths.get(i-11)+".millis");
-                            long remain =  millis + 1209600000 - System.currentTimeMillis();
+                            long millis = yaml.getLong("mainMarket."+paths.get(i-11)+".millis");
+                            long remain =  millis + saleLimit  - System.currentTimeMillis();
                             List<String> lore = itemMeta.getLore();
 
-                            if(remain < 0) {
+                            if(itemMeta.getDisplayName().contains("판매 완료!")) {
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "");
+                            }
+                            else if(remain < 0) {
+                                lore.clear();
                                 lore.add(0, "");
                                 lore.add(0, "§7클릭하여 아이템을 회수해 주세요");
                                 lore.add(0, "§7남은 판매기간: §c판매가 종료되었습니다");
-                                lore.add(0, "§5- §7판매가: §f"+config.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "");
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
                                 lore.add(0, "");
 
                             }
                             else {
-                                String day = remain / 86400000 > 0 ? remain / 86400000+"일" : "";
-                                String hour = remain % 86400000 / 3600000 > 0 ? remain % 86400000 / 3600000+"시" : "";
-                                String minute = remain % 86400000 % 3600000 / 60000 > 0 ? remain % 86400000 % 3600000 / 60000+"분" : "";
+                                String day = remain / 86400000 > 0 ? remain / 86400000+"일 " : "";
+                                String hour = remain % 86400000 / 3600000 > 0 ? remain % 86400000 / 3600000+"시 " : "";
+                                String minute = remain % 86400000 % 3600000 / 60000 > 0 ? remain % 86400000 % 3600000 / 60000+"분 " : "";
+                                String second = minute.equals("") ? remain % 86400000 % 3600000 % 60000 / 1000+"초 " : "";
 
                                 lore.add(0, "");
-                                lore.add(0, "§7남은 판매기간: "+day+" "+hour+" "+minute+" 남음");
-                                lore.add(0, "§5- §7판매가: §f"+config.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "§7남은 판매기간: "+day+hour+minute+second+"남음");
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
                                 lore.add(0, "");
-
-
                             }
 
                             itemMeta.setLore(lore);
@@ -963,7 +933,7 @@ public class Auction implements Listener {
                 }
             }
             catch(Exception e) {
-
+                e.printStackTrace();
             }
 
 

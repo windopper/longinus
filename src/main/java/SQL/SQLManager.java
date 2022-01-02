@@ -51,6 +51,7 @@ public class SQLManager {
                 sampleYaml.set(mobList.getPlanet()+"."+mobList.name()+".lastSeen", " ");
             }
         }
+
         String samples = converter.encodeYaml(sampleYaml);
         String previousclass = null;
 
@@ -58,12 +59,16 @@ public class SQLManager {
         double locy = player.getLocation().getY();
         double locz = player.getLocation().getZ();
 
+        YamlConfiguration marketitemsYaml = new YamlConfiguration();
+        marketitemsYaml.set("mainMarket", "");
+        String marketitems = converter.encodeYaml(marketitemsYaml);
+
         try {
             Connection conn = sqlData.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("insert into longinus.user values ('"+name+"', '"+uuid+"', '"+altera+"', '"
                     +storages+"', '"+classes+"', '"+quests+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
-                    +locx+"', '"+locy+"', '"+locz+"')");
+                    +locx+"', '"+locy+"', '"+locz+"', '"+marketitems+"')");
             stmt.close();
             conn.close();
         }

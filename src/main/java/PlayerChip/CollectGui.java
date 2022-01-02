@@ -3,16 +3,15 @@ package PlayerChip;
 import Items.ItemFunctions;
 import Mob.MobListManager;
 import PlanetSelect.PlanetList;
+import SQL.PlayerSample;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,25 +44,22 @@ public class CollectGui {
         player.openInventory(inventory);
     }
 
-
-    //TODO sql 데이터로 교체
     private Inventory Collectings(Inventory inventory, int rawslot, Player player) {
 
         String uuid = player.getUniqueId().toString();
         String username = player.getName();
 
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-
+        YamlConfiguration yaml = (new PlayerSample(player)).getSampleFile();
         String Planet = PlanetList.values()[rawslot].getRawName();
 
         int count = 0;
         for(MobListManager.MobList mobList : MobListManager.MobList.values()) {
             if(mobList.getPlanet().equals(Planet)) {
 
-                int num = config.getInt("Sample."+mobList.getPlanet()+"."+mobList.name()+".count");
-                inventory.setItem(count, setMetaData(mobList, num));
+                int num = yaml.getInt(mobList.getPlanet()+"."+mobList.name()+".count");
+                String firstSeen = yaml.getString(mobList.getPlanet()+"."+mobList.name()+".firstSeen");
+                String lastSeen = yaml.getString(mobList.getPlanet()+"."+mobList.name()+".lastSeen");
+                inventory.setItem(count, setMetaData(mobList, num, firstSeen, lastSeen));
                 count++;
 
             }
@@ -72,7 +68,7 @@ public class CollectGui {
         return inventory;
     }
 
-    private ItemStack setMetaData(MobListManager.MobList mobList, int num) {
+    private ItemStack setMetaData(MobListManager.MobList mobList, int num, String firstSeen, String lastSeen) {
 
         ItemStack itemStack;
 
@@ -98,7 +94,8 @@ public class CollectGui {
                     "§3>> 레벨: §6Lv."+mobList.getLevel(),
                     "§3>> 체력: §d♥ "+mobList.getHealth(),
                     "§3>> 피해량: §4"+mobList.getMindamage()+"-"+mobList.getMaxdamage(),
-                    ""));
+                    "",
+                    "§7최초발견: "+firstSeen));
             strings.addAll((new ItemFunctions()).setGrayLore(mobList.getDescription()));
 
             itemMeta.setLore(strings);
