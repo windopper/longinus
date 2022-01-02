@@ -1,7 +1,7 @@
 package UserStorage;
 
-import java.util.Set;
-
+import SQL.PlayerStorage;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.Set;
 
 public class Event implements Listener {
 	
@@ -106,7 +106,8 @@ public class Event implements Listener {
 		if(name.length < 2) return;
 		
 		if(name[0].equals("가상창고 ")) {
-			UserStorageManager.getinstance().Save(player, e.getInventory(), name[1]);
+			(new PlayerStorage(player)).storageSave(e.getInventory(), name[1]);
+			//UserStorageManager.getinstance().Save(player, e.getInventory(), name[1]);
 		}
 	}
 	
@@ -126,12 +127,14 @@ public class Event implements Listener {
 		
 		String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
 		
-		boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page+1));
+		//boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page+1));
+		boolean value = (new PlayerStorage(player)).checkStorageExist(Integer.toString(page+1));
 		
 		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("다음페이지")) {
 				
-			if(value == true) {
-				UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
+			if(value) {
+				(new PlayerStorage(player)).storageSave(inv, Integer.toString(page));
+				//UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
 				BankGui.getinstance().Open(player, Integer.toString(page+1));
 			}
 			else {
@@ -170,12 +173,14 @@ public class Event implements Listener {
 		
 		String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
 		
-		boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page));
+		//boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page));
+		boolean value = (new PlayerStorage(player)).checkStorageExist(Integer.toString(page));
 		
 		
 		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("이전페이지")) {
-			
-			UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
+
+			(new PlayerStorage(player)).storageSave(inv, Integer.toString(page));
+			//UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
 			BankGui.getinstance().Open(player, Integer.toString(page-1));
 			
 		}

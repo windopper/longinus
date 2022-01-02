@@ -3,10 +3,13 @@ package PlayerChip;
 import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
 import Party.PartyManager;
+import PlayerManager.PlayerAlarmManager;
 import PlayerManager.PlayerFileManager;
 import PlayerManager.PlayerManager;
 import PlayerManager.PlayerStatManager;
 import ReturnToBase.ReturnMech;
+import SQL.PlayerAltera;
+import SQL.PlayerClass;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -22,7 +25,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import spellinteracttest.Main;
-import PlayerManager.PlayerAlarmManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -192,7 +194,7 @@ public class GuiEvent implements Listener {
 			
 			
 			try {	
-				long currentgold = PlayerFileManager.getinstance().getGold(player);
+				long currentgold = (new PlayerAltera(player)).getAltera();
 				int content = Integer.parseInt(e.getMessage());
 				
 				if(currentgold < content) {
@@ -355,7 +357,8 @@ public class GuiEvent implements Listener {
 		Player p = (Player) e.getWhoClicked();
 
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
-		PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+		(new SQL.PlayerClass(p)).classSave();
+		//PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		
 		Classgui.getinstance().ClassSelectGuiOpen(p);
 		
@@ -371,60 +374,46 @@ public class GuiEvent implements Listener {
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-			
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "아이테르"));
-			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("아이테르"));
+			pC.classSave();
 		}
 		else if(rawslot == 12) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-			
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "엑셀러레이터"));
-			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("엑셀러레이터"));
+			pC.classSave();
 		}
 		else if(rawslot == 13) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-			
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "블래스터"));
-			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("블래스터"));
+			pC.classSave();
 		}
 		else if(rawslot == 14) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-			
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "바이V"));
-			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("바이V"));
+			pC.classSave();
 		}
 		else if(rawslot == 15) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-			
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "플록스"));
-			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("플록스"));
+			pC.classSave();
 		}
 		else if(rawslot == 20) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "카오스"));
-
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("카오스"));
+			pC.classSave();
 		}
 		else if(rawslot == 21) {
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
-
-			PlayerFileManager.getinstance().UserDetailClassCallData(p,
-					PlayerFileManager.getinstance().UserDetailClassRegister(p, "케이론"));
-
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("케이론"));
+			pC.classSave();
 		}
 		else if(rawslot == 27) {
 			Classgui.getinstance().ClassSelectGuiOpen(p);
@@ -462,12 +451,12 @@ public class GuiEvent implements Listener {
 		
 		if(action==InventoryAction.PICKUP_ALL) {
 			
-			for(String Class : PlayerFileManager.getinstance().getClasses(player)) {
+			for(String Class : (new PlayerClass(player)).getClasses()) {
 				
 				if(rawslot == 1) {
-					PlayerFileManager.getinstance().UserDetailClassDataSave(player);
-					
-					PlayerFileManager.getinstance().UserDetailClassCallData(player, Class);
+					PlayerClass pC = new PlayerClass(player);
+					pC.classSave();
+					pC.classCall(Class);
 
 					Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 						@Override
@@ -476,7 +465,7 @@ public class GuiEvent implements Listener {
 						}
 					}, 0);
 					
-					PlayerFileManager.getinstance().UserDetailClassDataSave(player);
+					pC.classSave();
 				}
 				rawslot --;
 				
@@ -484,7 +473,7 @@ public class GuiEvent implements Listener {
 		}
 		if(action==InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			
-			for(String Class : PlayerFileManager.getinstance().getClasses(player)) {
+			for(String Class : (new PlayerClass(player)).getClasses()) {
 				
 				if(rawslot == 1) {
 					if(CurrentClass.equals(Class)) {
@@ -510,7 +499,8 @@ public class GuiEvent implements Listener {
 		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(rawslot == 11) {
-			PlayerFileManager.getinstance().UserDetailClassDelete(player, PlayerManager.getinstance(player).AskDeleteClassName);
+			(new PlayerClass(player)).classDelete(PlayerManager.getinstance(player).AskDeleteClassName);
+			//PlayerFileManager.getinstance().UserDetailClassDelete(player, PlayerManager.getinstance(player).AskDeleteClassName);
 			player.closeInventory();
 		}
 		if(rawslot == 15) {
@@ -543,7 +533,7 @@ public class GuiEvent implements Listener {
 	
 	public void GoldSetPlayerAmount(Player sender, Player receiver) {
 		
-		long gold = PlayerFileManager.getinstance().getGold(sender);
+		long gold = (new PlayerAltera(sender)).getAltera();
 		sender.sendMessage("§6"+receiver.getName()+"님에게 보낼 알테라를 입력해주세요. 현재 알테라 "+gold);
 		GoldAllowReadingChatAmount.put(sender, receiver);
 		
@@ -552,11 +542,16 @@ public class GuiEvent implements Listener {
 	
 	public void GoldSendPlayertoPlayer(Player sender, Player receiver, int gold) {
 
-		long sendergold = PlayerFileManager.getinstance().getGold(sender);
-		PlayerFileManager.getinstance().setGold(sender, sendergold - gold);
+		PlayerAltera senderpA = new PlayerAltera(sender);
+		PlayerAltera receiverpA = new PlayerAltera(receiver);
 
-		long receivergold = PlayerFileManager.getinstance().getGold(receiver);
-		PlayerFileManager.getinstance().setGold(receiver, receivergold + gold);
+		long sendergold = (new PlayerAltera(sender)).getAltera();
+		senderpA.setAltera(sendergold - gold);
+		//PlayerFileManager.getinstance().setGold(sender, sendergold - gold);
+
+		long receivergold = (new PlayerAltera(receiver)).getAltera();
+		receiverpA.setAltera(receivergold + gold);
+		//PlayerFileManager.getinstance().setGold(receiver, receivergold + gold);
 		
 		PlayerAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
 		PlayerAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");

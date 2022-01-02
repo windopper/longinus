@@ -1,9 +1,10 @@
 package PlayerChip;
 
 import Party.PartyManager;
-import PlayerManager.PlayerFileManager;
+import PlayerManager.PlayerAlarmManager;
 import PlayerManager.PlayerManager;
 import PlayerManager.PlayerStatManager;
+import SQL.PlayerAltera;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,7 +13,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import PlayerManager.PlayerAlarmManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -250,7 +250,7 @@ public class Maingui {
 	
 	public ItemStack alteraitem(Player p) {
 		
-		long gold = PlayerFileManager.getinstance().getGold(p);
+		long gold = (new PlayerAltera(p)).getAltera();
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_BLOCK, 1);
 		ItemMeta meta = item.getItemMeta();

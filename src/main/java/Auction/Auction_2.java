@@ -1,6 +1,6 @@
 package Auction;
 
-import PlayerManager.PlayerFileManager;
+import SQL.PlayerAltera;
 import Shop.RightClickNPC;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.nbt.NBTTagCompound;
@@ -111,7 +111,7 @@ public class Auction_2 implements Listener {
             else if(slot == 13) {
                 ListenChat.add(player);
                 player.closeInventory();
-                player.sendMessage("§6책정 값을 입력해주세요. 현재 보유 알테라: "+ PlayerFileManager.getinstance().getGold(player));
+                player.sendMessage("§6책정 값을 입력해주세요. 현재 보유 알테라: "+ (new PlayerAltera(player).getAltera()));
             }
             else if(slot == 20) {
                 if(preRegisterAltera.containsKey(player) && preRegisterItem.containsKey(player)) {
@@ -432,7 +432,7 @@ public class Auction_2 implements Listener {
             if(config.getString("mainMarket."+s+".uuid").equals(Iuuid)) {
                 isExist = true;
                 long altera = config.getLong("mainMarket."+s+".altera");
-                if(altera <= PlayerFileManager.getinstance().getGold(player)) {
+                if(altera <= (new PlayerAltera(player).getAltera())) {
 
                     /* -------------------------------------------- */
                     try {
@@ -464,7 +464,9 @@ public class Auction_2 implements Listener {
                     }
                     /* -------------------------------------------- */
 
-                    PlayerFileManager.getinstance().setGold(player, PlayerFileManager.getinstance().getGold(player) - altera);
+                    PlayerAltera pA = new PlayerAltera(player);
+                    pA.setAltera(pA.getAltera() - altera);
+                    //PlayerFileManager.getinstance().setGold(player, PlayerFileManager.getinstance().getGold(player) - altera);
                     ItemStack item = config.getItemStack("mainMarket."+s+".item");
                     player.getInventory().addItem(item);
                     player.sendMessage("§a구매 완료!");

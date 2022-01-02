@@ -1,6 +1,5 @@
 package PlayerChip;
 
-import PlayerManager.PlayerFileManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -304,14 +303,14 @@ public class Classgui {
 		
 		int GUIlocation = 11;
 		
-		if(PlayerFileManager.getinstance().getClasses(p) == null) { // 등록된 클래스가 없으면
+		if(!(new SQL.PlayerClass(p)).isExist()) { // 등록된 클래스가 없으면
 			
 			gui.setItem(GUIlocation, ClassAddItem(p));
 			return;
 		}
 		
 		
-		for(String Class : PlayerFileManager.getinstance().getClasses(p)) {
+		for(String Class : (new SQL.PlayerClass(p)).getClassFile().getConfigurationSection("").getKeys(false)) {
 			
 			if(GUIlocation == 16) GUIlocation = 20;
 			if(GUIlocation == 25) GUIlocation = 29;
@@ -336,7 +335,7 @@ public class Classgui {
 	}
 
 	private ItemStack KhaosSelectItem(Player p, String classname) {
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 
 		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -355,7 +354,7 @@ public class Classgui {
 	}
 
 	private ItemStack CheironSelectItem(Player p, String classname) {
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 
 		ItemStack item = new ItemStack(Material.BOW, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -375,7 +374,7 @@ public class Classgui {
 	
 	private ItemStack AetherSelectItem(Player p, String classname) {
 		
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -402,7 +401,7 @@ public class Classgui {
 	
 	private ItemStack AcceleratorSelectItem(Player p, String classname) {
 		
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_HOE, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -429,7 +428,7 @@ public class Classgui {
 	
 	private ItemStack BlasterSelectItem(Player p, String classname) {
 		
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_SHOVEL, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -454,7 +453,7 @@ public class Classgui {
 	
 	private ItemStack ByVSelectItem(Player p, String classname) {
 		
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_AXE, 1);
 		ItemMeta meta = item.getItemMeta();
@@ -481,7 +480,7 @@ public class Classgui {
 	
 	private ItemStack PhloxSelectItem(Player p, String classname) {
 		
-		int lvl = PlayerFileManager.getinstance().getClassLevel(p, classname);
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_PICKAXE, 1);
 		ItemMeta meta = item.getItemMeta();

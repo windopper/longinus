@@ -9,7 +9,7 @@ public class sqlData {
     private final String server = "localhost"; // 서버 주소
     private final String user_name = "root"; //  접속자 id
     private final String password = "mysqlternis02@@@"; // 접속자 pw
-    private final String servername = "myserver";
+    public final String servername = "longinus";
     private final String table = "mainmarket";
 
 //    public static void main(String[] args) {
@@ -48,7 +48,7 @@ public class sqlData {
         try {
             Statement statement = con.createStatement();
             int eu = statement.executeUpdate("insert into "+servername+"."+table+" values ('"+System.currentTimeMillis()+"', '" +
-                    uuid+"', '"+selleruuid+"', '"+altera+"', '"+count+"', '"+item+"')");
+                    uuid+"', '"+selleruuid+"', '"+altera+"', '"+count+"', '"+item+"', '"+(new java.sql.Timestamp(new java.util.Date().getTime()))+"')");
 
             statement.close();
         }
@@ -62,19 +62,18 @@ public class sqlData {
         } catch (SQLException e) {}
     }
 
-    public void QueryLogMarket(long altera, ItemStack itemStack, int count, String seller, String buyer, java.sql.Date selltime) {
+    public void QueryLogMarket(long altera, ItemStack itemStack, int count, String seller, String buyer, String selltime) {
 
         String name = itemStack.getItemMeta().getDisplayName();
         String encodeditem = (new Converter()).encodeItem(itemStack);
-
-        java.sql.Date buytime = new java.sql.Date(System.currentTimeMillis());
+        java.sql.Timestamp buytime = new java.sql.Timestamp(new java.util.Date().getTime());
 
         try {
             Connection conn = getConnection();
             Statement statement = conn.createStatement();
-            statement.executeUpdate("insert into "+servername+"."+table+" values ('"+
+            statement.executeUpdate("insert into "+servername+".mainmarketlog"+" values ('"+
                     name+"', '"+altera+"', '"+encodeditem+"', '"+count+"', '"+seller+"', '"+
-                    buyer+"', '"+selltime+"', '"+buytime+"', '"+System.currentTimeMillis()+"'");
+                    buyer+"', '"+selltime+"', '"+buytime+"', '"+System.currentTimeMillis()+"')");
 
             statement.close();
             conn.close();
@@ -82,10 +81,6 @@ public class sqlData {
         catch(Exception e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 
     public ResultSet SelectQuery(String query) {

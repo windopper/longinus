@@ -1,7 +1,7 @@
 package UserStorage;
 
-import java.util.Arrays;
-
+import SQL.PlayerStorage;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,7 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import net.md_5.bungee.api.ChatColor;
+import java.util.Arrays;
 
 public class BankGui {
 	
@@ -50,8 +50,8 @@ public class BankGui {
 		gui.setItem(52, containerdetach_2());
 		
 		
-		
-		p.openInventory(UserStorageManager.getinstance().Call(p, gui, page));
+		p.openInventory((new PlayerStorage(p)).storageCall(gui, page));
+		//p.openInventory(UserStorageManager.getinstance().Call(p, gui, page));
 	}
 	
 	public void Open_Ask(Player p, String page) {
@@ -74,8 +74,8 @@ public class BankGui {
 		gui.setItem(52, containerdetach_2());
 		
 		
-		
-		p.openInventory(UserStorageManager.getinstance().Call(p, gui, page));
+		p.openInventory((new PlayerStorage(p)).storageCall(gui, page));
+		//p.openInventory(UserStorageManager.getinstance().Call(p, gui, page));
 	}
 	
 	private ItemStack containerdetach() {
@@ -104,7 +104,7 @@ public class BankGui {
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&a&o다음페이지"));
 		meta.setLore(Arrays.asList(
-				"§7현재 소유 공간 ( "+UserStorageManager.getinstance().MaxBankPage(p)+" / 10 )",
+				"§7현재 소유 공간 ( "+(new PlayerStorage(p)).maxStoragePage()+" / 10 )",
 				"",
 				"§3여러 조건들을 해금하여 가상공간을 확장할 수 있습니다!",
 				"§3자세한 정보는 메모리칩에서 확인할 수 있습니다"));
