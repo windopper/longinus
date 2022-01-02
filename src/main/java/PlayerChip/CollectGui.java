@@ -46,6 +46,7 @@ public class CollectGui {
     }
 
 
+    //TODO sql 데이터로 교체
     private Inventory Collectings(Inventory inventory, int rawslot, Player player) {
 
         String uuid = player.getUniqueId().toString();

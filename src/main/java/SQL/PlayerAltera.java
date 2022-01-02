@@ -25,11 +25,13 @@ public class PlayerAltera {
             ResultSet set = stmt.executeQuery("select altera from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
 
+                long altera = set.getLong("altera");
+
                 set.close();
                 stmt.close();
                 conn.close();
 
-                return set.getLong("altera");
+                return altera;
             }
 
             set.close();

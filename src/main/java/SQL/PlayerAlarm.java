@@ -104,7 +104,7 @@ public class PlayerAlarm {
         try {
             Connection conn = (new sqlData()).getConnection();
             Statement stmt = conn.createStatement();
-            stmt.executeUpdate("update longinus.user set alarms = '"+encodedYaml+"' where = uuid+'"+uuid+"'");
+            stmt.executeUpdate("update longinus.user set alarms = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
             stmt.close();
             conn.close();

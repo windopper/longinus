@@ -35,14 +35,14 @@ public class PlayerClass {
         try {
             Connection conn = (new sqlData()).getConnection();
             Statement stmt = conn.createStatement();
-            stmt.executeUpdate("update longinus.user set storages = '"+encodedYaml+"' where = uuid+'"+uuid+"'");
+            stmt.executeUpdate("update longinus.user set classes = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
             stmt.close();
             conn.close();
 
         }
         catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -61,6 +61,10 @@ public class PlayerClass {
 
                 return config;
             }
+
+            set.close();
+            stmt.close();
+            conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -75,6 +79,7 @@ public class PlayerClass {
             player.sendMessage("§c최대 클래스 생성 제한에 도달했습니다");
             return null;
         }
+
 
         if(!isExist()) {
             yaml = new YamlConfiguration();
@@ -102,7 +107,7 @@ public class PlayerClass {
                 String encoded = (new SQL.Converter()).encodeYaml(yaml);
                 sendToSQLServer(encoded);
 
-                return className;
+                return path;
             }
         }
 
@@ -111,11 +116,20 @@ public class PlayerClass {
 
     public void classCall(String className) {
 
-        if(className == null || className.equals("없음")) return;
+        //Bukkit.broadcastMessage(className);
+        if(className.equals("없음")) return;
+        if(className.equals("null")) return;
+
+        if(!isExist()) {
+            classRegister(className);
+            return;
+        }
 
         YamlConfiguration yaml = getClassFile();
-        if(yaml.contains(className)) {
+
+        if(!yaml.contains(className)) {
             player.sendMessage("§c파일 오류로 선택한 클래스의 정보를 불러오지 못하였습니다");
+            return;
         }
 
         player.updateInventory();
@@ -134,8 +148,6 @@ public class PlayerClass {
         //LastClassLocation.getinstance().classchangeteleport(player, className);
         Location location = (new Converter()).stringToCoord(player, className);
         player.teleport(location);
-
-
 
         ItemStack air = new ItemStack(org.bukkit.Material.AIR, 1);
         ItemStack[] items = new ItemStack[40];
@@ -191,6 +203,18 @@ public class PlayerClass {
         String encoded = (new SQL.Converter()).encodeYaml(yaml);
         sendToSQLServer(encoded);
 
+        try {
+            Connection conn = (new sqlData()).getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("update longinus.user set previousclass = '"+className+"' where uuid = '"+uuid+"'");
+
+            stmt.close();
+            conn.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void classDelete(String className) {
@@ -242,6 +266,7 @@ public class PlayerClass {
                 stmt.close();
                 conn.close();
 
+                if(previousClass == null) return "없음";
                 return previousClass;
             }
             set.close();
@@ -251,7 +276,7 @@ public class PlayerClass {
         catch(Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return "없음";
     }
 
     public boolean isExist() {
@@ -259,15 +284,21 @@ public class PlayerClass {
             String uuid = player.getUniqueId().toString();
             Connection conn = (new SQL.sqlData()).getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet set = stmt.executeQuery("select class from longinus.user where uuid = '"+uuid+
-                    "'");
+            ResultSet set = stmt.executeQuery("select classes from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
-                if(set.getString("classes") == null) {
+                if(set.getString("classes").equals("null")) {
 
                     set.close();
                     stmt.close();
                     conn.close();
 
+                    return false;
+                }
+                else if(set.getString("classes") == null) {
+
+                    set.close();
+                    stmt.close();
+                    conn.close();
                     return false;
                 }
             }

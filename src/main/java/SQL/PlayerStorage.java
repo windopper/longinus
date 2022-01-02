@@ -36,10 +36,19 @@ public class PlayerStorage {
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select storages from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
-                String yaml = set.getString("classes");
+                String yaml = set.getString("storages");
                 YamlConfiguration config = (new SQL.Converter()).decodeYaml(yaml);
+
+                set.close();
+                stmt.close();
+                conn.close();
+
                 return config;
             }
+
+            set.close();
+            stmt.close();
+            conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -76,32 +85,33 @@ public class PlayerStorage {
     }
 
     public boolean checkStorageExist(String page) {
+
         YamlConfiguration yaml = getStorageFile();
-        return yaml.contains("storage"+page);
+        return yaml.contains(page);
     }
 
     public int maxStoragePage() {
-        int i=0;
+
+        int i=1;
         while(checkStorageExist(Integer.toString(i))) {
             i++;
         }
-        i--;
 
-        return i;
+        return i-1;
     }
 
     private void sendToSQLServer(String encodedYaml) {
         try {
             Connection conn = (new sqlData()).getConnection();
             Statement stmt = conn.createStatement();
-            stmt.executeUpdate("update longinus.user set storages = '"+encodedYaml+"' where = uuid+'"+uuid+"'");
+            stmt.executeUpdate("update longinus.user set storages = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
             stmt.close();
             conn.close();
 
         }
         catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 }

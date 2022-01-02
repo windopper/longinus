@@ -29,26 +29,26 @@ public class SQLManager {
         String uuid = player.getUniqueId().toString();
         int altera = 0;
         YamlConfiguration storageYaml = new YamlConfiguration();
-        storageYaml.set("1", "");
-        storageYaml.set("2", "");
-        storageYaml.set("3", "");
+        storageYaml.set("1", " ");
+        storageYaml.set("2", " ");
+        storageYaml.set("3", " ");
         String storages = converter.encodeYaml(storageYaml);
         String classes = null;
         String quests = null;
         YamlConfiguration alarmYaml = new YamlConfiguration();
         for(int i=0; i<=100; i++) {
-            alarmYaml.set(i+".content", "");
-            alarmYaml.set(i+".type", "");
-            alarmYaml.set(i+".date", "");
+            alarmYaml.set(i+".content", " ");
+            alarmYaml.set(i+".type", " ");
+            alarmYaml.set(i+".date", " ");
         }
         String alarms = converter.encodeYaml(alarmYaml);
 
         YamlConfiguration sampleYaml = new YamlConfiguration();
         for(MobListManager.MobList mobList : MobListManager.MobList.values()) {
             if(mobList.isScannable()) {
-                sampleYaml.set(mobList.name()+".count", 0);
-                sampleYaml.set(mobList.name()+".firstSeen", "");
-                sampleYaml.set(mobList.name()+".lastSeen", "");
+                sampleYaml.set(mobList.getPlanet()+"."+mobList.name()+".count", 0);
+                sampleYaml.set(mobList.getPlanet()+"."+mobList.name()+".firstSeen", " ");
+                sampleYaml.set(mobList.getPlanet()+"."+mobList.name()+".lastSeen", " ");
             }
         }
         String samples = converter.encodeYaml(sampleYaml);
