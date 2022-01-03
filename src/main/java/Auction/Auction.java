@@ -1,5 +1,6 @@
 package Auction;
 
+import SQL.MainMarket;
 import SQL.PlayerAltera;
 import SQL.PlayerMarket;
 import Shop.RightClickNPC;
@@ -40,7 +41,7 @@ public class Auction implements Listener {
     private final static ConcurrentHashMap<Player, ItemStack> preRegisterItem = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Player, Long> preRegisterAltera = new ConcurrentHashMap<>();
 
-    private final static long saleLimit = 60000;
+    private final static long saleLimit = 1209600000;
 
     @EventHandler
     public void NPCRightClicked(RightClickNPC event) {
@@ -83,6 +84,13 @@ public class Auction implements Listener {
             if(msg.equals("취소")) {
                 OnSearching.remove(player);
             }
+            else {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                    MarketOpen(player, 1, msg);
+                }, 0);
+
+                OnSearching.remove(player);
+            }
 
             event.setCancelled(true);
         }
@@ -107,6 +115,36 @@ public class Auction implements Listener {
             }
             else if(slot == 35) {
                 MarketOpen(player, page == 1 ? 1 : page - 1);
+            }
+            else if(slot == 53) {
+                OnSearching.add(player);
+                player.closeInventory();
+                player.sendMessage("§6아이템을 검색해주세요. '취소'라고 입력하면 검색이 취소됩니다.");
+            }
+            else if(slot % 9 <= 6 && slot <= 53) {
+                ItemStack clickedItem = event.getCurrentItem();
+                if(clickedItem != null) {
+                    (new Window()).BuyItem(player, clickedItem);
+                }
+            }
+            event.setCancelled(true);
+        }
+        else if(event.getView().getTitle().contains("검색결과")) {
+            String search = player.getOpenInventory().getTitle().split("\"")[1];
+            int page = Integer.parseInt(player.getOpenInventory().getTitle().replaceAll("[^0-9]",""));
+            if(slot == 8) {
+                preRegisterItem.remove(player);
+                preRegisterAltera.remove(player);
+                (new Window()).Register(player);
+            }
+            else if(slot == 17) {
+                Window.mySellList(player);
+            }
+            else if(slot == 26) {
+                MarketOpen(player, page+1, search);
+            }
+            else if(slot == 35) {
+                MarketOpen(player, page == 1 ? 1 : page - 1, search);
             }
             else if(slot == 53) {
                 OnSearching.add(player);
@@ -242,8 +280,7 @@ public class Auction implements Listener {
     public static void MarketSalesTimeWatcher() {
 
         try {
-
-            Connection con = (new SQL.sqlData()).getConnection();
+            Connection con = SQL.sqlData.getConnection();
             Statement statement = con.createStatement();
             ResultSet set = statement.executeQuery("select * from longinus.mainmarket");
 
@@ -252,13 +289,14 @@ public class Auction implements Listener {
                 long remain = date + saleLimit - System.currentTimeMillis();
                 if(remain<0) {
                     //String selleruuid = set.getString("seller");
-                    statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+set.getString("uuid")+"'");
+                    (new MainMarket(set.getString("uuid"))).deleteItem();
+                    //statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+set.getString("uuid")+"'");
                 }
             }
 
             statement.close();
             set.close();
-            con.close();
+            //con.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -283,7 +321,7 @@ public class Auction implements Listener {
 
                     int j = (page - 1) * 42;
 
-                    Connection conn = (new SQL.sqlData()).getConnection();
+                    Connection conn = SQL.sqlData.getConnection();
                     Statement statement = conn.createStatement();
                     ResultSet set = statement.executeQuery("Select * from longinus.mainmarket order by milli desc limit "+j+", "+42);
 
@@ -317,7 +355,7 @@ public class Auction implements Listener {
 
                     set.close();
                     statement.close();
-                    conn.close();
+                    //conn.close();
 
                 }
                 catch(Exception e) {
@@ -330,10 +368,21 @@ public class Auction implements Listener {
     }
 
     private void MarketOpen(Player player, int page) {
+        MarketOpen(player, page, "");
+    }
+
+    private void MarketOpen(Player player, int page, String searchName) {
 
         Auction.MarketSalesTimeWatcher();
 
         Inventory inv = Bukkit.createInventory(null, 54, "MarketPlace [페이지 "+page+"]");
+        if(searchName.equals("")) {
+
+        }
+        else {
+            inv = Bukkit.createInventory(null, 54, "\""+searchName+"\" 검색결과 [페이지 "+page+"]");
+            searchName = "where itemname like '%"+searchName+"%'";
+        }
 
         inv.setItem(8, UI.register(player));
         inv.setItem(17, UI.SeeMySellList(player));
@@ -344,9 +393,9 @@ public class Auction implements Listener {
         try {
             int j = (page - 1) * 42;
 
-            Connection connection = (new SQL.sqlData()).getConnection();
+            Connection connection = SQL.sqlData.getConnection();
             Statement statement = connection.createStatement();
-            ResultSet set = statement.executeQuery("select * from longinus.mainmarket order by milli desc limit "+j+", "+42);
+            ResultSet set = statement.executeQuery("select * from longinus.mainmarket "+searchName+" order by milli desc limit "+j+", "+42);
 
 
             for(int i=0; i<54; i++) {
@@ -374,7 +423,7 @@ public class Auction implements Listener {
             player.openInventory(inv);
             set.close();
             statement.close();
-            connection.close();
+            //connection.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -386,35 +435,22 @@ public class Auction implements Listener {
     public void MarketRegister(Player player, ItemStack itemStack, long altera, int count) {
 
         String uuid = player.getUniqueId().toString();
+        String itemName = itemStack.getItemMeta().getDisplayName();
 
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound nbtTagCompound = nmsStack.getTag();
         String Iuuid = nbtTagCompound.getString("UUID");
 
-//        File UserFile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-//        FileConfiguration UserConfig = YamlConfiguration.loadConfiguration(UserFile);
 
         String pattern = "yyyyMMddHHmmssSSS";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, Locale.KOREA);
         long date = Long.parseLong(simpleDateFormat.format(new Date()));
 
         String path = "mainMarket."+date;
-        (new SQL.sqlData()).QueryRegisterMarket(Iuuid, altera, (new SQL.Converter()).encodeItem(itemStack), count, player.getUniqueId().toString());
 
+        (new SQL.MainMarket(Iuuid)).registerItem(Iuuid, altera, (new SQL.Converter()).encodeItem(itemStack), count, player.getUniqueId().toString(), itemName);
         (new SQL.PlayerMarket(player)).registerItem(date, itemStack, count, Iuuid, altera, System.currentTimeMillis());
 
-//        path = "mainMarket."+date;
-//        UserConfig.set(path+".item", itemStack);
-//        UserConfig.set(path+".count", count);
-//        UserConfig.set(path+".uuid", Iuuid);
-//        UserConfig.set(path+".altera", altera);
-//        UserConfig.set(path+".millis", System.currentTimeMillis());
-//        try {
-//            UserConfig.save(UserFile);
-//        }
-//        catch(Exception e) {
-//            e.printStackTrace();
-//        }
         MarketUpdate();
     }
 
@@ -434,13 +470,19 @@ public class Auction implements Listener {
 
 
         try {
-            Connection connection = (new SQL.sqlData()).getConnection();
+            Connection connection = SQL.sqlData.getConnection();
             Statement statement = connection.createStatement();
             ResultSet set = statement.executeQuery("select * from longinus.mainmarket where uuid = '"+Iuuid+"'");
 
             while(set.next()) {
                 if(set.getString("uuid").equals(Iuuid)) {
                     isExist = true;
+
+                    if(set.getString("seller").equals(player.getUniqueId().toString())) {
+                        player.sendMessage("§c자신의 아이템을 구매할 수 없습니다");
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                        break;
+                    }
                     long altera = set.getLong("altera");
                     if(altera <= (new SQL.PlayerAltera(player)).getAltera()) {
 
@@ -455,18 +497,6 @@ public class Auction implements Listener {
                             }
 
                             (new PlayerMarket(set.getString("seller"))).sendToSQLServer(yaml);
-
-//                            File file_ = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(),
-//                                    set.getString("seller")+".yml");
-//                            FileConfiguration config_ = YamlConfiguration.loadConfiguration(file_);
-//
-//                            // 판매자의 파일에 접근
-//                            for(String s_ : config_.getConfigurationSection("mainMarket").getKeys(false)) {
-//                                if(config_.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
-//                                    config_.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
-//                                    break;
-//                                }
-//                            }
 
                             UUID selleruuid = UUID.fromString(set.getString("seller"));
                             for(Player p_ : Bukkit.getOnlinePlayers()) {
@@ -488,15 +518,12 @@ public class Auction implements Listener {
                         player.sendMessage("§a구매 완료!");
                         player.closeInventory();
 
-                        //Bukkit.broadcastMessage(set.getString("selltime"));
-
                         (new SQL.sqlData()).QueryLogMarket(altera, item, item.getAmount(), set.getString("seller"),
                                 player.getUniqueId().toString(), set.getString("selltime"));
                         //registerItemAverage(item, altera);
 
                         int z = statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+Iuuid+"'");
-//
-//                        (new SQL.sqlData()).QueryDeleteItemFromMarket(Iuuid);
+
                     }
                     else {
                         player.closeInventory();
@@ -512,12 +539,16 @@ public class Auction implements Listener {
             }
             set.close();
             statement.close();
-            connection.close();
+            //connection.close();
         }
         catch(Exception e) {
 
         }
         MarketUpdate();
+    }
+
+    private void MarketSearch(Player player, String search) {
+
     }
 
     private void getAlteraFromMySalesStand(Player player, ItemStack itemStack) {
@@ -568,33 +599,36 @@ public class Auction implements Listener {
         }
         try {
 
-//            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-//            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
             String UUID = nmsStack.getTag().getString("UUID");
 
-            (new PlayerMarket(player)).deleteItem(UUID);
-//            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-//                if(config.getString("mainMarket."+s+".uuid").equals(UUID)) {
-//                    config.set("mainMarket."+s, null);
-//                    break;
-//                }
-//            }
+            PlayerMarket pM = new PlayerMarket(player);
+            YamlConfiguration yaml = pM.getMarketItemsFile();
+
+            if(yaml.getConfigurationSection("mainMarket") != null) {
+                for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                    if(yaml.getString("mainMarket."+s+".uuid").equals(UUID)) {
+                        ItemStack item = yaml.getItemStack("mainMarket."+s+".item");
+                        player.getInventory().addItem(item);
+                        break;
+                    }
+                }
+            }
 
             try {
-                Connection conn = (new SQL.sqlData()).getConnection();
+                Connection conn = SQL.sqlData.getConnection();
                 Statement statement = conn.createStatement();
-                ResultSet set = statement.executeQuery("select item from longinus.mainmarket where uuid = '"+UUID+"'");
-                while(set.next()) {
-                    ItemStack item = (new SQL.Converter()).decodeItem(set.getString("item"));
-                    player.getInventory().addItem(item);
-                }
+//                ResultSet set = statement.executeQuery("select item from longinus.mainmarket where uuid = '"+UUID+"'");
+//                while(set.next()) {
+//                    ItemStack item = (new SQL.Converter()).decodeItem(set.getString("item"));
+//                    player.getInventory().addItem(item);
+//                }
                 statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+UUID+"'");
+                pM.deleteItem(UUID);
 
-                set.close();
+//                set.close();
                 statement.close();
-                conn.close();
+                //conn.close();
             }
             catch(Exception e) {
                 e.printStackTrace();
@@ -608,44 +642,6 @@ public class Auction implements Listener {
         Window.mySellList(player);
         MarketUpdate();
     }
-
-//    private void registerItemAverage(ItemStack itemStack, long altera) {
-//
-//        String itemName = itemStack.getItemMeta().getDisplayName();
-//
-//        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
-//        if(!file.exists()) {
-//            try{
-//                file.createNewFile();
-//            }
-//            catch(Exception e) {
-//
-//            }
-//        }
-//        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-//
-//
-//        if(config.contains("itemAverage."+itemName)) {
-//            List<Long> list = config.getLongList("itemAverage."+itemName);
-//            list.add(0, altera);
-//            while(list.size() > 10) {
-//                list.remove(10);
-//            }
-//            config.set("itemAverage."+itemName, list);
-//        }
-//        else {
-//            List<Long> list = new ArrayList<>();
-//            list.add(altera);
-//            config.set("itemAverage."+itemName, list);
-//        }
-//
-//        try {
-//            config.save(file);
-//        }
-//        catch(Exception e) {
-//
-//        }
-//    }
 
     public void noticeYourItemsWereSoldWhenJoin(Player player) {
 
@@ -734,7 +730,7 @@ public class Auction implements Listener {
 
 
                 try {
-                    Connection conn = (new SQL.sqlData()).getConnection();
+                    Connection conn = SQL.sqlData.getConnection();
                     Statement stmt = conn.createStatement();
                     Statement stmt_ = conn.createStatement();
                     Statement stmt__ = conn.createStatement();
@@ -747,7 +743,7 @@ public class Auction implements Listener {
 
                     set.close();
                     stmt.close();
-                    conn.close();
+                    //conn.close();
                 }
                 catch(Exception e) {
                     e.printStackTrace();
@@ -796,7 +792,7 @@ public class Auction implements Listener {
         }
 
         static ItemStack itemSold(String itemName) {
-            ItemStack itemStack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE, 1);
+            ItemStack itemStack = new ItemStack(Material.EMERALD_BLOCK, 1);
 
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
             NBTTagCompound tag = nmsStack.getOrCreateTag();

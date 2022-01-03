@@ -3,7 +3,6 @@ package PlayerChip;
 import Party.PartyManager;
 import PlayerManager.PlayerAlarmManager;
 import PlayerManager.PlayerManager;
-import PlayerManager.PlayerStatManager;
 import SQL.PlayerAltera;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
@@ -100,8 +99,8 @@ public class Maingui {
 	private ItemStack PlayerProfile(Player p) {
 
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
-		String Level = Integer.toString(PlayerStatManager.getinstance(p).getlvl());
-		String EXP = Integer.toString(PlayerStatManager.getinstance(p).getexp());
+		String Level = Integer.toString(PlayerManager.getinstance(p).getlvl());
+		String EXP = Integer.toString(PlayerManager.getinstance(p).getexp());
 
 
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
@@ -163,10 +162,10 @@ public class Maingui {
 		ItemMeta statmeta = statsetting.getItemMeta();
 		statmeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6스탯 관리&6"));
 		statmeta.setLore(Arrays.asList(
-				"§c무기강화 §6 Lv."+ PlayerStatManager.getinstance(p).getStr(),
-				"§e감각강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDex(),
-				"§5외피강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDef(),
-				"§b기동강화 §6 Lv."+ PlayerStatManager.getinstance(p).getAgi(),
+				"§c무기강화 §6 Lv."+ PlayerManager.getinstance(p).getStr(),
+				"§e감각강화 §6 Lv."+ PlayerManager.getinstance(p).getDex(),
+				"§5외피강화 §6 Lv."+ PlayerManager.getinstance(p).getDef(),
+				"§b기동강화 §6 Lv."+ PlayerManager.getinstance(p).getAgi(),
 				""
 				));
 		statsetting.setItemMeta(statmeta);

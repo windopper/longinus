@@ -115,7 +115,6 @@ public class Event implements Listener {
 		
 		if(item == null) return false;
 		if(item.getItemMeta() == null) return false;
-		if(item.getItemMeta().getDisplayName() == null) return false;
 		return true;
 	}
 	
@@ -123,18 +122,15 @@ public class Event implements Listener {
 	public void DetermineJumptoNextPage(Player player, int page, ItemStack item, Inventory inv) {
 		
 		if(!ChecItemHasAMetaData(item)) return;
-		
-		
+
 		String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
-		
-		//boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page+1));
-		boolean value = (new PlayerStorage(player)).checkStorageExist(Integer.toString(page+1));
-		
+
+		boolean value = page + 1 <= (new PlayerStorage(player)).maxStoragePage();
+		//boolean value = (new PlayerStorage(player)).checkStorageExist(Integer.toString(page+1));
 		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("다음페이지")) {
 				
 			if(value) {
 				(new PlayerStorage(player)).storageSave(inv, Integer.toString(page));
-				//UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
 				BankGui.getinstance().Open(player, Integer.toString(page+1));
 			}
 			else {
@@ -142,47 +138,17 @@ public class Event implements Listener {
 			}
 			
 		}
-//		else { // 다음페이지 아닐때
-//			
-//			if(UserDataManager.getinstance().getGold(player) > 500 * page) {
-//				
-//				BankSave.getinstance().Save(player, inv, Integer.toString(page));
-//				UserDataManager.getinstance().addStorage(player);
-//				BankGui.getinstance().Open(player, Integer.toString(page+1));
-//				UserDataManager.getinstance().setGold(player, UserDataManager.getinstance().getGold(player)-(500*page));
-//
-//			}
-//			else {
-//				
-//				player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 1);
-//				BankSave.getinstance().Save(player, inv, Integer.toString(page));
-//				BankGui.getinstance().Open(player, Integer.toString(page));
-//				
-//			}
-//			
-//
-//				
-//			
-//		}
-			
 	}
 	
 	public void DetermineJumptoPreviousPage(Player player, int page, ItemStack item, Inventory inv) {
 		
 		if(!ChecItemHasAMetaData(item)) return;
-		
 		String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
-		
-		//boolean value = UserStorageManager.getinstance().CheckBankPage(player, Integer.toString(page));
-		boolean value = (new PlayerStorage(player)).checkStorageExist(Integer.toString(page));
-		
-		
-		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("이전페이지")) {
 
+		if(page==1) return;
+		if(ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals("이전페이지")) {
 			(new PlayerStorage(player)).storageSave(inv, Integer.toString(page));
-			//UserStorageManager.getinstance().Save(player, inv, Integer.toString(page));
 			BankGui.getinstance().Open(player, Integer.toString(page-1));
-			
 		}
 		
 	}

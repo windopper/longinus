@@ -23,27 +23,30 @@ public class SQLManager {
         SQL.sqlData sqlData = new SQL.sqlData();
         SQL.Converter converter = new SQL.Converter();
 
+        if(!(new PlayerStorage(player)).isDataExist()) {
+            (new PlayerStorage(player)).initUserStorages();
+        }
+
         if(isDataExist()) return;
 
         String name = player.getName();
         String uuid = player.getUniqueId().toString();
         int altera = 0;
-        YamlConfiguration storageYaml = new YamlConfiguration();
-        storageYaml.set("1", " ");
-        storageYaml.set("2", " ");
-        storageYaml.set("3", " ");
-        String storages = converter.encodeYaml(storageYaml);
+
         String classes = null;
         String quests = null;
+
         YamlConfiguration alarmYaml = new YamlConfiguration();
         for(int i=0; i<=100; i++) {
             alarmYaml.set(i+".content", " ");
             alarmYaml.set(i+".type", " ");
             alarmYaml.set(i+".date", " ");
         }
+
         String alarms = converter.encodeYaml(alarmYaml);
 
         YamlConfiguration sampleYaml = new YamlConfiguration();
+
         for(MobListManager.MobList mobList : MobListManager.MobList.values()) {
             if(mobList.isScannable()) {
                 sampleYaml.set(mobList.getPlanet()+"."+mobList.name()+".count", 0);
@@ -67,10 +70,9 @@ public class SQLManager {
             Connection conn = sqlData.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("insert into longinus.user values ('"+name+"', '"+uuid+"', '"+altera+"', '"
-                    +storages+"', '"+classes+"', '"+quests+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
+                    +classes+"', '"+quests+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
                     +locx+"', '"+locy+"', '"+locz+"', '"+marketitems+"')");
             stmt.close();
-            conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -82,6 +84,9 @@ public class SQLManager {
         SQL.sqlData sqlData = new SQL.sqlData();
 
         if(!isDataExist()) return;
+
+        (new PlayerSample(player)).updateNewSampleList(); // 새로운 몬스터가 업데이트 된것이 있으면 업데이트
+
 
         try {
 

@@ -9,7 +9,6 @@ import ClassAbility.Khaos.KhaosMelee;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
-import PlayerManager.PlayerStatManager;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 
@@ -316,7 +315,7 @@ public class Combination {
 
 	public void Khaos(Player p, String combo) {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 
@@ -332,7 +331,7 @@ public class Combination {
 
 	public void Cheiron(Player p, String combo) {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 
@@ -351,7 +350,7 @@ public class Combination {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 		
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
@@ -480,7 +479,7 @@ public class Combination {
 
 	public void Accelerator(Player p, String combo) {
 		
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
@@ -606,7 +605,7 @@ public class Combination {
 
 	public void ByV(Player p, String combo) {
 		
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
@@ -756,7 +755,7 @@ public class Combination {
 
 	public void Phlox(Player p, String combo) {
 		
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int CurrentRobot = PlayerFunction.getinstance(p).PHNanoRobot;
@@ -908,7 +907,7 @@ public class Combination {
 	
 	public void Blaster(Player p, String combo) {
 		
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
+		int lvl = PlayerManager.getinstance(p).getlvl();
 		
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;

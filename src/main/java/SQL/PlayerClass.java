@@ -2,7 +2,6 @@ package SQL;
 
 import PlayerChip.Maingui;
 import PlayerManager.PlayerManager;
-import PlayerManager.PlayerStatManager;
 import QuestFunctions.QuestList;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,6 +17,8 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Set;
 
+import static SQL.sqlData.getConnection;
+
 public class PlayerClass {
 
     final static String[] data = {".str", ".dex", ".def", ".agi", ".lvl", ".exp", ".coord"};
@@ -30,10 +31,10 @@ public class PlayerClass {
         this.uuid = player.getUniqueId().toString();
     }
 
-    private void sendToSQLServer(String encodedYaml) {
+    public void sendToSQLServer(String encodedYaml) {
 
         try {
-            Connection conn = (new sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set classes = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
@@ -48,7 +49,7 @@ public class PlayerClass {
 
     public YamlConfiguration getClassFile() {
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select classes from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -101,7 +102,7 @@ public class PlayerClass {
                 }
                 Arrays.stream(QuestList.values()).forEach(value-> {
                     yaml.set(path+".quests."+value.name()+".progress", 0);
-                    Bukkit.broadcastMessage(value.name()+"  "+value.getLevelReq());
+                    //Bukkit.broadcastMessage(value.name()+"  "+value.getLevelReq());
                 });
 
                 String encoded = (new SQL.Converter()).encodeYaml(yaml);
@@ -138,12 +139,12 @@ public class PlayerClass {
 
         PlayerManager.getinstance(player).CurrentClass = className.split("/")[0];
         PlayerManager.getinstance(player).CurrentClassNumber = Integer.parseInt(className.split("/")[1]);
-        PlayerStatManager.getinstance(player).setStr(yaml.getInt(className+".str"));
-        PlayerStatManager.getinstance(player).setDex(yaml.getInt(className+".dex"));
-        PlayerStatManager.getinstance(player).setDef(yaml.getInt(className+".def"));
-        PlayerStatManager.getinstance(player).setAgi(yaml.getInt(className+".agi"));
-        PlayerStatManager.getinstance(player).setlvl(yaml.getInt(className+".lvl") <= 0 ? 1 : yaml.getInt(className+".lvl"));
-        PlayerStatManager.getinstance(player).setexp(yaml.getInt(className+".exp"));
+        PlayerManager.getinstance(player).setStr(yaml.getInt(className+".str"));
+        PlayerManager.getinstance(player).setDex(yaml.getInt(className+".dex"));
+        PlayerManager.getinstance(player).setDef(yaml.getInt(className+".def"));
+        PlayerManager.getinstance(player).setAgi(yaml.getInt(className+".agi"));
+        PlayerManager.getinstance(player).setlvl(yaml.getInt(className+".lvl") <= 0 ? 1 : yaml.getInt(className+".lvl"));
+        PlayerManager.getinstance(player).setexp(yaml.getInt(className+".exp"));
 
         //LastClassLocation.getinstance().classchangeteleport(player, className);
         Location location = (new Converter()).stringToCoord(player, className);
@@ -174,16 +175,15 @@ public class PlayerClass {
     public void classSave() {
 
         PlayerManager pM = PlayerManager.getinstance(player);
-        PlayerStatManager psM = PlayerStatManager.getinstance(player);
         if(pM.CurrentClass.equals("없음")) return;
         String className = pM.CurrentClass+"/"+pM.CurrentClassNumber;
         YamlConfiguration yaml = getClassFile();
-        yaml.set(className+".str", psM.getStr());
-        yaml.set(className+".dex", psM.getDex());
-        yaml.set(className+".def", psM.getDef());
-        yaml.set(className+".agi", psM.getAgi());
-        yaml.set(className+".lvl", psM.getlvl());
-        yaml.set(className+".exp", psM.getexp());
+        yaml.set(className+".str", pM.getStr());
+        yaml.set(className+".dex", pM.getDex());
+        yaml.set(className+".def", pM.getDef());
+        yaml.set(className+".agi", pM.getAgi());
+        yaml.set(className+".lvl", pM.getlvl());
+        yaml.set(className+".exp", pM.getexp());
         yaml.set(className+".coord", (new Converter()).coordToString(player.getLocation()));
 
         for(int i=0; i<41; i++) {
@@ -204,12 +204,12 @@ public class PlayerClass {
         sendToSQLServer(encoded);
 
         try {
-            Connection conn = (new sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set previousclass = '"+className+"' where uuid = '"+uuid+"'");
 
             stmt.close();
-            conn.close();
+            //conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -256,7 +256,7 @@ public class PlayerClass {
     public String getPreviousClass() {
 
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select previousclass from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -264,14 +264,14 @@ public class PlayerClass {
 
                 set.close();
                 stmt.close();
-                conn.close();
+                //conn.close();
 
                 if(previousClass == null) return "없음";
                 return previousClass;
             }
             set.close();
             stmt.close();
-            conn.close();
+            //conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -282,7 +282,7 @@ public class PlayerClass {
     public boolean isExist() {
         try {
             String uuid = player.getUniqueId().toString();
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select classes from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -290,7 +290,7 @@ public class PlayerClass {
 
                     set.close();
                     stmt.close();
-                    conn.close();
+                    //conn.close();
 
                     return false;
                 }
@@ -298,13 +298,13 @@ public class PlayerClass {
 
                     set.close();
                     stmt.close();
-                    conn.close();
+                    //conn.close();
                     return false;
                 }
             }
             set.close();
             stmt.close();
-            conn.close();
+            //conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();

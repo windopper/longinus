@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
+import static SQL.sqlData.getConnection;
+
 public class PlayerSample {
 
     private Player player;
@@ -26,7 +28,7 @@ public class PlayerSample {
 
     public YamlConfiguration getSampleFile() {
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select samples from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -49,20 +51,41 @@ public class PlayerSample {
         return null;
     }
 
+    public void updateSampleList() {
+
+    }
+
     private void sendToSQLServer(String encodedYaml) {
 
         try {
-            Connection conn = (new sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set samples = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
             stmt.close();
-            conn.close();
+            //conn.close();
 
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void updateNewSampleList() {
+
+        YamlConfiguration yaml = getSampleFile();
+
+        for(MobListManager.MobList mobList : MobListManager.MobList.values()) {
+            if(mobList.isScannable()) {
+                if(yaml.contains(mobList.getPlanet()+"."+mobList.name())) continue;
+                yaml.set(mobList.getPlanet()+"."+mobList.name()+".count", 0);
+                yaml.set(mobList.getPlanet()+"."+mobList.name()+".firstSeen", " ");
+                yaml.set(mobList.getPlanet()+"."+mobList.name()+".lastSeen", " ");
+            }
+        }
+
+        sendToSQLServer((new Converter()).encodeYaml(yaml));
+
     }
 
     public void updateAnalyzedEntity(LivingEntity entity) {

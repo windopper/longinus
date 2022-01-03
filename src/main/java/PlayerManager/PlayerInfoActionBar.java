@@ -29,29 +29,29 @@ public class PlayerInfoActionBar {
 			
 			// 아이테르 전용
 			String m = "§c§l☈ §l§c"+PF.AEImpulse+"/1000 "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 플록스 전용
 			String f = "§9§l◈ §l§9"+PF.PHNanoRobot +"/100  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 바이V 전용
 			String h = "§4§l▲ §l"+PlayerFunction.getinstance(player).essence+"  "+"§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			// 기본
 			String n = "§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+					"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			
 			
 			
-			if(PlayerEnergy.getinstance(player).getEnergyRate()>1 && i<=11) {  // 에너지 배수가 있을때 
+			if(PlayerEnergy.getinstance(player).getEnergyRate()>1 && i<=11) {  // 에너지 배수가 있을때
 				n = "§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-						"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+						"/"+MaxShield+"§5  §3§l⚡ §l§r§3"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			}
 			else if(PlayerEnergy.getinstance(player).getEnergyRate()>1 && i>11) {  // 에너지 배수가 있을때
 				n = "§6§l♥ §l§r§6"+CurrentHealth+"/"+MaxHealth+"§6  §5§l🛡 §l§r§5"+CurrentShield+
-						"/"+MaxShield+"§5  §b§l⚡ §l§r§b"+PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
+						"/"+MaxShield+"§5  §b§l⚡ §l§r§b"+ PlayerEnergy.getinstance(player).getEnergy()+"/20§3";
 			}
 			
 			if(CurrentClass.equals("아이테르")) {

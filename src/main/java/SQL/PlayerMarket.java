@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import static SQL.sqlData.getConnection;
+
 public class PlayerMarket {
 
     private Player player;
@@ -24,7 +26,7 @@ public class PlayerMarket {
 
     public YamlConfiguration getMarketItemsFile() {
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select marketitems from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -33,13 +35,13 @@ public class PlayerMarket {
 
                 set.close();
                 stmt.close();
-                conn.close();
+                //conn.close();
 
                 return config;
             }
             set.close();
             stmt.close();
-            conn.close();
+            //conn.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -51,12 +53,12 @@ public class PlayerMarket {
 
         try {
             String encodedYaml = (new Converter()).encodeYaml(rawYaml);
-            Connection conn = (new sqlData()).getConnection();
+            Connection conn = getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set marketitems = '"+encodedYaml+"' where uuid = '"+uuid+"'");
 
             stmt.close();
-            conn.close();
+            //conn.close();
 
         }
         catch(Exception e) {

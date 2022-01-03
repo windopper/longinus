@@ -2,6 +2,7 @@ package PlayerManager;
 
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -34,6 +35,14 @@ public class PlayerManager {
 	public int Shield = 0;
 	public int WalkSpeed = 0;
 	public int ManaDecrease = 0;
+
+	public int Str = 0;
+	public int Dex = 0;
+	public int Def = 0;
+	public int Agi = 0;
+	public int lvl = 0;
+	public int exp = 0;
+	public int remainstat = 0;
 	
 	public int WeaponLevelreq = 0;
 	public int WeaponStrreq = 0;
@@ -91,9 +100,48 @@ public class PlayerManager {
 			getinstance(p).equipmentsetting();
 		}
 	}
+
+	public int getStr() {
+		return Str;
+	}
+	public int getDex() {
+		return Dex;
+	}
+	public int getDef() {
+		return Def;
+	}
+	public int getAgi() {
+		return Agi;
+	}
+	public int getremainstat() {
+		return remainstat = lvl * 2 - Str - Dex - Def - Agi;
+	}
+	public int getlvl() {
+		return lvl;
+	}
+	public int getexp()	{
+		return exp;
+	}
+	public void setStr(int Str) {
+		this.Str = Str;
+	}
+	public void setDex(int Dex) {
+		this.Dex = Dex;
+	}
+	public void setDef(int Def) {
+		this.Def = Def;
+	}
+	public void setAgi(int Agi) {
+		this.Agi = Agi;
+	}
+	public void setlvl(int lvl) {
+		this.lvl = lvl;
+	}
+	public void setexp(int exp) {
+		this.exp = exp;
+	}
 	
 	public void setmap() {
-
 		WeaponClass = "없음";
 		MinDamage = 0;
 		MaxDamage = 0;
@@ -104,10 +152,55 @@ public class PlayerManager {
 		Shield = 0;
 		WalkSpeed = 0;
 		ManaDecrease = 0;
-
 	}
-	
-	
+
+	public void statadd(Player p, String stat, int amount) {
+
+		remainstat = lvl * 2 - Str - Dex - Def - Agi;
+
+		if(remainstat - amount < 0) {
+			statadd(p, stat, remainstat);
+		}
+
+		if(remainstat <= 0) {
+			p.sendMessage("§c남은 스탯이 없습니다");
+			p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.5f, 2f);
+			return;
+		}
+
+		if(stat.equals("str")) {
+
+			remainstat-=amount;
+			Str+=amount;
+			return;
+		}
+		if(stat.equals("dex")) {
+
+			remainstat-=amount;
+			Dex+=amount;
+			return;
+		}
+		if(stat.equals("def")) {
+
+			remainstat-=amount;
+			Def+=amount;
+			return;
+		}
+		if(stat.equals("agi")) {
+
+			remainstat -= amount;
+			Agi += amount;
+			return;
+		}
+	}
+
+	public void statreset() {
+		Str = 0;
+		Dex = 0;
+		Def = 0;
+		Agi = 0;
+	}
+
 	public void equipmentsetting() {
 		
 		WeaponClass = "없음";
@@ -119,7 +212,7 @@ public class PlayerManager {
 		int walkspeed = 0;
 		int energypersecond = 1;
 		int manadecrease = 0;
-		int shieldraw = (int)(Health / 10);
+		int shieldraw = Health / 10;
 		int count = 0; // 순서 세기
 		
 		WeaponLevelreq = 0;
@@ -189,11 +282,11 @@ public class PlayerManager {
 				HelmetDexreq = tag.getInt("감각강화제한");
 				HelmetDefreq = tag.getInt("외피강화제한");
 				HelmetAgireq = tag.getInt("기동강화제한");
-				if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
-				if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
-				if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
-				if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
-				if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
+				if(getlvl()<HelmetLevelreq) break;
+				if(getStr()<HelmetStrreq) break;
+				if(getDex()<HelmetDexreq) break;
+				if(getDef()<HelmetDefreq) break;
+				if(getAgi()<HelmetAgireq) break;
 			}
 			else if(count==2) {
 				ChestplateLevelreq = tag.getInt("레벨제한");
@@ -201,11 +294,11 @@ public class PlayerManager {
 				ChestplateDexreq = tag.getInt("감각강화제한");
 				ChestplateDefreq = tag.getInt("외피강화제한");
 				ChestplateAgireq = tag.getInt("기동강화제한");
-				if(PlayerStatManager.getinstance(p).getlvl()<ChestplateLevelreq) break;
-				if(PlayerStatManager.getinstance(p).getStr()<ChestplateStrreq) break;
-				if(PlayerStatManager.getinstance(p).getDex()<ChestplateDexreq) break;
-				if(PlayerStatManager.getinstance(p).getDef()<ChestplateDefreq) break;
-				if(PlayerStatManager.getinstance(p).getAgi()<ChestplateAgireq) break;
+				if(getlvl()<ChestplateLevelreq) break;
+				if(getStr()<ChestplateStrreq) break;
+				if(getDex()<ChestplateDexreq) break;
+				if(getDef()<ChestplateDefreq) break;
+				if(getAgi()<ChestplateAgireq) break;
 			}
 			else if(count==3) {
 				LeggingsLevelreq = tag.getInt("레벨제한");
@@ -213,11 +306,11 @@ public class PlayerManager {
 				LeggingsDexreq = tag.getInt("감각강화제한");
 				LeggingsDefreq = tag.getInt("외피강화제한");
 				LeggingsAgireq = tag.getInt("기동강화제한");
-				if(PlayerStatManager.getinstance(p).getlvl()<LeggingsLevelreq) break;
-				if(PlayerStatManager.getinstance(p).getStr()<LeggingsStrreq) break;
-				if(PlayerStatManager.getinstance(p).getDex()<LeggingsDexreq) break;
-				if(PlayerStatManager.getinstance(p).getDef()<LeggingsDefreq) break;
-				if(PlayerStatManager.getinstance(p).getAgi()<LeggingsAgireq) break;
+				if(getlvl()<LeggingsLevelreq) break;
+				if(getStr()<LeggingsStrreq) break;
+				if(getDex()<LeggingsDexreq) break;
+				if(getDef()<LeggingsDefreq) break;
+				if(getAgi()<LeggingsAgireq) break;
 			}
 			else if(count==4) {
 				HelmetLevelreq = tag.getInt("레벨제한");
@@ -225,11 +318,11 @@ public class PlayerManager {
 				HelmetDexreq = tag.getInt("감각강화제한");
 				HelmetDefreq = tag.getInt("외피강화제한");
 				HelmetAgireq = tag.getInt("기동강화제한");
-				if(PlayerStatManager.getinstance(p).getlvl()<HelmetLevelreq) break;
-				if(PlayerStatManager.getinstance(p).getStr()<HelmetStrreq) break;
-				if(PlayerStatManager.getinstance(p).getDex()<HelmetDexreq) break;
-				if(PlayerStatManager.getinstance(p).getDef()<HelmetDefreq) break;
-				if(PlayerStatManager.getinstance(p).getAgi()<HelmetAgireq) break;
+				if(getlvl()<HelmetLevelreq) break;
+				if(getStr()<HelmetStrreq) break;
+				if(getDex()<HelmetDexreq) break;
+				if(getDef()<HelmetDefreq) break;
+				if(getAgi()<HelmetAgireq) break;
 			}
 			else if(count==5) {
 				WeaponLevelreq = tag.getInt("레벨제한");
@@ -237,11 +330,11 @@ public class PlayerManager {
 				WeaponDexreq = tag.getInt("감각강화제한");
 				WeaponDefreq = tag.getInt("외피강화제한");
 				WeaponAgireq = tag.getInt("기동강화제한");
-				if(PlayerStatManager.getinstance(p).getlvl()<WeaponLevelreq) break;
-				if(PlayerStatManager.getinstance(p).getStr()<WeaponStrreq) break;
-				if(PlayerStatManager.getinstance(p).getDex()<WeaponDexreq) break;
-				if(PlayerStatManager.getinstance(p).getDef()<WeaponDefreq) break;
-				if(PlayerStatManager.getinstance(p).getAgi()<WeaponAgireq) break;
+				if(getlvl()<WeaponLevelreq) break;
+				if(getStr()<WeaponStrreq) break;
+				if(getDex()<WeaponDexreq) break;
+				if(getDef()<WeaponDefreq) break;
+				if(getAgi()<WeaponAgireq) break;
 			}
 
 			health += getTag(tag, "생명력");
@@ -308,10 +401,10 @@ public class PlayerManager {
 	
 	public double statstr(Player p) {
 		
-		if(PlayerStatManager.getinstance(p).getStr()==0) return 1;
+		if(getStr()==0) return 1;
 		
 		double sum = 0;
-		for(int i = 1; i<= PlayerStatManager.getinstance(p).getStr(); i++) {
+		for(int i = 1; i<= getStr(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -323,11 +416,11 @@ public class PlayerManager {
 	public double statdex(Player p) {
 		
 
-		if(PlayerStatManager.getinstance(p).getDex()==0) return 1;
+		if(getDex()==0) return 1;
 		
 		double sum = 0;
 		
-		for(int i = 1; i<= PlayerStatManager.getinstance(p).getDex(); i++) {
+		for(int i = 1; i<= getDex(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -346,10 +439,10 @@ public class PlayerManager {
 	}
 	public double statdef(Player p) {
 		
-		if(PlayerStatManager.getinstance(p).getDef()==0) return 1;
+		if(getDef()==0) return 1;
 		
 		double sum = 0;
-		for(int i = 1; i<= PlayerStatManager.getinstance(p).getDef(); i++) {
+		for(int i = 1; i<= getDef(); i++) {
 			
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;
@@ -360,10 +453,10 @@ public class PlayerManager {
 	}
 	public double statagi(Player p) {
 		
-		if(PlayerStatManager.getinstance(p).getAgi()==0) return 1;
+		if(getAgi()==0) return 1;
 		
 		double sum = 0;
-		for(int i = 1; i<= PlayerStatManager.getinstance(p).getAgi(); i++) {
+		for(int i = 1; i<= getAgi(); i++) {
 
 			double multiply = Math.pow(0.99, i);
 			sum += multiply;

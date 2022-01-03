@@ -328,8 +328,9 @@ public class Classgui {
 		
 		if(GUIlocation == 16) GUIlocation = 20;
 		if(GUIlocation == 25) GUIlocation = 29;
-		
-		if(GUIlocation <=33) gui.setItem(GUIlocation, ClassAddItem(p));
+
+		if((new SQL.PlayerClass(p)).getClassesAmount()<10)
+			if(GUIlocation <=33) gui.setItem(GUIlocation, ClassAddItem(p));
 		
 		
 	}

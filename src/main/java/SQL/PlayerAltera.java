@@ -29,14 +29,14 @@ public class PlayerAltera {
 
                 set.close();
                 stmt.close();
-                conn.close();
+//                conn.close();
 
                 return altera;
             }
 
             set.close();
             stmt.close();
-            conn.close();
+//            conn.close();
 
         }
         catch(Exception e) {
@@ -54,7 +54,7 @@ public class PlayerAltera {
             stmt.executeUpdate("update longinus.user set altera = '"+altera+"' where uuid = '"+uuid+"'");
 
             stmt.close();
-            conn.close();
+//            conn.close();
 
         }
         catch(Exception e) {

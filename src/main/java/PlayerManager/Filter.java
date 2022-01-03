@@ -68,7 +68,7 @@ public class Filter {
 	}
 	
 	public static void UserRequirementChecker(int req, Player p) {
-		int level = PlayerStatManager.getinstance(p).getlvl();
+		int level = PlayerManager.getinstance(p).getlvl();
 		if(level<req) {
 			p.sendMessage("§c아직 필요레벨을 충족하지 못하였습니다");
 		}
@@ -77,11 +77,11 @@ public class Filter {
 	
 	private static boolean UserRequirementChecker(Player p) {
 
-		int lvl = PlayerStatManager.getinstance(p).getlvl();
-		int str = PlayerStatManager.getinstance(p).getStr();
-		int dex = PlayerStatManager.getinstance(p).getDex();
-		int def = PlayerStatManager.getinstance(p).getDef();
-		int agi = PlayerStatManager.getinstance(p).getAgi();
+		int lvl = PlayerManager.getinstance(p).getlvl();
+		int str = PlayerManager.getinstance(p).getStr();
+		int dex = PlayerManager.getinstance(p).getDex();
+		int def = PlayerManager.getinstance(p).getDef();
+		int agi = PlayerManager.getinstance(p).getAgi();
 		
 		if(lvl < PlayerManager.getinstance(p).WeaponLevelreq ||
 				lvl < PlayerManager.getinstance(p).HelmetLevelreq ||

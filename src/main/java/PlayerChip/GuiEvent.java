@@ -3,10 +3,9 @@ package PlayerChip;
 import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
 import Party.PartyManager;
-import PlayerManager.PlayerAlarmManager;
 import PlayerManager.PlayerManager;
-import PlayerManager.PlayerStatManager;
 import ReturnToBase.ReturnMech;
+import SQL.PlayerAlarm;
 import SQL.PlayerAltera;
 import SQL.PlayerClass;
 import org.bukkit.Bukkit;
@@ -257,12 +256,14 @@ public class GuiEvent implements Listener {
 		p.playSound(p.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);
 		
 		if(action == InventoryAction.PICKUP_HALF) {
-			PlayerAlarmManager.instance().removeallalarms(p);
+			(new PlayerAlarm(p)).removeAllAlarm();
+			//PlayerAlarmManager.instance().removeallalarms(p);
 			Alarmgui.getinstance().AlarmGuiOpen(p);
 			
 		}
 		else if(action == InventoryAction.PICKUP_ALL) {
-			PlayerAlarmManager.instance().removeoldonealarm(p);
+			(new PlayerAlarm(p)).removeOldAlarm();
+			//PlayerAlarmManager.instance().removeoldonealarm(p);
 			Alarmgui.getinstance().AlarmGuiOpen(p);
 		}
 		
@@ -298,37 +299,37 @@ public class GuiEvent implements Listener {
 		if(rawslot == 11) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "str", 1);
+				PlayerManager.getinstance(p).statadd(p, "str", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "str", 5);
+				PlayerManager.getinstance(p).statadd(p, "str", 5);
 			}
 		}
 		if(rawslot == 12) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "dex", 1);
+				PlayerManager.getinstance(p).statadd(p, "dex", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "dex", 5);
+				PlayerManager.getinstance(p).statadd(p, "dex", 5);
 			}
 		}
 		if(rawslot == 14) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "def", 1);
+				PlayerManager.getinstance(p).statadd(p, "def", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "def", 5);
+				PlayerManager.getinstance(p).statadd(p, "def", 5);
 			}
 		}
 		if(rawslot == 15) {
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 2);
 			if(e.getClick().isLeftClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "agi", 1);
+				PlayerManager.getinstance(p).statadd(p, "agi", 1);
 			}
 			if(e.getClick().isRightClick()) {
-				PlayerStatManager.getinstance(p).statadd(p, "agi", 5);
+				PlayerManager.getinstance(p).statadd(p, "agi", 5);
 			}
 		}
 		if(rawslot == 27) {
@@ -344,7 +345,7 @@ public class GuiEvent implements Listener {
 			}
 			if(ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName()).equals("정말로 초기화 하시겠습니까?")) {
 				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1, 0);
-				PlayerStatManager.getinstance(p).statreset();
+				PlayerManager.getinstance(p).statreset();
 			}	
 		}
 		
@@ -551,13 +552,15 @@ public class GuiEvent implements Listener {
 		long receivergold = (new PlayerAltera(receiver)).getAltera();
 		receiverpA.setAltera(receivergold + gold);
 		//PlayerFileManager.getinstance().setGold(receiver, receivergold + gold);
+
+		PlayerAlarm senderpaL = new PlayerAlarm(sender);
+		PlayerAlarm receiverpaL = new PlayerAlarm(receiver);
 		
-		PlayerAlarmManager.instance().addalarm(sender, "§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
-		PlayerAlarmManager.instance().addalarm(receiver, "§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
+		senderpaL.addAlarm("§d"+receiver.getName()+"§7님에게 §a"+gold+"§d 알테라를 보냈습니다", "alterasend");
+		receiverpaL.addAlarm("§d"+sender.getName()+"§7님으로 부터 §a"+gold+"§d 알테라를 받았습니다", "alterareceive");
 		
 		sender.sendMessage("§a"+receiver.getName()+"님에게 성공적으로 §6"+gold+" §a알테라를 보냈습니다");
 		receiver.sendMessage("§a"+sender.getName()+"님으로 부터 §6"+gold+" §a알테라를 받았습니다");
-
 	}		
 	
 	public void ReturnEvent(InventoryClickEvent e) {

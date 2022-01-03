@@ -2,6 +2,7 @@ package ClassAbility.Cheiron;
 
 import PlayParticle.PlayParticle;
 import PlayerManager.PlayerFunction;
+import PlayerManager.PlayerManager;
 import org.bukkit.*;
 import org.bukkit.entity.AbstractArrow;
 import org.bukkit.entity.Arrow;
@@ -47,7 +48,7 @@ public class CheironMelee implements Listener {
         Player player = event.getPlayer();
 
         try {
-            if(!PlayerManager.PlayerManager.getinstance(player).CurrentClass.equals("케이론")) return;
+            if(!PlayerManager.getinstance(player).CurrentClass.equals("케이론")) return;
             if(event.getItem().getType() == Material.BOW && (event.getAction() == Action.RIGHT_CLICK_BLOCK
                     || event.getAction() == Action.RIGHT_CLICK_AIR)) {
                 ItemStack bow = event.getItem();
@@ -120,7 +121,7 @@ public class CheironMelee implements Listener {
         arrow.setShooter(player);
         arrow.setInvulnerable(true);
         arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
-        int damage = PlayerManager.PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
+        int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
         arrow.addScoreboardTag(Integer.toString(damage));
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 2);
@@ -140,7 +141,7 @@ public class CheironMelee implements Listener {
         arrow.setInvulnerable(true);
         arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         arrow.setCustomName("StrongShot");
-        int damage = PlayerManager.PlayerManager.getinstance(player).meleedmgcalculate(player, 1.5);
+        int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 1.5);
         arrow.addScoreboardTag(Integer.toString(damage));
         (new PlayParticle(Particle.CRIT)).BowShotVerticalParticle(loc.add(v), 1, 1d);
         (new PlayParticle(Particle.SMOKE_NORMAL)).BowShotVerticalParticle(loc.add(v), 0.3, 1);
@@ -178,7 +179,7 @@ public class CheironMelee implements Listener {
         arrow.setInvulnerable(true);
         arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         arrow.setCustomName("TripleShot");
-        int damage = PlayerManager.PlayerManager.getinstance(player).meleedmgcalculate(player, 0.7);
+        int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 0.7);
         arrow.addScoreboardTag(Integer.toString(damage));
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 2);
@@ -206,7 +207,7 @@ public class CheironMelee implements Listener {
             arrow.setInvulnerable(true);
             arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
             arrow.setCustomName("MultiShot");
-            int damage = PlayerManager.PlayerManager.getinstance(player).meleedmgcalculate(player, 0.3);
+            int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 0.3);
             arrow.addScoreboardTag(Integer.toString(damage));
 
             dir.subtract(new Vector(random1, random2, random3));
