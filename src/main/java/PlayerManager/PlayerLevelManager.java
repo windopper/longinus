@@ -73,7 +73,7 @@ public class PlayerLevelManager {
             if(CBList.get(player) < halfaverage) continue;
             // 아니면
             else {
-                PlayerStatManager psm = PlayerStatManager.getinstance(player);
+                PlayerManager psm = PlayerManager.getinstance(player);
                 double contributeRate = (double)CBList.get(player) / MaxHealth > 1 ? 1 : (double)CBList.get(player) / MaxHealth;
                 int GiveExp = (int) (exp * contributeRate);
 
@@ -145,18 +145,18 @@ public class PlayerLevelManager {
     private void DistributePartyXP(int GivenExp, Player Distributor) {
         if(PartyManager.getParty(Distributor) == null) return;
 
-        int distributorLevel = PlayerStatManager.getinstance(Distributor).getlvl();
+        int distributorLevel = PlayerManager.getinstance(Distributor).getlvl();
         List<Player> members = PartyManager.getParty(Distributor).getMembers();
         int membersize = members.size();
         int BonusExp = (int)(GivenExp * ((membersize >= 4) ? 0.2 : 0.05 * membersize));
 
         for(Player member : members) {
-            int memberlevel = PlayerStatManager.getinstance(member).getlvl();
+            int memberlevel = PlayerManager.getinstance(member).getlvl();
             if(distributorLevel - memberlevel >= 10) {
                 continue;
             }
             else {
-                PlayerStatManager.getinstance(member).setexp(PlayerStatManager.getinstance(member).getexp() + BonusExp);
+                PlayerManager.getinstance(member).setexp(PlayerManager.getinstance(member).getexp() + BonusExp);
                 PartyManager.getParty(member).addPartyXP(BonusExp);
             }
         }

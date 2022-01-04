@@ -1,6 +1,8 @@
 package Auction;
 
-import PlayerManager.PlayerFileManager;
+import SQL.MainMarket;
+import SQL.PlayerAltera;
+import SQL.PlayerMarket;
 import Shop.RightClickNPC;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.nbt.NBTTagCompound;
@@ -38,6 +40,8 @@ public class Auction implements Listener {
     private final static Set<Player> OnSearching = new HashSet<>();
     private final static ConcurrentHashMap<Player, ItemStack> preRegisterItem = new ConcurrentHashMap<>();
     private final static ConcurrentHashMap<Player, Long> preRegisterAltera = new ConcurrentHashMap<>();
+
+    private final static long saleLimit = 1209600000;
 
     @EventHandler
     public void NPCRightClicked(RightClickNPC event) {
@@ -80,6 +84,13 @@ public class Auction implements Listener {
             if(msg.equals("취소")) {
                 OnSearching.remove(player);
             }
+            else {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                    MarketOpen(player, 1, msg);
+                }, 0);
+
+                OnSearching.remove(player);
+            }
 
             event.setCancelled(true);
         }
@@ -118,6 +129,36 @@ public class Auction implements Listener {
             }
             event.setCancelled(true);
         }
+        else if(event.getView().getTitle().contains("검색결과")) {
+            String search = player.getOpenInventory().getTitle().split("\"")[1];
+            int page = Integer.parseInt(player.getOpenInventory().getTitle().replaceAll("[^0-9]",""));
+            if(slot == 8) {
+                preRegisterItem.remove(player);
+                preRegisterAltera.remove(player);
+                (new Window()).Register(player);
+            }
+            else if(slot == 17) {
+                Window.mySellList(player);
+            }
+            else if(slot == 26) {
+                MarketOpen(player, page+1, search);
+            }
+            else if(slot == 35) {
+                MarketOpen(player, page == 1 ? 1 : page - 1, search);
+            }
+            else if(slot == 53) {
+                OnSearching.add(player);
+                player.closeInventory();
+                player.sendMessage("§6아이템을 검색해주세요. '취소'라고 입력하면 검색이 취소됩니다.");
+            }
+            else if(slot % 9 <= 6 && slot <= 53) {
+                ItemStack clickedItem = event.getCurrentItem();
+                if(clickedItem != null) {
+                    (new Window()).BuyItem(player, clickedItem);
+                }
+            }
+            event.setCancelled(true);
+        }
         else if(event.getView().getTitle().contains("등록할 아이템을 선택하세요")) {
             if(slot == 24) {
                 MarketOpen(player, 1);
@@ -127,7 +168,7 @@ public class Auction implements Listener {
             else if(slot == 13) {
                 ListenChat.add(player);
                 player.closeInventory();
-                player.sendMessage("§6책정 값을 입력해주세요. 현재 보유 알테라: "+ PlayerFileManager.getinstance().getGold(player));
+                player.sendMessage("§6책정 값을 입력해주세요. 현재 보유 알테라: "+(new SQL.PlayerAltera(player)).getAltera());
             }
             else if(slot == 20) {
                 if(preRegisterAltera.containsKey(player) && preRegisterItem.containsKey(player)) {
@@ -239,29 +280,30 @@ public class Auction implements Listener {
     public static void MarketSalesTimeWatcher() {
 
         try {
-
-            Connection con = (new SQL.sqlData()).getConnection();
+            Connection con = SQL.sqlData.getConnection();
             Statement statement = con.createStatement();
-            ResultSet set = statement.executeQuery("Select * from myserver.mainmarket");
+            ResultSet set = statement.executeQuery("select * from longinus.mainmarket");
 
             while (set.next()) {
                 long date = set.getLong("milli");
-                long remain = date + 1209600000 - System.currentTimeMillis();
+                long remain = date + saleLimit - System.currentTimeMillis();
                 if(remain<0) {
-                    statement.executeQuery("delte from myserver.mainmarket where uuid = '"+set.getString("uuid")+"'");
-                    //(new SQL.sqlData()).QueryDeleteItemFromMarket(set.getString("uuid"));
+                    //String selleruuid = set.getString("seller");
+                    (new MainMarket(set.getString("uuid"))).deleteItem();
+                    //statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+set.getString("uuid")+"'");
                 }
             }
+
             statement.close();
             set.close();
-            con.close();
+            //con.close();
         }
         catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 
-    public static void MarketUpdate() {
+    public void MarketUpdate() {
 
         Auction.MarketSalesTimeWatcher();
 
@@ -279,9 +321,9 @@ public class Auction implements Listener {
 
                     int j = (page - 1) * 42;
 
-                    Connection conn = (new SQL.sqlData()).getConnection();
+                    Connection conn = SQL.sqlData.getConnection();
                     Statement statement = conn.createStatement();
-                    ResultSet set = statement.executeQuery("Select * from myserver.mainmarket order by milli desc limit "+j+", "+42);
+                    ResultSet set = statement.executeQuery("Select * from longinus.mainmarket order by milli desc limit "+j+", "+42);
 
                     if(!set.next()) {
                         player.openInventory(inv);
@@ -313,14 +355,12 @@ public class Auction implements Listener {
 
                     set.close();
                     statement.close();
-                    conn.close();
+                    //conn.close();
 
                 }
                 catch(Exception e) {
                     e.printStackTrace();
                 }
-
-
             }
             else {
             }
@@ -328,10 +368,21 @@ public class Auction implements Listener {
     }
 
     private void MarketOpen(Player player, int page) {
+        MarketOpen(player, page, "");
+    }
+
+    private void MarketOpen(Player player, int page, String searchName) {
 
         Auction.MarketSalesTimeWatcher();
 
         Inventory inv = Bukkit.createInventory(null, 54, "MarketPlace [페이지 "+page+"]");
+        if(searchName.equals("")) {
+
+        }
+        else {
+            inv = Bukkit.createInventory(null, 54, "\""+searchName+"\" 검색결과 [페이지 "+page+"]");
+            searchName = "where itemname like '%"+searchName+"%'";
+        }
 
         inv.setItem(8, UI.register(player));
         inv.setItem(17, UI.SeeMySellList(player));
@@ -342,9 +393,9 @@ public class Auction implements Listener {
         try {
             int j = (page - 1) * 42;
 
-            Connection connection = (new SQL.sqlData()).getConnection();
+            Connection connection = SQL.sqlData.getConnection();
             Statement statement = connection.createStatement();
-            ResultSet set = statement.executeQuery("select * from myserver.mainmarket order by milli desc limit "+j+", "+42);
+            ResultSet set = statement.executeQuery("select * from longinus.mainmarket "+searchName+" order by milli desc limit "+j+", "+42);
 
 
             for(int i=0; i<54; i++) {
@@ -372,7 +423,7 @@ public class Auction implements Listener {
             player.openInventory(inv);
             set.close();
             statement.close();
-            connection.close();
+            //connection.close();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -381,40 +432,29 @@ public class Auction implements Listener {
 
     }
 
-    public static synchronized void MarketRegister(Player player, ItemStack itemStack, long altera, int count) {
+    public void MarketRegister(Player player, ItemStack itemStack, long altera, int count) {
 
         String uuid = player.getUniqueId().toString();
+        String itemName = itemStack.getItemMeta().getDisplayName();
 
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         NBTTagCompound nbtTagCompound = nmsStack.getTag();
         String Iuuid = nbtTagCompound.getString("UUID");
 
-        File UserFile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-        FileConfiguration UserConfig = YamlConfiguration.loadConfiguration(UserFile);
 
         String pattern = "yyyyMMddHHmmssSSS";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern, Locale.KOREA);
         long date = Long.parseLong(simpleDateFormat.format(new Date()));
 
         String path = "mainMarket."+date;
-        (new SQL.sqlData()).QueryRegisterMarket(Iuuid, altera, (new SQL.Converter()).encodeItem(itemStack), count, player.getUniqueId().toString());
 
-        path = "mainMarket."+date;
-        UserConfig.set(path+".item", itemStack);
-        UserConfig.set(path+".count", count);
-        UserConfig.set(path+".uuid", Iuuid);
-        UserConfig.set(path+".altera", altera);
-        UserConfig.set(path+".millis", System.currentTimeMillis());
-        try {
-            UserConfig.save(UserFile);
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
+        (new SQL.MainMarket(Iuuid)).registerItem(Iuuid, altera, (new SQL.Converter()).encodeItem(itemStack), count, player.getUniqueId().toString(), itemName);
+        (new SQL.PlayerMarket(player)).registerItem(date, itemStack, count, Iuuid, altera, System.currentTimeMillis());
+
         MarketUpdate();
     }
 
-    private static synchronized void MarketBuy(Player player, ItemStack itemStack) {
+    private void MarketBuy(Player player, ItemStack itemStack) {
 
         if(player.getInventory().firstEmpty() == -1) {
             player.sendMessage("§c인벤토리에 공간이 없습니다! 인벤토리를 먼저 비워주세요");
@@ -430,29 +470,33 @@ public class Auction implements Listener {
 
 
         try {
-            Connection connection = (new SQL.sqlData()).getConnection();
+            Connection connection = SQL.sqlData.getConnection();
             Statement statement = connection.createStatement();
-            ResultSet set = statement.executeQuery("select * from myserver.mainmarket where uuid = '"+Iuuid+"'");
+            ResultSet set = statement.executeQuery("select * from longinus.mainmarket where uuid = '"+Iuuid+"'");
 
             while(set.next()) {
                 if(set.getString("uuid").equals(Iuuid)) {
                     isExist = true;
+
+                    if(set.getString("seller").equals(player.getUniqueId().toString())) {
+                        player.sendMessage("§c자신의 아이템을 구매할 수 없습니다");
+                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+                        break;
+                    }
                     long altera = set.getLong("altera");
-                    if(altera <= PlayerFileManager.getinstance().getGold(player)) {
+                    if(altera <= (new SQL.PlayerAltera(player)).getAltera()) {
 
                         try {
 
-                            File file_ = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(),
-                                    set.getString("seller")+".yml");
-                            FileConfiguration config_ = YamlConfiguration.loadConfiguration(file_);
-
-                            // 판매자의 파일에 접근
-                            for(String s_ : config_.getConfigurationSection("mainMarket").getKeys(false)) {
-                                if(config_.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
-                                    config_.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
+                            YamlConfiguration yaml = (new PlayerMarket(set.getString("seller"))).getMarketItemsFile();
+                            for(String s_ : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                                if(yaml.getString("mainMarket."+s_+".uuid").equals(Iuuid)) {
+                                    yaml.set("mainMarket."+s_+".item", UI.itemSold(itemStack.getItemMeta().getDisplayName()));
                                     break;
                                 }
                             }
+
+                            (new PlayerMarket(set.getString("seller"))).sendToSQLServer(yaml);
 
                             UUID selleruuid = UUID.fromString(set.getString("seller"));
                             for(Player p_ : Bukkit.getOnlinePlayers()) {
@@ -461,27 +505,25 @@ public class Auction implements Listener {
                                     break;
                                 }
                             }
-
-                            config_.save(file_);
+                            //config_.save(file_);
                         }
                         catch(Exception e) {
                             player.sendMessage("§c예기치 않은 오류가 발생했습니다");
                         }
 
 
-                        PlayerFileManager.getinstance().setGold(player, PlayerFileManager.getinstance().getGold(player) - altera);
+                        (new SQL.PlayerAltera(player)).setAltera( (new SQL.PlayerAltera(player)).getAltera() - altera);
                         ItemStack item = (new SQL.Converter()).decodeItem(set.getString("item"));
                         player.getInventory().addItem(item);
                         player.sendMessage("§a구매 완료!");
                         player.closeInventory();
 
                         (new SQL.sqlData()).QueryLogMarket(altera, item, item.getAmount(), set.getString("seller"),
-                                player.getUniqueId().toString(), new java.sql.Date(set.getLong("milli")));
-                        registerItemAverage(item, altera);
+                                player.getUniqueId().toString(), set.getString("selltime"));
+                        //registerItemAverage(item, altera);
 
-                        int z = statement.executeUpdate("delete from myserver.mainmarket where uuid = '"+Iuuid+"'");
-//
-//                        (new SQL.sqlData()).QueryDeleteItemFromMarket(Iuuid);
+                        int z = statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+Iuuid+"'");
+
                     }
                     else {
                         player.closeInventory();
@@ -497,7 +539,7 @@ public class Auction implements Listener {
             }
             set.close();
             statement.close();
-            connection.close();
+            //connection.close();
         }
         catch(Exception e) {
 
@@ -505,58 +547,49 @@ public class Auction implements Listener {
         MarketUpdate();
     }
 
+    private void MarketSearch(Player player, String search) {
+
+    }
+
     private void getAlteraFromMySalesStand(Player player, ItemStack itemStack) {
 
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+        PlayerMarket pM = new PlayerMarket(player);
+        PlayerAltera pA = new PlayerAltera(player);
+
+        YamlConfiguration yaml = pM.getMarketItemsFile();
 
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         String UUID = nmsStack.getTag().getString("UUID");
 
-        try {
-            if(config.contains("mainMarket")) {
-                for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                    ItemStack itemStack_ = config.getItemStack("mainMarket."+s+".item");
-                    net.minecraft.world.item.ItemStack nmsStack_ = CraftItemStack.asNMSCopy(itemStack_);
-                    if(nmsStack_.getTag().getString("UUID").equals(UUID)) {
-
-                        long altera = config.getLong("mainMarket."+s+".altera");
-                        long sumAltera = 0;
-
-                        try {
-                            sumAltera = Math.addExact(config.getLong("Gold"), altera);
-                        }
-                        catch(ArithmeticException e) {
-                            sumAltera = Long.MAX_VALUE;
-                        }
-
-                        config.set("mainMarket."+s, null);
-                        config.set("Gold", config.getLong("Gold")+altera);
-                        config.save(file);
-                        player.sendMessage("§a알테라 수령 완료! +"+altera+" §7보유 알테라: "
-                                +config.getLong("Gold"));
-                        player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
-
-                        break;
-                    }
+        for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+            ItemStack itemStack_ = yaml.getItemStack("mainMarket."+s+".item");
+            net.minecraft.world.item.ItemStack nmsStack_ = CraftItemStack.asNMSCopy(itemStack_);
+            if(nmsStack_.getTag().getString("UUID").equals(UUID)); {
+                long altera = yaml.getLong("mainMarket."+s+".altera");
+                long sumAltera = 0;
+                try {
+                    sumAltera = Math.addExact(pA.getAltera(), altera);
                 }
+                catch(ArithmeticException e) {
+                    sumAltera = Long.MAX_VALUE;
+                }
+                yaml.set("mainMarket."+s, null);
+                pM.sendToSQLServer(yaml);
+
+                pA.setAltera(sumAltera);
+                player.sendMessage("§a알테라 수령 완료! +"+altera+" §7보유 알테라: "
+                        +pA.getAltera());
+                player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
+
+                break;
             }
         }
-        catch(Exception e) {
 
-        }
-
-//        try {
-//            config.save(file);
-//        }
-//        catch(Exception e) {
-//
-//        }
 
         Window.mySellList(player);
     }
 
-    private static synchronized void getItemFromMySalesStand(Player player, ItemStack itemStack) {
+    private void getItemFromMySalesStand(Player player, ItemStack itemStack) {
 
         if(player.getInventory().firstEmpty() == -1) {
             player.sendMessage("§c인벤토리에 공간이 없습니다! 인벤토리를 먼저 비워주세요");
@@ -566,99 +599,68 @@ public class Auction implements Listener {
         }
         try {
 
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
             String UUID = nmsStack.getTag().getString("UUID");
 
-            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                if(config.getString("mainMarket."+s+".uuid").equals(UUID)) {
-                    config.set("mainMarket."+s, null);
-                    break;
+            PlayerMarket pM = new PlayerMarket(player);
+            YamlConfiguration yaml = pM.getMarketItemsFile();
+
+            if(yaml.getConfigurationSection("mainMarket") != null) {
+                for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                    if(yaml.getString("mainMarket."+s+".uuid").equals(UUID)) {
+                        ItemStack item = yaml.getItemStack("mainMarket."+s+".item");
+                        player.getInventory().addItem(item);
+                        break;
+                    }
                 }
             }
 
             try {
-                Connection conn = (new SQL.sqlData()).getConnection();
+                Connection conn = SQL.sqlData.getConnection();
                 Statement statement = conn.createStatement();
-                ResultSet set = statement.executeQuery("select item from myserver.mainmarket where uuid = '"+UUID+"'");
-                ItemStack item = (new SQL.Converter()).decodeItem(set.getString("item"));
-                player.getInventory().addItem(item);
+//                ResultSet set = statement.executeQuery("select item from longinus.mainmarket where uuid = '"+UUID+"'");
+//                while(set.next()) {
+//                    ItemStack item = (new SQL.Converter()).decodeItem(set.getString("item"));
+//                    player.getInventory().addItem(item);
+//                }
+                statement.executeUpdate("delete from longinus.mainmarket where uuid = '"+UUID+"'");
+                pM.deleteItem(UUID);
 
-                statement.executeUpdate("delete from myserver.mainmarket where uuid = '"+UUID+"'");
-
-                set.close();
+//                set.close();
                 statement.close();
-                conn.close();
+                //conn.close();
             }
             catch(Exception e) {
-
+                e.printStackTrace();
             }
 
-            config.save(file);
+            //config.save(file);
         }
         catch(Exception e) {
 
         }
-
         Window.mySellList(player);
         MarketUpdate();
     }
 
-    private static synchronized void registerItemAverage(ItemStack itemStack, long altera) {
-
-        String itemName = itemStack.getItemMeta().getDisplayName();
-
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
-        if(!file.exists()) {
-            try{
-                file.createNewFile();
-            }
-            catch(Exception e) {
-
-            }
-        }
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        if(config.contains("itemAverage."+itemName)) {
-            List<Long> list = config.getLongList("itemAverage."+itemName);
-            list.add(0, altera);
-            while(list.size() > 10) {
-                list.remove(10);
-            }
-            config.set("itemAverage."+itemName, list);
-        }
-        else {
-            List<Long> list = new ArrayList<>();
-            list.add(altera);
-            config.set("itemAverage."+itemName, list);
-        }
-
-        try {
-            config.save(file);
-        }
-        catch(Exception e) {
-
-        }
-    }
-
     public void noticeYourItemsWereSoldWhenJoin(Player player) {
 
-        File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-        FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
         int count = 0;
+        PlayerMarket pM = new PlayerMarket(player);
+        YamlConfiguration yaml = pM.getMarketItemsFile();
 
-        if(config.contains("mainMarket")) {
-            for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                ItemStack itemStack = config.getItemStack("mainMarket."+s+".item");
+        try {
+            for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                ItemStack itemStack = yaml.getItemStack("mainMarket."+s+".item");
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 if(itemMeta.getDisplayName().contains("판매 완료!")) {
                     count++;
                 }
             }
         }
+        catch(NullPointerException e) {
 
+        }
         if(count != 0) {
             player.sendMessage("§5>> §6"+count+"§a개의 아이템이 판매되었습니다! 마켓플레이스에서 알테라를 수령해 주세요");
         }
@@ -725,27 +727,26 @@ public class Auction implements Listener {
             if(preRegisterItem.containsKey(player)) {
                 ItemStack itemStack = preRegisterItem.get(player);
                 String itemName = itemStack.getItemMeta().getDisplayName();
-                File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "MarketPriceAverage.yml");
-                if(!file.exists()) {
-                    try{
-                        file.createNewFile();
-                    }
-                    catch(Exception e) {
 
+
+                try {
+                    Connection conn = SQL.sqlData.getConnection();
+                    Statement stmt = conn.createStatement();
+                    Statement stmt_ = conn.createStatement();
+                    Statement stmt__ = conn.createStatement();
+                    ResultSet set = stmt.executeQuery("select avg(altera), max(altera), min(altera) from longinus.mainmarketlog where name = '"+itemName+"' order by buytime desc limit 0, 10");
+                    if(set.next()) {
+                        average = set.getLong("avg(altera)");
+                        min = set.getLong("min(altera)");
+                        max = set.getLong("max(altera)");
                     }
+
+                    set.close();
+                    stmt.close();
+                    //conn.close();
                 }
-                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-                if(config.contains("itemAverage." + itemName)) {
-                    long sum = 0;
-                    for(long i : config.getLongList("itemAverage." + itemName)) {
-                        sum += i;
-                    }
-                    average = sum / config.getLongList("itemAverage." + itemName).size();
-
-
-                    min = Collections.min(config.getLongList("itemAverage." + itemName));
-                    max = Collections.max(config.getLongList("itemAverage." + itemName));
+                catch(Exception e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -791,7 +792,7 @@ public class Auction implements Listener {
         }
 
         static ItemStack itemSold(String itemName) {
-            ItemStack itemStack = new ItemStack(Material.GREEN_STAINED_GLASS_PANE, 1);
+            ItemStack itemStack = new ItemStack(Material.EMERALD_BLOCK, 1);
 
             net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
             NBTTagCompound tag = nmsStack.getOrCreateTag();
@@ -839,12 +840,11 @@ public class Auction implements Listener {
 
         void Register(Player player) {
 
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), player.getUniqueId().toString()+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            YamlConfiguration yaml = (new PlayerMarket(player)).getMarketItemsFile();
 
-            if(config.contains("mainMarket")) {
+            if(yaml.getConfigurationSection("mainMarket") != null) {
                 int j=0;
-                for(String s : config.getConfigurationSection("mainMarket").getKeys(false)) {
+                for(String s : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
                     j++;
                 }
                 if(j>=5) {
@@ -870,51 +870,55 @@ public class Auction implements Listener {
         static void mySellList(Player player) {
             Inventory inv = Bukkit.createInventory(null, 27, "판매 중인 아이템");
 
-            String uuid = player.getUniqueId().toString();
-            File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            PlayerMarket pM = new PlayerMarket(player);
+
+            YamlConfiguration yaml = pM.getMarketItemsFile();
 
             List<Long> paths = new ArrayList<>();
 
-            if(!config.contains("mainMarket")) {
-                player.openInventory(inv);
-                return;
-            }
-            for(String i : config.getConfigurationSection("mainMarket").getKeys(false)) {
-                paths.add(Long.parseLong(i));
+            if(yaml.getConfigurationSection("mainMarket") != null) {
+                for(String i : yaml.getConfigurationSection("mainMarket").getKeys(false)) {
+                    paths.add(Long.parseLong(i));
+                }
             }
 
             try {
                 for(int i=11; i<=15; i++) {
-                    String path = "mainMarket."+paths.get(i-11);
-                    if(config.contains(path)) {
-                        ItemStack itemStack = config.getItemStack(path+".item");
+                    if(paths.size() == i-11) break;
+                    String path = Long.toString(paths.get(i-11));
+                    if(yaml.contains("mainMarket."+path)) {
+                        ItemStack itemStack = yaml.getItemStack("mainMarket."+path+".item");
                         if(itemStack == null) inv.setItem(i, new ItemStack(Material.AIR, 1));
                         else {
                             ItemMeta itemMeta = itemStack.getItemMeta();
-                            long millis = config.getLong("mainMarket."+paths.get(i-11)+".millis");
-                            long remain =  millis + 1209600000 - System.currentTimeMillis();
+                            long millis = yaml.getLong("mainMarket."+paths.get(i-11)+".millis");
+                            long remain =  millis + saleLimit  - System.currentTimeMillis();
                             List<String> lore = itemMeta.getLore();
 
-                            if(remain < 0) {
+                            if(itemMeta.getDisplayName().contains("판매 완료!")) {
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "");
+                            }
+                            else if(remain < 0) {
+                                lore.clear();
                                 lore.add(0, "");
                                 lore.add(0, "§7클릭하여 아이템을 회수해 주세요");
                                 lore.add(0, "§7남은 판매기간: §c판매가 종료되었습니다");
-                                lore.add(0, "§5- §7판매가: §f"+config.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "");
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
                                 lore.add(0, "");
 
                             }
                             else {
-                                String day = remain / 86400000 > 0 ? remain / 86400000+"일" : "";
-                                String hour = remain % 86400000 / 3600000 > 0 ? remain % 86400000 / 3600000+"시" : "";
-                                String minute = remain % 86400000 % 3600000 / 60000 > 0 ? remain % 86400000 % 3600000 / 60000+"분" : "";
+                                String day = remain / 86400000 > 0 ? remain / 86400000+"일 " : "";
+                                String hour = remain % 86400000 / 3600000 > 0 ? remain % 86400000 / 3600000+"시 " : "";
+                                String minute = remain % 86400000 % 3600000 / 60000 > 0 ? remain % 86400000 % 3600000 / 60000+"분 " : "";
+                                String second = minute.equals("") ? remain % 86400000 % 3600000 % 60000 / 1000+"초 " : "";
 
                                 lore.add(0, "");
-                                lore.add(0, "§7남은 판매기간: "+day+" "+hour+" "+minute+" 남음");
-                                lore.add(0, "§5- §7판매가: §f"+config.getLong("mainMarket."+paths.get(i-11)+".altera"));
+                                lore.add(0, "§7남은 판매기간: "+day+hour+minute+second+"남음");
+                                lore.add(0, "§5- §7판매가: §f"+yaml.getLong("mainMarket."+paths.get(i-11)+".altera"));
                                 lore.add(0, "");
-
-
                             }
 
                             itemMeta.setLore(lore);
@@ -925,7 +929,7 @@ public class Auction implements Listener {
                 }
             }
             catch(Exception e) {
-
+                e.printStackTrace();
             }
 
 

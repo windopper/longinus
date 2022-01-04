@@ -1,4 +1,4 @@
-package QuestClasses;
+package Quests;
 
 import Mob.EntityStatusManager;
 import org.bukkit.*;

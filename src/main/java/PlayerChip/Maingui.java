@@ -1,9 +1,9 @@
 package PlayerChip;
 
 import Party.PartyManager;
-import PlayerManager.PlayerFileManager;
 import PlayerManager.PlayerManager;
-import PlayerManager.PlayerStatManager;
+import SQL.PlayerAlarm;
+import SQL.PlayerAltera;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import PlayerManager.PlayerAlarmManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,8 +99,8 @@ public class Maingui {
 	private ItemStack PlayerProfile(Player p) {
 
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
-		String Level = Integer.toString(PlayerStatManager.getinstance(p).getlvl());
-		String EXP = Integer.toString(PlayerStatManager.getinstance(p).getexp());
+		String Level = Integer.toString(PlayerManager.getinstance(p).getlvl());
+		String EXP = Integer.toString(PlayerManager.getinstance(p).getexp());
 
 
 		ItemStack item = new ItemStack(Material.PLAYER_HEAD);
@@ -163,10 +162,10 @@ public class Maingui {
 		ItemMeta statmeta = statsetting.getItemMeta();
 		statmeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6스탯 관리&6"));
 		statmeta.setLore(Arrays.asList(
-				"§c무기강화 §6 Lv."+ PlayerStatManager.getinstance(p).getStr(),
-				"§e감각강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDex(),
-				"§5외피강화 §6 Lv."+ PlayerStatManager.getinstance(p).getDef(),
-				"§b기동강화 §6 Lv."+ PlayerStatManager.getinstance(p).getAgi(),
+				"§c무기강화 §6 Lv."+ PlayerManager.getinstance(p).getStr(),
+				"§e감각강화 §6 Lv."+ PlayerManager.getinstance(p).getDex(),
+				"§5외피강화 §6 Lv."+ PlayerManager.getinstance(p).getDef(),
+				"§b기동강화 §6 Lv."+ PlayerManager.getinstance(p).getAgi(),
 				""
 				));
 		statsetting.setItemMeta(statmeta);
@@ -181,13 +180,13 @@ public class Maingui {
 		ItemMeta alarmmeta = alarm.getItemMeta();
 		alarmmeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6유저 알림&6"));
 		
-		int amount = PlayerAlarmManager.instance().getalarmamount(p);
+		int amount = (new PlayerAlarm(p)).getAlarmAmount();
 		
 		if(amount ==0)
 			alarmmeta.setLore(Arrays.asList("§7알람이 없습니다§7"));
 		else if(amount ==1) {
 
-			ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, 0);
+			List<String> list = (new PlayerAlarm(p)).getAlarmList(0);
 			
 			int i = 0;
 			
@@ -201,7 +200,7 @@ public class Maingui {
 		}
 			
 		else {
-			ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, 0);
+			List<String> list = (new PlayerAlarm(p)).getAlarmList(0);
 			
 			int i = 0;
 			
@@ -250,7 +249,7 @@ public class Maingui {
 	
 	public ItemStack alteraitem(Player p) {
 		
-		long gold = PlayerFileManager.getinstance().getGold(p);
+		long gold = (new PlayerAltera(p)).getAltera();
 		
 		ItemStack item = new ItemStack(Material.DIAMOND_BLOCK, 1);
 		ItemMeta meta = item.getItemMeta();

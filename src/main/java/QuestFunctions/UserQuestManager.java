@@ -1,20 +1,18 @@
 package QuestFunctions;
 
-import Shop.RightClickNPC;
-import QuestClasses.FirstMission;
 import PlayerManager.PlayerManager;
+import Quests.FirstMission;
+import SQL.PlayerQuest;
+import Shop.RightClickNPC;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -72,27 +70,15 @@ public class UserQuestManager implements EventsInterface, Listener {
 	@Override
 	public void AcceptQuest(String questname, Player p) {
 
-
 		String InsertSpace = questname.replaceAll("_", " ");
 		p.sendTitle("§a임무 시작", "§e"+InsertSpace, 20, 80, 20);
 		p.sendMessage("§5>> §a임무 시작: §6"+InsertSpace);
 		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2 ,1);
 
-
 		String uuid = p.getUniqueId().toString();
 		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
-
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-		config.set("Class."+Class+".quests."+questname+".progress", 2);
-
-		try {
-			config.save(file);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
+		PlayerQuest pQ = new PlayerQuest(p);
+		pQ.setQuestProgress(Class, questname, 2);
 
 	}
 
@@ -109,18 +95,8 @@ public class UserQuestManager implements EventsInterface, Listener {
 		String uuid = p.getUniqueId().toString();
 		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-		config.set("Class."+Class+".quests."+questname+".progress",
-				config.getInt("Class."+Class+".quests."+questname+".progress")+1);
-
-		try {
-			config.save(file);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
+		PlayerQuest pQ = new PlayerQuest(p);
+		pQ.addQuestProgress(Class, questname);
 
 	}
 
@@ -135,29 +111,14 @@ public class UserQuestManager implements EventsInterface, Listener {
 		String uuid = p.getUniqueId().toString();
 		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-		config.set("Class."+Class+".quests."+questname+".progress", 1);
-
-		try {
-			config.save(file);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-
+		(new PlayerQuest(p)).setQuestProgress(Class, questname, 1);
 	}
 
 	public int getQuestStep(String questname, Player p) {
 		String uuid = p.getUniqueId().toString();
 		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-
-		return config.getInt("Class."+Class+".quests."+questname+".progress");
-
+		return (new PlayerQuest(p)).getQuestProgress(Class, questname);
 	}
 
 	public void QuestReset(Player p) {
@@ -165,20 +126,11 @@ public class UserQuestManager implements EventsInterface, Listener {
 		String uuid = p.getUniqueId().toString();
 		String Class = PlayerManager.getinstance(p).CurrentClass+"/"+ PlayerManager.getinstance(p).CurrentClassNumber;
 
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+		PlayerQuest pQ = new PlayerQuest(p);
 
 		Arrays.stream(QuestList.values()).forEach(value-> {
-			config.set("Class."+Class+".quests."+value.name()+".progress", 0);
+			pQ.setQuestProgress(Class, value.name(), 0);
 		});
-
-		try {
-			config.save(file);
-		}
-		catch(Exception e){
-			e.printStackTrace();
-		}
-
 
 	}
 }

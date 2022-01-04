@@ -160,7 +160,7 @@ public class PlayerAlarmManager {
 			File file2 = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
 			FileConfiguration config2 = YamlConfiguration.loadConfiguration(file2);
 			
-			for(int i=49; i>=0; i-- ) {
+			for(int i=49; i>=0; i--) {
 				
 				int j = i+1;
 				

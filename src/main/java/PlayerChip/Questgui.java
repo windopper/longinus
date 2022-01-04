@@ -1,20 +1,18 @@
 package PlayerChip;
 
-import java.io.File;
-import java.util.Arrays;
-
+import PlayerManager.PlayerManager;
+import QuestFunctions.QuestList;
+import SQL.PlayerClass;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import QuestFunctions.QuestList;
-import PlayerManager.PlayerManager;
+import java.util.Arrays;
 
 public class Questgui {
 	
@@ -51,15 +49,14 @@ public class Questgui {
 		String uuid = p.getUniqueId().toString();
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		int CurrentClassNumber = PlayerManager.getinstance(p).CurrentClassNumber;
-		String path = "Class."+CurrentClass+"/"+CurrentClassNumber+".quests";
-		
-		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
-		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-		
+		String path = CurrentClass+"/"+CurrentClassNumber+".quests";
+
+		PlayerClass pC = new PlayerClass(p);
+		YamlConfiguration yaml = pC.getClassFile();
 		int slot = 0;
 		
-		for(String Questname : config.getConfigurationSection(path).getKeys(false)) {
-			gui.setItem(slot, callQuestBook(Questname, QuestList.valueOf(Questname).getLevelReq(), config.getInt(path+"."+Questname+".progress")));
+		for(String Questname : yaml.getConfigurationSection(path).getKeys(false)) {
+			gui.setItem(slot, callQuestBook(Questname, QuestList.valueOf(Questname).getLevelReq(), yaml.getInt(path+"."+Questname+".progress")));
 			slot++;
 		}
 		

@@ -1,12 +1,12 @@
-package QuestClasses;
+package Quests;
 
 import Items.ItemFunctions;
 import Items.ItemManager;
+import PlayerManager.PlayerManager;
 import QuestFunctions.QuestFunctions;
 import QuestFunctions.QuestList;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
-import PlayerManager.PlayerStatManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
@@ -78,7 +78,7 @@ public class FirstMission {
         instance.remove(p);
     }
 
-    public static void addQuestNPCs() {
+    public static void initQuestNPCs() {
         Location StartLoc = new Location(Bukkit.getWorld("world"), 2.5, 52, -37.5, 39, 3);
         QuestNPCManager.getinstance().createNPC(StartLoc, "데이즈", "", "");
 
@@ -95,11 +95,11 @@ public class FirstMission {
         // When Progress is 0
         if(QuestStep == 0 && NPCname.equals("데이즈")) {
 
-            if(QuestList.valueOf(Questname).getLevelReq() > PlayerStatManager.getinstance(p).getlvl()) {
+            if(QuestList.valueOf(Questname).getLevelReq() > PlayerManager.getinstance(p).getlvl()) {
                 p.sendMessage("레벨부족");
             }
             else {
-                if(QNF.ShowScripts(Script_1, detailStep) == false) {
+                if(!QNF.ShowScripts(Script_1, detailStep)) {
 
                     // 종자 아이템 데이즈로부터 받기
                     if(detailStep == 1) {
@@ -161,7 +161,7 @@ public class FirstMission {
                 return;
             }
 
-            if(QNF.ShowScripts(Script_2, detailStep) == false) {
+            if(!QNF.ShowScripts(Script_2, detailStep)) {
 
                 // 종자 아이템 아르안에게 전달하기
                 if(detailStep == 1) {

@@ -31,6 +31,10 @@ import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
 import ReturnToBase.ReturnMech;
+import SQL.PlayerAlarm;
+import SQL.PlayerAltera;
+import SQL.PlayerClass;
+import SQL.SQLManager;
 import Shop.RightClickNPC;
 import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
@@ -82,8 +86,8 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		
-		
+
+		SQLManager.setUpMySQL();
 		instance = this;
 		consol.sendMessage(ChatColor.AQUA + "Plugin Online v4");
 		this.getServer().getPluginManager().registerEvents(this, this);
@@ -149,7 +153,7 @@ public class Main extends JavaPlugin implements Listener {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			
-			PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+			(new PlayerClass(p)).classSave();
 			
 			PacketReader reader = new PacketReader(p);
 			reader.uninject(p);
@@ -189,8 +193,9 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void serverquit(PlayerQuitEvent e) {
 		Player p = e.getPlayer();
-		
-		PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+
+		(new PlayerClass(p)).classSave();
+		//PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 		
 		PacketReader reader = new PacketReader(p);
 		reader.uninject(e.getPlayer());
@@ -486,14 +491,26 @@ public class Main extends JavaPlugin implements Listener {
 			case "itemmarket": {
 				File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "config.yml");
 				FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-				for(int i=0; i<500; i++) {
-					for(String s_ : config.getConfigurationSection("").getKeys(false)) {
-						WeaponManager data = new WeaponManager(s_);
-						if(data.checkname(s_))	{
-							Auction.MarketRegister(player, data.getitem(), (int) (Math.random() * 2000), 1);
+
+				new BukkitRunnable() {
+
+					int time = 0;
+
+					@Override
+					public void run() {
+						for(String s_ : config.getConfigurationSection("").getKeys(false)) {
+							WeaponManager data = new WeaponManager(s_);
+							if(data.checkname(s_) && Math.random() * 2 < 1)	{
+								(new Auction()).MarketRegister(player, data.getitem(), (int) (Math.random() * 2000), 1);
+								break;
+							}
 						}
+
+						time++;
+						if(time>4) cancel();
 					}
-				}
+				}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
 				break;
 			}
 
@@ -626,22 +643,16 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "getgold":{
-				PlayerFileManager.getinstance().setGold(player, Long.parseLong(args[1]));
-				break;
-			}
-
-			case "alarmdb":{
-				SQLiteManager sql = new SQLiteManager();
-				sql.addalarm(player, "test", "type");
-
-
+				(new PlayerAltera(player)).setAltera(Long.parseLong(args[1]));
+				//PlayerFileManager.getinstance().setGold(player, Long.parseLong(args[1]));
 				break;
 			}
 
 			case "save":{
 				for(Player p : Bukkit.getOnlinePlayers()) {
 
-					PlayerFileManager.getinstance().UserDetailClassDataSave(p);
+					(new PlayerClass(p)).classSave();
+					//PlayerFileManager.getinstance().UserDetailClassDataSave(p);
 				}
 				break;
 			}
@@ -661,7 +672,7 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "level":{
 
-				PlayerStatManager.getinstance(player).setlvl(Integer.parseInt(args[1]));
+				PlayerManager.getinstance(player).setlvl(Integer.parseInt(args[1]));
 				break;
 			}
 
@@ -669,7 +680,8 @@ public class Main extends JavaPlugin implements Listener {
 
 				args[1].replace("_", " ");
 
-				PlayerAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
+				PlayerAlarm.broadcastAlarm(args[1], "notification");
+				//PlayerAlarmManager.instance().addalarmtoallplayers(args[1], "notification");
 				break;
 			}
 
@@ -679,8 +691,8 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "stats":{
-				player.sendMessage("Level:" +Integer.toString(PlayerStatManager.getinstance(player).getlvl()));
-				player.sendMessage("EXP:"+Integer.toString(PlayerStatManager.getinstance(player).getexp()));
+				player.sendMessage("Level:" +Integer.toString(PlayerManager.getinstance(player).getlvl()));
+				player.sendMessage("EXP:"+Integer.toString(PlayerManager.getinstance(player).getexp()));
 				player.sendMessage("Damage:" + Integer.toString(PlayerManager.getinstance(player).MinDamage)+"-"+Integer.toString(PlayerManager.getinstance(player).MaxDamage));
 				player.sendMessage("Health: " + Integer.toString(PlayerManager.getinstance(player).Health));
 				player.sendMessage("Shield: " + Integer.toString(PlayerManager.getinstance(player).ShieldRaw));
@@ -700,11 +712,11 @@ public class Main extends JavaPlugin implements Listener {
 				for(Player p : Bukkit.getOnlinePlayers()) {
 					if(p.getName().equals(args[1])) {
 
-						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getStr()));
-						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getDex()));
-						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getDef()));
-						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getAgi()));
-						player.sendMessage(Integer.toString(PlayerStatManager.getinstance(p).getlvl()));
+						player.sendMessage(Integer.toString(PlayerManager.getinstance(p).getStr()));
+						player.sendMessage(Integer.toString(PlayerManager.getinstance(p).getDex()));
+						player.sendMessage(Integer.toString(PlayerManager.getinstance(p).getDef()));
+						player.sendMessage(Integer.toString(PlayerManager.getinstance(p).getAgi()));
+						player.sendMessage(Integer.toString(PlayerManager.getinstance(p).getlvl()));
 					}
 				}
 				break;
@@ -866,18 +878,14 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public void UnregisterInstance(Player p) {
 
-		PlayerStatManager.getinstance(p).removeinstance();
+		//PlayerManager.getinstance(p).removeinstance();
 		PlayerManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
-
-		//ClassAbility.Combination.getinstance().removemaps(p);
-
 		PlayerHealthShield.getinstance(p).removeinstance();
 		PlayerEnergy.getinstance(p).removeinstance();
 		EntityHealthBossBar.getinstance(p).removeinstance();
 		PlayerCombination.getinstance(p).removeinstance();
 		PlayerFunction.getinstance(p).removeinstance();
-
 		PartyManager.getinstance().removeinstance(p);
 		DuelManager.getDuelManager(p).setLoser(p);
 		
@@ -885,12 +893,11 @@ public class Main extends JavaPlugin implements Listener {
 	
 	public void ServerJoinToDo(Player p) {
 
-		PlayerFileManager.getinstance().UserDetailRegister(p);
-		PlayerStatManager.getinstance(p);
-		PlayerManager.getinstance(p);
+		(new SQL.SQLManager(p)).updateData();
+		(new SQL.SQLManager(p)).initData();
 
-		PlayerFileManager.getinstance().joinedplayerlistregister(p);
-		
+		//PlayerStatManager.getinstance(p);
+		PlayerManager.getinstance(p);
 		LeavingWhileQuestAndJoinAgain leavingwhilequestandjoinagain = new LeavingWhileQuestAndJoinAgain();
 		leavingwhilequestandjoinagain.restore(p); // 튜토리얼 도중 포기 감지
 
@@ -906,20 +913,10 @@ public class Main extends JavaPlugin implements Listener {
 		reader.inject(p); // npc 우클릭 감지 등록
 		
 		PlayerAlarmManager.instance().register(p); // 유저 알람 파일 등록
-		
-		PlayerFileManager.getinstance().UserDetailClassCallData(p, PlayerFileManager.getinstance().getPreviousClass(p));
-		(new Auction()).noticeYourItemsWereSoldWhenJoin(p);
 
+		PlayerClass pC = new PlayerClass(p);
+		pC.classCall(pC.getPreviousClass());
+		(new Auction()).noticeYourItemsWereSoldWhenJoin(p);
 		Aether.getinstance().PassiveEffect();
 	}
-
-	public void ServerJoinToDo2(Player p) {
-//		CraftPlayer cp = ((CraftPlayer) p).getHandle();
-//		NBTTagCompound nbtTagCompound = cp.getMetadata()
-//		cp.setMetadata("hi", new Metadata);
-	}
-
-
-	
-
 }

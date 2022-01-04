@@ -50,9 +50,9 @@ public class LastClassLocation {
 		
 		String split[] = coord.split(",");
 		String world = split[0];
-		Double x = Double.parseDouble(split[1]);
-		Double y = Double.parseDouble(split[2]);
-		Double z = Double.parseDouble(split[3]);
+		double x = Double.parseDouble(split[1]);
+		double y = Double.parseDouble(split[2]);
+		double z = Double.parseDouble(split[3]);
 		Location location = new Location(Bukkit.getWorld(world), x, y, z);
 		
 		return location;

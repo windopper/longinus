@@ -1,7 +1,7 @@
 package QuestFunctions;
 
-import QuestClasses.FirstMission;
-import QuestClasses.TestQuest;
+import Quests.FirstMission;
+import Quests.TestQuest;
 import net.minecraft.server.level.EntityPlayer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -19,14 +19,12 @@ public class QuestFunctions {
         this.p = p;
     }
 
-    public void addQuestNPCs() {
+    public void initQuestNPCs() {
 
         TestQuest.getSingleton().addQuestNPCs();
-        FirstMission.addQuestNPCs();
-
+        FirstMission.initQuestNPCs();
 
     }
-
     public void NPCForQuest(EntityPlayer NPC, String name) {
 
         if(name.equals("TestQuest")) TestQuest.getinstance(p).QuestProgress();
@@ -37,8 +35,6 @@ public class QuestFunctions {
         if(name.equals("데이즈")) {
             FirstMission.getinstance(p).QuestProgress(NPC, name);
         }
-
-
     }
 
     public void StandardScript(String scripts) {
@@ -62,10 +58,4 @@ public class QuestFunctions {
     public void ShowScript(String Script) {
         StandardScript(Script);
     }
-
-//    public void QuestStart(String v1, String v2) {
-//        p.sendTitle("§")
-//    }
-
-
 }

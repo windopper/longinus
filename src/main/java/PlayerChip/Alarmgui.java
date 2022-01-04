@@ -1,9 +1,6 @@
 package PlayerChip;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import PlayerManager.PlayerAlarmManager;
+import SQL.PlayerAlarm;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,6 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class Alarmgui {
 	
@@ -42,13 +42,13 @@ public class Alarmgui {
 		
 		Inventory gui = Bukkit.createInventory(null, 54, "Alarm");
 		
-		int limit = PlayerAlarmManager.instance().getalarmamount(p);
+		int limit = (new PlayerAlarm(p)).getAlarmAmount();
 		
 		for(int i=0; i<limit; i++) {
 			gui.setItem(i, AlarmItems(p, i));
 		}
 		
-		if(PlayerAlarmManager.instance().getalarmamount(p)==0) {
+		if((new PlayerAlarm(p)).getAlarmAmount()==0) {
 			gui.setItem(22, noalarmindicateitem());
 		}
 		
@@ -65,19 +65,19 @@ public class Alarmgui {
 	
 	public ItemStack AlarmItems(Player p, int location) {
 		
-		ItemStack item = null;
+		ItemStack item = new ItemStack(Material.AIR, 1);
 		
-		String alarmtype = PlayerAlarmManager.instance().getalarmtype(p, location);
-		
-		if(alarmtype.equals("notification")) item = new ItemStack(Material.PAPER, 1);
-		if(alarmtype.equals("alterasend")) item = new ItemStack(Material.REDSTONE_BLOCK, 1);
-		if(alarmtype.equals("alterareceive")) item = new ItemStack(Material.EMERALD_BLOCK, 1);
-		
-		
+		String alarmtype = (new PlayerAlarm(p)).getAlarmType(location);
+
+		if(alarmtype == null) return item;
+		else if(alarmtype.equals("notification")) item = new ItemStack(Material.PAPER, 1);
+		else if(alarmtype.equals("alterasend")) item = new ItemStack(Material.REDSTONE_BLOCK, 1);
+		else if(alarmtype.equals("alterareceive")) item = new ItemStack(Material.EMERALD_BLOCK, 1);
+
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', "&6알림&6"));
 		
-		ArrayList<String> list = PlayerAlarmManager.instance().getalarmlist(p, location);
+		List<String> list = (new PlayerAlarm(p)).getAlarmList(location);
 		
 		int i = 0;
 		
@@ -88,9 +88,6 @@ public class Alarmgui {
 		
 		meta.setLore(list);
 		item.setItemMeta(meta);
-		
-		
-		
 		return item;
 	}
 	
