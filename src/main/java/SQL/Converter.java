@@ -52,6 +52,8 @@ public class Converter {
     }
 
     public YamlConfiguration decodeYaml(String yaml) {
+
+        if(yaml == null || yaml.equals("null")) return new YamlConfiguration();
         YamlConfiguration config = new YamlConfiguration();
         yaml = new String(Base64.getDecoder().decode(yaml.getBytes()));
         yaml = UriEncoder.decode(yaml);

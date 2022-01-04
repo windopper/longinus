@@ -131,7 +131,7 @@ public class QuestNPCManager {
 
 		QuestFunctions QN = new QuestFunctions();
 		Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-			QN.addQuestNPCs();
+			QN.initQuestNPCs();
 		}, 10);
 
 

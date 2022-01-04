@@ -1,4 +1,4 @@
-package QuestClasses;
+package Quests;
 
 import PlayerManager.PlayerManager;
 import QuestFunctions.QuestList;

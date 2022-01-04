@@ -1,4 +1,4 @@
-package QuestClasses;
+package Quests;
 
 public class TutorialImproved {
 	

@@ -6,7 +6,8 @@ import java.sql.*;
 
 public class sqlData {
     private static Connection con;
-    private static final String server = "localhost"; // 서버 주소
+//    private static final String server = "34.64.134.53"; // 서버 주소
+    private static final String server = "localhost";
     private static final String user_name = "root"; //  접속자 id
     private static final String password = "mysqlternis02@@@"; // 접속자 pw
     public static final String servername = "longinus";

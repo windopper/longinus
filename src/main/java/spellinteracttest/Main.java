@@ -34,6 +34,7 @@ import ReturnToBase.ReturnMech;
 import SQL.PlayerAlarm;
 import SQL.PlayerAltera;
 import SQL.PlayerClass;
+import SQL.SQLManager;
 import Shop.RightClickNPC;
 import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
@@ -85,8 +86,8 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
-		
-		
+
+		SQLManager.setUpMySQL();
 		instance = this;
 		consol.sendMessage(ChatColor.AQUA + "Plugin Online v4");
 		this.getServer().getPluginManager().registerEvents(this, this);
@@ -644,14 +645,6 @@ public class Main extends JavaPlugin implements Listener {
 			case "getgold":{
 				(new PlayerAltera(player)).setAltera(Long.parseLong(args[1]));
 				//PlayerFileManager.getinstance().setGold(player, Long.parseLong(args[1]));
-				break;
-			}
-
-			case "alarmdb":{
-				SQLiteManager sql = new SQLiteManager();
-				sql.addalarm(player, "test", "type");
-
-
 				break;
 			}
 

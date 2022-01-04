@@ -7,8 +7,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 import static SQL.sqlData.getConnection;
 
@@ -26,9 +25,14 @@ public class PlayerAlarm {
         try {
             Connection conn = getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet set = stmt.executeQuery("select classes from longinus.user where uuid = '"+uuid+"'");
+            ResultSet set = stmt.executeQuery("select alarms from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
                 String yaml = set.getString("alarms");
+                if(yaml.equals("null")) {
+                    set.close();
+                    stmt.close();
+                    return new YamlConfiguration();
+                }
                 YamlConfiguration config = (new SQL.Converter()).decodeYaml(yaml);
 
                 set.close();
@@ -41,7 +45,7 @@ public class PlayerAlarm {
         catch(Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new YamlConfiguration();
     }
 
     public static void broadcastAlarm(String contents, String type) {
@@ -63,12 +67,14 @@ public class PlayerAlarm {
                     int j = i+1;
 
                     if(i!=49) {
-                        yaml.set("alarm."+j+".content", yaml.getString("alarm."+i+".content"));
-                        yaml.set("alarm."+j+".type", yaml.getString("alarm."+i+".type"));
+                        yaml.set(j+".content", yaml.getString(i+".content"));
+                        yaml.set(j+".type", yaml.getString(i+".type"));
+                        yaml.set(j+".date", yaml.getString(i+".date"));
                     }
                     if(i==0) {
-                        yaml.set("alarm."+i+".content", contents);
-                        yaml.set("alarm."+i+".type", type);
+                        yaml.set(i+".content", contents);
+                        yaml.set(i+".type", type);
+                        yaml.set(i+".date", datestr);
                     }
                 }
 
@@ -77,7 +83,7 @@ public class PlayerAlarm {
 
                 try {
                     stmt = conn.createStatement();
-                    stmt.executeUpdate("update longinus.user set alarms = '"+encoded+"' where = '"+uuid+"'");
+                    stmt.executeUpdate("update longinus.user set alarms = '"+encoded+"' where uuid = '"+uuid+"'");
                 }
                 catch(Exception e) {
                     e.printStackTrace();
@@ -122,11 +128,8 @@ public class PlayerAlarm {
 
         for(int i=49; i>=0; i-- ) {
 
-            if(yaml.getString(i+".content").equals("")) continue;
-
-            yaml.set(i+".content", "");
-            yaml.set(i+".type", "");
-            yaml.set(i+".date", "");
+            if(!yaml.contains(Integer.toString(i))) continue;
+            yaml.set(Integer.toString(i), null);
             break;
         }
 
@@ -139,13 +142,54 @@ public class PlayerAlarm {
         YamlConfiguration yaml = getAlarmFile();
 
         for(int i=49; i>=0; i--) {
-            yaml.set(i+".content", "");
-            yaml.set(i+".type", "");
-            yaml.set(i+".date", "");
+            yaml.set(Integer.toString(i), null);
         }
 
         String encoded = (new Converter()).encodeYaml(yaml);
         sendToSQLServer(encoded);
+    }
+
+    public int getAlarmAmount() {
+
+        YamlConfiguration yaml = getAlarmFile();
+        int amount = 0;
+
+        for(int i=0; i<50; i++) {
+            if(yaml.contains(Integer.toString(i))) amount++;
+            //if(!yaml.getString(i+".content").equals("")) amount++;
+        }
+        return amount;
+    }
+
+    public List<String> getAlarmList(int location) {
+
+        YamlConfiguration yaml = getAlarmFile();
+        ArrayList<String> list = new ArrayList<>();
+
+        if(!yaml.contains(Integer.toString(location))) return list;
+
+        String contents = yaml.getString(location+".content");
+        String dates = yaml.getString(location+".date");
+
+        SimpleDateFormat currentdate = new SimpleDateFormat("yy/MM/dd HH:mm:ss", Locale.KOREA);
+        String currentdates = currentdate.format(new Date());
+
+        String splits[] = contents.split("\\*");
+
+        list.addAll(Arrays.asList(splits));
+        list.add("");
+        list.add(dates);
+        return list;
+    }
+
+    public String getAlarmType(int location) {
+
+        YamlConfiguration yaml = getAlarmFile();
+
+        if(!yaml.contains(Integer.toString(location))) return null;
+        String type = yaml.getString(location+".type");
+
+        return type;
     }
 
     //TODO 알람데이터 sql 전환

@@ -18,6 +18,104 @@ public class SQLManager {
         this.uuid = player.getUniqueId().toString();
     }
 
+    public static void setUpMySQL() {
+
+        try {
+            Connection conn = sqlData.getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("CREATE SCHEMA `longinus` DEFAULT CHARACTER SET utf8mb4");
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Connection conn = sqlData.getConnection();
+            Statement stmt = conn.createStatement();
+
+            stmt.executeUpdate("create table if not exists longinus.mainmarket (" +
+                    "milli BIGINT NOT NULL,"+
+                    "itemname VARCHAR(45) NOT NULL,"+
+                    "uuid VARCHAR(45) PRIMARY KEY NOT NULL,"+
+                    "seller VARCHAR(45) NOT NULL,"+
+                    "altera BIGINT NOT NULL"+
+                    "count INT NOT NULL,"+
+                    "item MEDIUMTEXT NOT NULL,"+
+                    "selltime DATETIME NOT NULL)");
+
+            stmt.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Connection conn = sqlData.getConnection();
+            Statement stmt = conn.createStatement();
+
+            stmt.executeUpdate("create table if not exists longinus.mainmarketlog ("+
+                    "name TINYTEXT NOT NULL,"+
+                    "altera BIGINT NOT NULL,"+
+                    "item MEDIUMTEXT NOT NULL,"+
+                    "count INT NOT NULL,"+
+                    "seller VARCHAR(45) NOT NULL,"+
+                    "buyer VARCHAR(45) NOT NULL,"+
+                    "selltime DATETIME NOT NULL,"+
+                    "buytime DATETIME NOT NULL,"+
+                    "milli VARCHAR(45) PRIMARY KEY NOT NULL)");
+
+            stmt.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Connection conn = sqlData.getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("create table if not exists longinus.user ("+
+                    "name VARCHAR(25) NOT NULL,"+
+                    "uuid VARCHAR(45) PRIMARY KEY NOT NULL,"+
+                    "altera BIGINT NOT NULL DEFAULT '0',"+
+                    "classes MEDIUMTEXT,"+
+                    "alarms MEDIUMTEXT,"+
+                    "samples MEDIUMTEXT,"+
+                    "previousclass VARCHAR(45),"+
+                    "locx DOUBLE NOT NULL,"+
+                    "locy DOUBLE NOT NULL,"+
+                    "locz DOUBLE NOT NULL,"+
+                    "marketitems MEDIUMTEXT NOT NULL)");
+
+            stmt.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Connection conn = sqlData.getConnection();
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate("create table if not exists longinus.userstorages ("+
+                    "uuid VARCHAR(45) NOT NULL PRIMARY KEY,"+
+                    "storagelimit INT NOT NULL DEFAULT '3',"+
+                    "storage1 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage2 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage3 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage4 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage5 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage6 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage7 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage8 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage9 MEDIUMTEXT DEFAULT NULL,"+
+                    "storage10 MEDIUMTEXT DEFAULT NULL)");
+
+            stmt.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void initData() {
 
         SQL.sqlData sqlData = new SQL.sqlData();
@@ -70,7 +168,7 @@ public class SQLManager {
             Connection conn = sqlData.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("insert into longinus.user values ('"+name+"', '"+uuid+"', '"+altera+"', '"
-                    +classes+"', '"+quests+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
+                    +classes+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
                     +locx+"', '"+locy+"', '"+locz+"', '"+marketitems+"')");
             stmt.close();
         }

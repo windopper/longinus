@@ -1,4 +1,4 @@
-package QuestClasses;
+package Quests;
 
 import Items.ItemFunctions;
 import Items.ItemManager;
@@ -78,7 +78,7 @@ public class FirstMission {
         instance.remove(p);
     }
 
-    public static void addQuestNPCs() {
+    public static void initQuestNPCs() {
         Location StartLoc = new Location(Bukkit.getWorld("world"), 2.5, 52, -37.5, 39, 3);
         QuestNPCManager.getinstance().createNPC(StartLoc, "데이즈", "", "");
 
@@ -161,7 +161,7 @@ public class FirstMission {
                 return;
             }
 
-            if(QNF.ShowScripts(Script_2, detailStep) == false) {
+            if(!QNF.ShowScripts(Script_2, detailStep)) {
 
                 // 종자 아이템 아르안에게 전달하기
                 if(detailStep == 1) {

@@ -1,6 +1,6 @@
 package QuestFunctions;
 
-import QuestClasses.Tutorial;
+import Quests.Tutorial;
 
 public class Loop {
 	
