@@ -17,7 +17,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Set;
 
-import static SQL.sqlData.getConnection;
+import static SQL.Connector.getConnection;
 
 public class PlayerClass {
 

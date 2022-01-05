@@ -20,7 +20,7 @@ public class PlayerAltera {
         String uuid = player.getUniqueId().toString();
 
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = (new Connector()).getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select altera from longinus.user where uuid = '"+uuid+"'");
             if(set.next()) {
@@ -49,7 +49,7 @@ public class PlayerAltera {
         String uuid = player.getUniqueId().toString();
 
         try {
-            Connection conn = (new SQL.sqlData()).getConnection();
+            Connection conn = (new Connector()).getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set altera = '"+altera+"' where uuid = '"+uuid+"'");
 

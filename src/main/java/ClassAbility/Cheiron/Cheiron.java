@@ -9,12 +9,10 @@ import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
 import com.google.common.base.Enums;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
-import org.bukkit.Vibration;
+import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 
@@ -51,7 +49,8 @@ public class Cheiron implements Listener {
     private enum ENUM {
         LL(4, "§o§l방어태세§l§o §3§l-⚡§l"),
         LR(8, "§o§l전격 화살§l§o §3§l-⚡§l"),
-        FL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
+        FL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l"),
+        SHIFL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
 
         private int mana;
         private String title;
@@ -208,5 +207,61 @@ public class Cheiron implements Listener {
             arrow.setInvulnerable(true);
             arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
         }
+    }
+
+    public void VortexArrow() {
+
+        Location loc = player.getEyeLocation();
+        Vector dir = loc.getDirection().normalize().multiply(3.5);
+        Vector v = loc.getDirection().normalize().multiply(2);
+        Arrow arrow = (Arrow) player.getWorld().spawnArrow(loc, dir, 0, 0);
+        arrow.setVelocity(dir);
+        arrow.setGlowing(true);
+        arrow.setShooter(player);
+        arrow.setInvulnerable(true);
+        arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+        arrow.setCustomName("VortexArrow");
+        int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 0.7);
+        arrow.addScoreboardTag(Integer.toString(damage));
+
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 2);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_LAUNCH, 1, 1);
+
+        (new PlayParticle(Particle.CRIT)).CirCleHorizontalSmallImpact(player.getLocation().add(0, 0.2, 0));
+
+        new BukkitRunnable() {
+
+            double time = 0;
+            double angle = 0;
+
+            @Override
+            public void run() {
+
+                for(int i=0; i<10; i++) {
+
+                    for(double j=0; j<Math.PI*2; j+=Math.PI/4) {
+
+                        double x = Math.cos(j+Math.toRadians(angle));
+                        double y = angle / 60;
+                        double z = Math.sin(j+Math.toRadians(angle));
+
+                        Vector v = new Vector(x, y, z);
+                        v = rotate.
+
+                    }
+                    angle += 6;
+                }
+
+
+                if(time>=4) cancel();
+                time++;
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
+
+    }
+
+    public void VortexArrowHit() {
+
     }
 }

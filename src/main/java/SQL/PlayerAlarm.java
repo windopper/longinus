@@ -9,7 +9,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static SQL.sqlData.getConnection;
+import static SQL.Connector.getConnection;
 
 public class PlayerAlarm {
 
@@ -55,7 +55,7 @@ public class PlayerAlarm {
         datestr = "§7"+datestr;
 
         try {
-            Connection conn = SQL.sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select * from longinus.user");
 

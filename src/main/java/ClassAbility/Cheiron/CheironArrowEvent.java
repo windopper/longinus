@@ -82,6 +82,9 @@ public class CheironArrowEvent implements Listener {
                 else if(name.equals("ElecArrow")) {
                     (new Cheiron(shooter)).ElecArrowHit(arrow.getLocation());
                 }
+                else if(name.equals("PiercingShot")) {
+
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package Auction;
 
+import SQL.Connector;
 import SQL.MainMarket;
 import SQL.PlayerAltera;
 import SQL.PlayerMarket;
@@ -280,7 +281,7 @@ public class Auction implements Listener {
     public static void MarketSalesTimeWatcher() {
 
         try {
-            Connection con = SQL.sqlData.getConnection();
+            Connection con = Connector.getConnection();
             Statement statement = con.createStatement();
             ResultSet set = statement.executeQuery("select * from longinus.mainmarket");
 
@@ -321,7 +322,7 @@ public class Auction implements Listener {
 
                     int j = (page - 1) * 42;
 
-                    Connection conn = SQL.sqlData.getConnection();
+                    Connection conn = Connector.getConnection();
                     Statement statement = conn.createStatement();
                     ResultSet set = statement.executeQuery("Select * from longinus.mainmarket order by milli desc limit "+j+", "+42);
 
@@ -393,7 +394,7 @@ public class Auction implements Listener {
         try {
             int j = (page - 1) * 42;
 
-            Connection connection = SQL.sqlData.getConnection();
+            Connection connection = Connector.getConnection();
             Statement statement = connection.createStatement();
             ResultSet set = statement.executeQuery("select * from longinus.mainmarket "+searchName+" order by milli desc limit "+j+", "+42);
 
@@ -470,7 +471,7 @@ public class Auction implements Listener {
 
 
         try {
-            Connection connection = SQL.sqlData.getConnection();
+            Connection connection = Connector.getConnection();
             Statement statement = connection.createStatement();
             ResultSet set = statement.executeQuery("select * from longinus.mainmarket where uuid = '"+Iuuid+"'");
 
@@ -518,7 +519,7 @@ public class Auction implements Listener {
                         player.sendMessage("§a구매 완료!");
                         player.closeInventory();
 
-                        (new SQL.sqlData()).QueryLogMarket(altera, item, item.getAmount(), set.getString("seller"),
+                        (new Connector()).QueryLogMarket(altera, item, item.getAmount(), set.getString("seller"),
                                 player.getUniqueId().toString(), set.getString("selltime"));
                         //registerItemAverage(item, altera);
 
@@ -616,7 +617,7 @@ public class Auction implements Listener {
             }
 
             try {
-                Connection conn = SQL.sqlData.getConnection();
+                Connection conn = Connector.getConnection();
                 Statement statement = conn.createStatement();
 //                ResultSet set = statement.executeQuery("select item from longinus.mainmarket where uuid = '"+UUID+"'");
 //                while(set.next()) {
@@ -730,7 +731,7 @@ public class Auction implements Listener {
 
 
                 try {
-                    Connection conn = SQL.sqlData.getConnection();
+                    Connection conn = Connector.getConnection();
                     Statement stmt = conn.createStatement();
                     Statement stmt_ = conn.createStatement();
                     Statement stmt__ = conn.createStatement();

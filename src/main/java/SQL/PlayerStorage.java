@@ -10,7 +10,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static SQL.sqlData.getConnection;
+import static SQL.Connector.getConnection;
 
 public class PlayerStorage {
 
@@ -60,11 +60,11 @@ public class PlayerStorage {
 
     public boolean isDataExist() {
 
-        SQL.sqlData sqlData = new SQL.sqlData();
+        Connector Connector = new Connector();
 
         try {
             String uuid = player.getUniqueId().toString();
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select exists ( select * from longinus.userstorages where uuid = '"+uuid+
                     "' ) as success");

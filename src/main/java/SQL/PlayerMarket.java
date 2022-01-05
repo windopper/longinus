@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-import static SQL.sqlData.getConnection;
+import static SQL.Connector.getConnection;
 
 public class PlayerMarket {
 

@@ -5,7 +5,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-public class ItemFunctions {
+public class ItemSetter {
 
     public ItemStack setUntradable(ItemStack itemStack) {
         return itemStack;

@@ -1,6 +1,6 @@
 package Quests;
 
-import Items.ItemFunctions;
+import Items.ItemSetter;
 import Items.ItemManager;
 import PlayerManager.PlayerManager;
 import QuestFunctions.QuestFunctions;
@@ -110,7 +110,7 @@ public class FirstMission {
                         itemMeta.setLore(Arrays.asList("",
                                 "§7글리제581c의 아르안에게 전달해야 할 종자다"));
                         itemStack.setItemMeta(itemMeta);
-                        ItemFunctions itemFunctions = new ItemFunctions();
+                        ItemSetter itemFunctions = new ItemSetter();
                         itemFunctions.setQuestItem(itemStack);
 
                         // Swing Main hand
@@ -143,7 +143,7 @@ public class FirstMission {
             itemMeta.setLore(Arrays.asList("",
                     "§7글리제581c의 아르안에게 전달해야 할 종자다"));
             itemStack.setItemMeta(itemMeta);
-            ItemFunctions itemFunctions = new ItemFunctions();
+            ItemSetter itemFunctions = new ItemSetter();
             itemFunctions.setQuestItem(itemStack);
 
             p.getInventory().addItem(itemStack);

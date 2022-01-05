@@ -51,7 +51,9 @@ public class Khaos {
 
     private enum ENUM {
         RL(4, "§o§l반월참§l§o §3§l-⚡§l"),
-        SHIFTR(4, "§o§l공간전이§l§o §3§l-⚡§l");
+        SHIFTR(4, "§o§l공간전이§l§o §3§l-⚡§l"),
+        RR(6, "§o§lRR스킬§l§o §3§l-⚡§l"),
+        FR(8, "§o§lFR스킬§l§o §3§l-⚡§l");
 
         private int mana;
         private String title;
@@ -99,11 +101,14 @@ public class Khaos {
 
         Set<Entity> Hit = new HashSet<>();
 
+        if(KhaosMelee.getThrown(player) == null) {
+
+        }
         /*
         단검이 있다면 단검으로 순간이동
 
          */
-        if(KhaosMelee.getThrown(player) != null) {
+        else if(KhaosMelee.getThrown(player) != null) {
 
             player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation().add(0, 1, 0)
                     , 500, 0, 0, 0, 1);
@@ -241,7 +246,10 @@ public class Khaos {
                 time++;
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+    }
 
+    public void RR() {
+        Location loc = player.getEyeLocation();
 
     }
 

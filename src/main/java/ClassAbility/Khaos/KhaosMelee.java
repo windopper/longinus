@@ -105,7 +105,11 @@ public class KhaosMelee {
             }
         }
         else if(MeleeCombo == 4) {
-
+            if(combo.equals("L")) {
+                SweepAround();
+                playerFunction.addMeleeCombo();
+                playerFunction.setMeleeDelay(10);
+            }
         }
         else if(MeleeCombo == 5) {
 
@@ -282,6 +286,7 @@ public class KhaosMelee {
     public void BlinkHit() {
 
         Location loc = player.getEyeLocation();
+        Location location = player.getLocation();
         Vector dir = loc.getDirection().normalize();
         final List<Entity> Hit = new ArrayList<>();
 
@@ -291,13 +296,13 @@ public class KhaosMelee {
 
         for(double i=0.2; i<10; i+=0.2) {
             dirmultiply = i;
-            if(loc.clone().add(dir.clone().multiply(i+0.5)).getBlock().getType().isSolid()) {
+            if(loc.clone().add(dir.clone().multiply(i)).getBlock().getType().isSolid()) {
+                dirmultiply -= 1;
                 break;
             }
         }
 
-        for(double i = 0.2; i<dirmultiply; i+= 0.2) {
-
+        for(double i = 0.5; i<dirmultiply; i+= 0.5) {
 
             player.getWorld().spawnParticle(Particle.SWEEP_ATTACK, loc.add(dir.clone().multiply(i)),
                     2, 0, 0, 0, 0);
@@ -323,10 +328,11 @@ public class KhaosMelee {
 
         dir.multiply(dirmultiply);
         loc.add(dir);
+        location.add(dir);
 
 
         player.getWorld().spawnParticle(Particle.CRIT, loc, 0, dir.getX(), dir.getY(), dir.getZ(), 1);
-        player.teleport(new Location(player.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw()+180, -loc.getPitch()));
+        player.teleport(new Location(player.getWorld(), loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch()));
 
     }
 
@@ -420,6 +426,7 @@ public class KhaosMelee {
             if(!tasks.get(player).isCancelled()) tasks.get(player).cancel();
             tasks.remove(player);
             throwns.get(player).remove();
+
         }
         throwns.remove(player);
 
@@ -462,7 +469,7 @@ public class KhaosMelee {
 
                     if(t<11) {
                         dagger.setVelocity(vector);
-                        if(dagger.getEyeLocation().add(vector.clone().normalize().multiply(0.5)).getBlock().getType().isSolid()) t = 11;
+                        if(dagger.getEyeLocation().add(vector.clone().normalize().multiply(0.8)).getBlock().getType().isSolid()) t = 11;
 
 
                         player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, dagger.getEyeLocation().add(0, 0.25, 0), 0, vector.clone().multiply(-1).getX()
@@ -590,6 +597,107 @@ public class KhaosMelee {
 
     }
 
+    private void SweepAround() {
+
+        final List<Entity> Hit = new ArrayList<>();
+        Location loc = player.getEyeLocation().add(0, -0.5, 0);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+
+        new BukkitRunnable() {
+
+            double rpitch = Math.toRadians(player.getLocation().getPitch());
+            double ryaw = Math.toRadians(player.getLocation().getYaw());
+            int time =0;
+            double angle = 0;
+            double angle2 = 180;
+
+            @Override
+            public void run() {
+
+                for(int i=0; i<5; i++) {
+
+                    double yangle = Math.toRadians(angle);
+                    double ycos = Math.cos(yangle);
+                    double ysin = Math.sin(yangle);
+
+                    double yangle2 = Math.toRadians(angle2);
+                    double ycos2 = Math.cos(yangle2);
+                    double ysin2 = Math.sin(yangle2);
+
+                    double x = 0;
+                    double y = -angle / 360;
+
+                    for (double j = 0; j < 10; j++) {
+                        double z = 1 + angle / 200 + j / 6;
+                        double z2 = 1 + angle2 / 200 + j / 6;
+
+                        Vector v = new Vector(x, y, z);
+                        Vector v2 = new Vector(x, y, z2);
+
+                        v = Rotate.rotateAroundAxisY(v, ycos, ysin);
+                        v = transform(v, ryaw, rpitch, 0);
+
+                        v2 = Rotate.rotateAroundAxisY(v2, ycos2, ysin2);
+                        v2 = transform(v2, ryaw, rpitch, 0);
+
+                        loc.add(v);
+                        if(j>5) {
+                            player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
+                            player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
+
+                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
+                                    Location eloc = entity.getEyeLocation();
+                                    BoundingBox box = entity.getBoundingBox();
+                                    if(eloc.distance(loc) < 2.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+                                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 2);
+                                        Damage.getinstance().taken(dmg, entity, player);
+                                        Hit.add(entity);
+                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+                        loc.subtract(v);
+
+                        loc.add(v2);
+                        if(j>5) {
+                            player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
+                            player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
+
+                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
+                                    Location eloc = entity.getEyeLocation();
+                                    BoundingBox box = entity.getBoundingBox();
+                                    if(eloc.distance(loc) < 2.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+                                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 2);
+                                        Damage.getinstance().taken(dmg, entity, player);
+                                        Hit.add(entity);
+                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+                        loc.subtract(v2);
+                    }
+                    angle += 6;
+                    angle2 += 6;
+                }
+
+                if(time>=6) cancel();
+                time++;
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+
+    }
+
     private void KhaosOneofTripleHit(Double roll, Location loc) {
 
         final List<Entity> Hit = new ArrayList<>();
@@ -615,7 +723,7 @@ public class KhaosMelee {
 
                 for(int i=0; i<5; i++) {
 
-                    for(double k = 2; k<4; k+=0.2) {
+                    for(double k = 2; k<4; k+=0.4) {
 
                         x = 0;
                         y = 0;

@@ -1,14 +1,14 @@
 package file;
 
-import java.io.File;
-
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
+
 public class quest {
-	
+	//TODO 지우기
 	private static quest q;
 	
 	
@@ -46,8 +46,7 @@ public class quest {
 		
 		File questfile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "userquest.yml");
 		FileConfiguration quest = YamlConfiguration.loadConfiguration(questfile);
-		
-		
+
 		if(quest.contains(p.getUniqueId().toString()+"."+category)) quest.set(p.getUniqueId().toString()+"."+category, write);
 		
 		try {

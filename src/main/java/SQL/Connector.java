@@ -4,7 +4,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.sql.*;
 
-public class sqlData {
+public class Connector {
     private static Connection con;
 //    private static final String server = "34.64.134.53"; // 서버 주소
     private static final String server = "localhost";
@@ -18,7 +18,7 @@ public class sqlData {
 //        s.QueryDeleteItemFromMarket("d");
 //    }
 
-    public sqlData() {
+    public Connector() {
 
     }
 

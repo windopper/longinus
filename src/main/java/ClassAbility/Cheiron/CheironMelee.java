@@ -107,6 +107,10 @@ public class CheironMelee implements Listener {
             playerFunction.addMeleeCombo();
             playerFunction.setMeleeDelay(10);
         }
+        else if(MeleeCombo==5) {
+            playerFunction.setMeleeCombo(1);
+            playerFunction.setMeleeDelay(10);
+        }
 
     }
 
@@ -225,6 +229,27 @@ public class CheironMelee implements Listener {
         }, 4);
 
 
+    }
+
+    private void PiercingShot() {
+
+        Location loc = player.getEyeLocation();
+        Vector dir = loc.getDirection().normalize().multiply(3.5);
+        Vector v = loc.getDirection().normalize().multiply(3);
+        Arrow arrow = (Arrow) player.getWorld().spawnArrow(loc, dir, 0, 0);
+        arrow.setVelocity(dir);
+        arrow.setGlowing(true);
+        arrow.setShooter(player);
+        arrow.setInvulnerable(true);
+        arrow.setPickupStatus(AbstractArrow.PickupStatus.DISALLOWED);
+        arrow.setPierceLevel(10);
+        arrow.setCustomName("PiercingShot");
+        int damage = PlayerManager.getinstance(player).meleedmgcalculate(player, 0.7);
+        arrow.addScoreboardTag(Integer.toString(damage));
+
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 2);
+        (new PlayParticle(Particle.CRIT)).BowShotVerticalParticle(loc.add(v), 1, 1);
+        (new PlayParticle(Particle.CRIT)).CirCleHorizontalSmallImpact(player.getLocation().add(0, 0.2, 0));
     }
 
 }

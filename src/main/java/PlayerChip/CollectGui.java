@@ -1,6 +1,6 @@
 package PlayerChip;
 
-import Items.ItemFunctions;
+import Items.ItemSetter;
 import Mob.MobListManager;
 import PlanetSelect.PlanetList;
 import SQL.PlayerSample;
@@ -96,7 +96,7 @@ public class CollectGui {
                     "§3>> 피해량: §4"+mobList.getMindamage()+"-"+mobList.getMaxdamage(),
                     "",
                     "§7최초발견: "+firstSeen));
-            strings.addAll((new ItemFunctions()).setGrayLore(mobList.getDescription()));
+            strings.addAll((new ItemSetter()).setGrayLore(mobList.getDescription()));
 
             itemMeta.setLore(strings);
             itemStack.setItemMeta(itemMeta);

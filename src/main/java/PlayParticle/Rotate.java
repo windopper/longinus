@@ -22,15 +22,15 @@ public class Rotate {
         return v.setX(x).setY(y);
     }
 
-    /**
-     * Intrinsic matrix rotation for MC coordinate system
-     * @author Michel_0
-     * @param direction The directional vector to be transformed
-     * @param yaw The desired yaw angle for rotation
-     * @param pitch The desired pitch angle for rotation
-     * @param roll The desired roll angle for rotation
-     * @return The transformed directional vector
-     */
+//    /**
+//     * Intrinsic matrix rotation for MC coordinate system
+//     * @author Michel_0
+//     * @param direction The directional vector to be transformed
+//     * @param yaw The desired yaw angle for rotation
+//     * @param pitch The desired pitch angle for rotation
+//     * @param roll The desired roll angle for rotation
+//     * @return The transformed directional vector
+//     */
     public static Vector transform(Vector direction, double yaw, double pitch, double roll) {
         double[] vec = new double[] { direction.getX(), direction.getY(), direction.getZ() };
         direction.setX(

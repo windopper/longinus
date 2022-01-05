@@ -51,7 +51,6 @@ public class BankGui {
 		
 		
 		p.openInventory((new PlayerStorage(p)).storageCall(gui, page));
-		//p.openInventory(UserStorageManager.getinstance().Call(p, gui, page));
 	}
 	
 	public void Open_Ask(Player p, String page) {

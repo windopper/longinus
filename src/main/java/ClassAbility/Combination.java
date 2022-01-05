@@ -315,25 +315,19 @@ public class Combination {
 
 	public void Khaos(Player p, String combo) {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
-		int lvl = PlayerManager.getinstance(p).getlvl();
-		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 
 		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
 			if(PF.getMeleeDelay() == 0) {
 				(new KhaosMelee(p)).Melee(combo);
 			}
 		}
-		if(combo.equals("SHIFTR") || combo.equals("RL")) {
+		if(combo.equals("SHIFTR") || combo.equals("RL") || combo.equals("RR") || combo.equals("FR")) {
 			(new Khaos(p)).Skill(combo);
 		}
 	}
 
 	public void Cheiron(Player p, String combo) {
 		PlayerFunction PF = PlayerFunction.getinstance(p);
-		int lvl = PlayerManager.getinstance(p).getlvl();
-		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 
 		if(combo.equals("SHIFTR") || combo.equals("R")) {
 			if(PF.getMeleeDelay() == 0) {
@@ -355,17 +349,17 @@ public class Combination {
 		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
 		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
 		
-		int impulseswitchshieldmana = Aether.ImpulseSwitchShieldmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int shieldswitchchargemana = Aether.ShieldSwitchChargemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int WeaponModeChangemana = Aether.WeaponModeChangemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int impulseswitchweaponmana = Aether.ImpulseSwitchWeaponmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int impulseswitchenergymana = Aether.ImpulseSwitchEnergymana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		
-		String RL = "§o§l충격량전환: 보호막§l§o §3§l-⚡§l"+(impulseswitchshieldmana);
-		String RR = "§o§l충격량전환: 돌진§l§o §3§l-⚡§l"+(shieldswitchchargemana);
-		String FR = "§o§l무기 모드 변경§l§o §3§l-⚡§l"+(WeaponModeChangemana);
-		String RF = "§o§l충격량전환: 레이저§l§o §3§l-⚡§l"+(impulseswitchweaponmana);
-		String FF = "§o§l충격량전환: 에너지§l§o §c§l-☈§l100";
+//		int impulseswitchshieldmana = Aether.ImpulseSwitchShieldmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int shieldswitchchargemana = Aether.ShieldSwitchChargemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int WeaponModeChangemana = Aether.WeaponModeChangemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int impulseswitchweaponmana = Aether.ImpulseSwitchWeaponmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int impulseswitchenergymana = Aether.ImpulseSwitchEnergymana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//
+//		String RL = "§o§l충격량전환: 보호막§l§o §3§l-⚡§l"+(impulseswitchshieldmana);
+//		String RR = "§o§l충격량전환: 돌진§l§o §3§l-⚡§l"+(shieldswitchchargemana);
+//		String FR = "§o§l무기 모드 변경§l§o §3§l-⚡§l"+(WeaponModeChangemana);
+//		String RF = "§o§l충격량전환: 레이저§l§o §3§l-⚡§l"+(impulseswitchweaponmana);
+//		String FF = "§o§l충격량전환: 에너지§l§o §c§l-☈§l100";
 		
 		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
 			

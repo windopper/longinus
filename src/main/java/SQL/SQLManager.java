@@ -21,7 +21,7 @@ public class SQLManager {
     public static void setUpMySQL() {
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("CREATE SCHEMA `longinus` DEFAULT CHARACTER SET utf8mb4");
         }
@@ -30,7 +30,7 @@ public class SQLManager {
         }
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
 
             stmt.executeUpdate("create table if not exists longinus.mainmarket (" +
@@ -50,7 +50,7 @@ public class SQLManager {
         }
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
 
             stmt.executeUpdate("create table if not exists longinus.mainmarketlog ("+
@@ -71,7 +71,7 @@ public class SQLManager {
         }
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("create table if not exists longinus.user ("+
                     "name VARCHAR(25) NOT NULL,"+
@@ -93,7 +93,7 @@ public class SQLManager {
         }
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("create table if not exists longinus.userstorages ("+
                     "uuid VARCHAR(45) NOT NULL PRIMARY KEY,"+
@@ -118,7 +118,7 @@ public class SQLManager {
 
     public void initData() {
 
-        SQL.sqlData sqlData = new SQL.sqlData();
+        Connector Connector = new Connector();
         SQL.Converter converter = new SQL.Converter();
 
         if(!(new PlayerStorage(player)).isDataExist()) {
@@ -165,7 +165,7 @@ public class SQLManager {
         String marketitems = converter.encodeYaml(marketitemsYaml);
 
         try {
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("insert into longinus.user values ('"+name+"', '"+uuid+"', '"+altera+"', '"
                     +classes+"', '"+alarms+"', '"+samples+"', '"+previousclass+"', '"
@@ -179,7 +179,7 @@ public class SQLManager {
 
     public void updateData() {
 
-        SQL.sqlData sqlData = new SQL.sqlData();
+        Connector Connector = new Connector();
 
         if(!isDataExist()) return;
 
@@ -191,7 +191,7 @@ public class SQLManager {
             String name = player.getName();
             String uuid = player.getUniqueId().toString();
 
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             stmt.executeUpdate("update longinus.user set name = '"+name+"' where uuid = '"+uuid+"'");
 
@@ -205,11 +205,11 @@ public class SQLManager {
     }
     public boolean isDataExist() {
 
-        SQL.sqlData sqlData = new SQL.sqlData();
+        Connector Connector = new Connector();
 
         try {
             String uuid = player.getUniqueId().toString();
-            Connection conn = sqlData.getConnection();
+            Connection conn = Connector.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet set = stmt.executeQuery("select exists ( select * from longinus.user where uuid = '"+uuid+
                     "' ) as success");

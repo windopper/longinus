@@ -29,7 +29,7 @@ public class MainMarket {
     public void updateQuery(String query) {
 
         try {
-            Connection connection = sqlData.getConnection();
+            Connection connection = Connector.getConnection();
             Statement stmt = connection.createStatement();
             stmt.executeUpdate(query);
 
@@ -44,7 +44,7 @@ public class MainMarket {
     public void registerItem(String uuid, long altera, String item, int count, String selleruuid, String itemName) {
 
         try {
-            Connection con = sqlData.getConnection();
+            Connection con = Connector.getConnection();
             Statement statement = con.createStatement();
             int eu = statement.executeUpdate("insert into longinus.mainmarket values ('"+System.currentTimeMillis()+"', '"+itemName+"', '"+
                     uuid+"', '"+selleruuid+"', '"+altera+"', '"+count+"', '"+item+"', '"+(new java.sql.Timestamp(new java.util.Date().getTime()))+"')");
