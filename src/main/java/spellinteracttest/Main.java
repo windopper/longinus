@@ -7,6 +7,7 @@ import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox;
 import Duel.DuelManager;
+import Elevator.Elevator_Events;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.WeaponManager;
@@ -774,7 +775,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		return true;
 	}
-	
+
 	public void loop() {
 
 		
@@ -827,7 +828,9 @@ public class Main extends JavaPlugin implements Listener {
 				Map.updateMap();
 
 				PlayerLevelManager.getInstance().expWatcher();
-				
+
+				(new Elevator_Events()).runnable();
+
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
