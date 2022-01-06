@@ -43,11 +43,11 @@ public class EntityPlayerManager {
         return entityPlayerManager;
     }
 
-    public EntityPlayer summonnpc(World world, Location location, String texture, String signature) {
+    public EntityPlayer dummyNetworkNPC(World world, Location location, String texture, String signature) {
 
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
+        GameProfile profile = new GameProfile(UUID.randomUUID(), " ");
         DummyEntityPlayer entityPlayer = new DummyEntityPlayer(nmsServer, nmsWorld, profile);
         Property property = new Property("textures", texture, signature);
         profile.getProperties().put("textures", property);

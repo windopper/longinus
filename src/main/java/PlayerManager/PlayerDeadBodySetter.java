@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityPose;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
+import net.minecraft.world.entity.monster.EntitySlime;
 import net.minecraft.world.level.World;
 import net.minecraft.world.scores.ScoreboardTeam;
 import org.bukkit.Bukkit;
@@ -22,14 +23,19 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboard;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Slime;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.Main;
 
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerDeadBodySetter {
 
     private final int REMAINTICK = 600;
+    public static final ConcurrentHashMap<org.bukkit.entity.Entity, Player> playerMarker = new ConcurrentHashMap<>();
 
     private final String texture;
     private final String signature;
@@ -58,7 +64,7 @@ public class PlayerDeadBodySetter {
         Body.e(new BlockPosition(bed.getX(), bed.getY(), bed.getZ()));
 
         ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Bukkit.getScoreboardManager().getMainScoreboard())
-                .getHandle(), player.getName());
+                .getHandle(), player.getName()+"a");
         PacketPlayOutScoreboardTeam score1 = PacketPlayOutScoreboardTeam.a(team);
         PacketPlayOutScoreboardTeam score2 = PacketPlayOutScoreboardTeam.a(team, true);
         PacketPlayOutScoreboardTeam score3 = PacketPlayOutScoreboardTeam.a(team, Body.getName(), PacketPlayOutScoreboardTeam.a.a);
@@ -96,8 +102,6 @@ public class PlayerDeadBodySetter {
 
             connection.sendPacket(new PacketPlayOutEntityMetadata(Body.getId(), watcher, true));
             connection.sendPacket(move);
-//            connection.sendPacket(lookPacket);
-//            connection.sendPacket(headRotationPacket);
 
             new BukkitRunnable() {
                 @Override
@@ -107,35 +111,115 @@ public class PlayerDeadBodySetter {
             }.runTaskAsynchronously(Main.getPlugin(Main.class));
         }
 
-        final EntityArmorStand bodyMarker = new BodyMarker(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle(),
-                player.getName(), player.getLocation());
+        final EntitySlime bodyMarker = new BodyMarker(EntityTypes.aD, ((CraftWorld) player.getWorld()).getHandle(),
+                player.getName(), player.getLocation(), texture, signature, player);
+        final EntityArmorStand bodyMarker_ = new BodyMarker1(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle(),
+                player.getName(), player.getLocation(), texture, signature, player);
+        Slime slime = (Slime) bodyMarker.getBukkitEntity();
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
-            for(Player on : Bukkit.getOnlinePlayers()) {
-                PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
-                connection.sendPacket(new PacketPlayOutEntityDestroy(Body.getId()));
+        playerMarker.put(slime, player);
+
+        new BukkitRunnable() {
+
+            int time = 0;
+
+            @Override
+            public void run() {
+
+                if(!playerMarker.containsKey(slime)) {
+                    for(Player on : Bukkit.getOnlinePlayers()) {
+                        PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
+                        connection.sendPacket(new PacketPlayOutEntityDestroy(Body.getId()));
+                    }
+                    Body.setRemoved(Entity.RemovalReason.a);
+                    bodyMarker.setRemoved(Entity.RemovalReason.a);
+                    bodyMarker_.setRemoved(Entity.RemovalReason.a);
+                    slime.remove();
+                    cancel();
+                }
+                if(time >= REMAINTICK) {
+                    for(Player on : Bukkit.getOnlinePlayers()) {
+                        PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
+                        connection.sendPacket(new PacketPlayOutEntityDestroy(Body.getId()));
+                    }
+                    Body.setRemoved(Entity.RemovalReason.a);
+                    bodyMarker.setRemoved(Entity.RemovalReason.a);
+                    bodyMarker_.setRemoved(Entity.RemovalReason.a);
+                    playerMarker.remove(slime);
+                    cancel();
+                }
+                time++;
             }
-            Body.setRemoved(Entity.RemovalReason.a);
-            bodyMarker.setRemoved(Entity.RemovalReason.a);
-        }, REMAINTICK);
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 
+//        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+//            for(Player on : Bukkit.getOnlinePlayers()) {
+//                PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
+//                connection.sendPacket(new PacketPlayOutEntityDestroy(Body.getId()));
+//            }
+//            Body.setRemoved(Entity.RemovalReason.a);
+//            bodyMarker.setRemoved(Entity.RemovalReason.a);
+//            playerMarker.remove((ArmorStand) bodyMarker.getBukkitEntity().getHandle());
+//        }, REMAINTICK);
 
     }
 
-    public class BodyMarker extends EntityArmorStand {
+    public class BodyMarker extends EntitySlime {
 
-        public BodyMarker(EntityTypes<? extends EntityArmorStand> entitytypes, World world, String Name, Location loc) {
+        String texture = "";
+        String signature = "";
+
+        public BodyMarker(EntityTypes<? extends EntitySlime> entitytypes, World world, String Name, Location loc
+         ,   String texture, String signature, Player player) {
             super(entitytypes, world);
+
+            this.texture = texture;
+            this.signature = signature;
+
+            Slime bodymarker = (Slime) this.getBukkitEntity();
+            bodymarker.setCustomNameVisible(true);
+            bodymarker.setCustomName("§c§o"+Name+"의 시체");
+            bodymarker.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10));
+            bodymarker.setInvulnerable(false);
+            bodymarker.setCollidable(false);
+            bodymarker.setAI(false);
+
+            bodymarker.setSilent(true);
+            bodymarker.setGravity(false);
+            bodymarker.addScoreboardTag(Name);
+            bodymarker.addScoreboardTag("texture:"+texture);
+            bodymarker.addScoreboardTag("signature:"+signature);
+            world.addEntity(this);
+
+            this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        }
+    }
+
+    public class BodyMarker1 extends EntityArmorStand {
+
+        String texture = "";
+        String signature = "";
+
+        public BodyMarker1(EntityTypes<? extends EntityArmorStand> entitytypes, World world, String Name, Location loc
+                ,   String texture, String signature, Player player) {
+            super(entitytypes, world);
+
+            this.texture = texture;
+            this.signature = signature;
 
             ArmorStand bodymarker = (ArmorStand) this.getBukkitEntity();
             bodymarker.setCustomNameVisible(true);
-            bodymarker.setInvisible(true);
-            bodymarker.setInvulnerable(true);
-            bodymarker.setCollidable(false);
             bodymarker.setCustomName("§c§o"+Name+"의 시체");
-            bodymarker.setSmall(true);
+            bodymarker.setInvisible(true);
+            bodymarker.setInvulnerable(false);
+            bodymarker.setCollidable(false);
+            bodymarker.setAI(false);
+
+            bodymarker.setSilent(true);
             bodymarker.setGravity(false);
             bodymarker.addScoreboardTag(Name);
+            bodymarker.addScoreboardTag("texture:"+texture);
+            bodymarker.addScoreboardTag("signature:"+signature);
             world.addEntity(this);
 
             this.setPosition(loc.getX(), loc.getY(), loc.getZ());

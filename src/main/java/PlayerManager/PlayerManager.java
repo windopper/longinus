@@ -83,6 +83,7 @@ public class PlayerManager {
 	}
 
 	public static PlayerManager getinstance(@Nonnull Player p) {
+
 		if(!instance.containsKey(p)) {
 			instance.put(p, new PlayerManager(p));
 			p.sendMessage("UserManager successfully initialized");

@@ -77,8 +77,7 @@ public class PlayerCustomEventListener implements Listener {
         }
 
         for(Entity player : target.getNearbyEntities(10, 10, 10)) { // 데미지를 받은 플레이어 근처에 "아이테르"가 있으면 impulse 에너지를 부여
-            if(player instanceof Player) {
-                Player pl = (Player) player;
+            if(player instanceof Player pl) {
                 //자신이 아이테르가 아니고 자신주변 10칸 이내에 아이테르가 있으면 그 사람에게 에너지를 줌
                 if(PlayerManager.getinstance(pl).CurrentClass.equals("아이테르") && !entitycheck.duelcheck(pl, target)) {
                     Aether.getinstance().DmgtoImpulse((int)(damage/2), pl, target);

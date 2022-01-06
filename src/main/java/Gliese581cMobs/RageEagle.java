@@ -8,16 +8,14 @@ import net.minecraft.sounds.SoundEffects;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.ai.goal.target.PathfinderGoalNearestAttackableTarget;
 import net.minecraft.world.entity.animal.EntityBee;
 import net.minecraft.world.level.World;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Entity;
-import org.bukkit.event.entity.EntityTargetEvent;
 
 import java.lang.reflect.Method;
 
@@ -62,7 +60,6 @@ public class RageEagle extends EntityBee {
 
         EntityManager.getinstance(bee, mobList)
                 .setShowNameTag(true)
-                .setAttackAbility(method1, this)
                 .setAmbientAbility(method, this);
 
         this.bP.a(5, new GatherLocation(this, 1, 10, new Location(location.getWorld(), -319,105, 210)));
@@ -97,6 +94,12 @@ public class RageEagle extends EntityBee {
     protected void initPathfinder() {
 
         super.initPathfinder();
+
+        this.bQ.a(3, new PathfinderGoalNearestAttackableTarget(this, EntityLiving.class,10, true, true, entityliving -> {
+            if(((net.minecraft.world.entity.Entity) entityliving).isInvulnerable()) return false;
+            if(entityliving instanceof RageEagle) return false;
+            return true;
+        }));
 
 //        this.bP.a(0, new PathfinderGoalMeleeAttack(this, 1, true));
 //        this.bP.a(2, new PathfinderGoalRandomStrollLand(this, 0.6D));
@@ -138,29 +141,39 @@ public class RageEagle extends EntityBee {
 
     public void attackAbility() {
 
-        try {
-            if(this.getGoalTarget().getBukkitEntity().getLocation().distance(this.getBukkitEntity().getLocation()) > 10) {
-                this.setGoalTarget(null);
-            }
-        }
-        catch(Exception e) {
-
-        }
-        if(this.getGoalTarget() != null) {
-            this.setGoalTarget(this.getGoalTarget());
-            return;
-        }
-
-        for(Entity entity : this.getBukkitEntity().getNearbyEntities(10, 10, 10)) {
-            if(((CraftEntity) entity).getHandle() instanceof RageEagle) {
-                continue;
-            }
-            if(entity instanceof ArmorStand) continue;
-            if(entity.isInvulnerable()) continue;
-            this.setGoalTarget((EntityLiving) ((CraftEntity) entity).getHandle(), EntityTargetEvent.TargetReason.TARGET_ATTACKED_ENTITY,
-                        true);
-            break;
-        }
+//        try {
+//            if(this.getGoalTarget().getBukkitEntity().getLocation().distance(this.getBukkitEntity().getLocation()) > 10) {
+//                this.setGoalTarget(null);
+//            }
+//        }
+//        catch(Exception e) {
+//
+//        }
+//        if(this.getGoalTarget() != null) {
+//            this.setGoalTarget(this.getGoalTarget());
+//            return;
+//        }
+//
+//        Entity nearest = null;
+//        double distance = 100;
+//        Location origin = this.getBukkitEntity().getLocation();
+//
+//        for(Entity entity : this.getBukkitEntity().getNearbyEntities(10, 10, 10)) {
+//            if(((CraftEntity) entity).getHandle() instanceof RageEagle) {
+//                continue;
+//            }
+//            if(entity instanceof ArmorStand) continue;
+//            if(entity.isInvulnerable()) continue;
+//            if(distance > origin.distance(entity.getLocation())) {
+//                distance = origin.distance(entity.getLocation());
+//                nearest = entity;
+//            }
+//        }
+//
+//        if(nearest != null) {
+//            this.setGoalTarget((EntityLiving) ((CraftEntity) nearest).getHandle(), EntityTargetEvent.TargetReason.TARGET_ATTACKED_ENTITY,
+//                    true);
+//        }
 
     }
 }

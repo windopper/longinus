@@ -782,8 +782,16 @@ public class Main extends JavaPlugin implements Listener {
 			
 			@Override
 			public void run() {
-				
+
+				try {
+
+				}
+				catch(Exception e) {
+
+				}
+
 				PlayerManager.updateloop();
+
 
 				for(Entity entity : EntityManager.getEntityManagerEntities()) {
 					EntityManager.getinstance(entity).EntityWatcher();

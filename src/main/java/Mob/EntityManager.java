@@ -28,16 +28,20 @@ public class EntityManager {
 	private Entity e; // 마스터 엔티티
 	private ArmorStand Namear; // 이름 아머스탠드
 	private ArmorStand Healthar; // 체력 아머스탠드
-	private String CustomName = ""; // 마스터 엔티티 이름
+	public String CustomName = ""; // 마스터 엔티티 이름
 	private int CurrentHealth; // 현재 체력
 	private int PreviousHealth; // 이전 체력
 	private int MaxHealth; // 최대 체력
+	public int Level = 1;
 	private int patterntime = 0; // 패턴 시간
 	private boolean isinChunk = false;
 	private int DamageAfterDelay = 0;
 	private MobListManager.MobList mobList;
 	private double Height = 0;
+	private double HeightTempAdd = 0; // 아머스탠드 이름 위치 맞지 않는거 보정 값
 	private boolean showNameTag = true;
+	public int minDmg = 1;
+	public int maxDmg = 1;
 
 	private Object EntityInstance;
 	private Method particleMethod;
@@ -47,16 +51,13 @@ public class EntityManager {
 	
 	private EntityManager(@Nonnull Entity e) {
 		this.e = e;
-		if(e==null) Bukkit.broadcastMessage("null!");
 		CurrentHealth = 1000;
 		MaxHealth = 1000;
 		Height = e.getHeight();
-
 	}
 
 	private EntityManager(@Nonnull Entity e, int maxhealth, String CustomName, HashMap<Entity, Location> disguises) {
 		this.e = e;
-		if(e==null) Bukkit.broadcastMessage("null!");
 		CurrentHealth = maxhealth;
 		PreviousHealth = maxhealth;
 		MaxHealth = maxhealth;
@@ -67,26 +68,30 @@ public class EntityManager {
 
 	private EntityManager(@Nonnull Entity e, int maxhealth, MobListManager.MobList mobList) {
 		this.e = e;
-		if(e==null) Bukkit.broadcastMessage("null!");
 		CurrentHealth = maxhealth;
 		PreviousHealth = maxhealth;
 		MaxHealth = maxhealth;
 		this.mobList = mobList;
 		CustomName = mobList.getName();
 		Height = e.getHeight();
+		minDmg = mobList.getMindamage();
+		maxDmg = mobList.getMaxdamage();
+		Level = mobList.getLevel();
 	}
 
 	private EntityManager(@Nonnull Entity e, int maxhealth, MobListManager.MobList mobList, HashMap<Entity, Location> disguises) {
 		this.e = e;
-		if(e==null) Bukkit.broadcastMessage("null!");
 		CurrentHealth = maxhealth;
 		PreviousHealth = maxhealth;
 		MaxHealth = maxhealth;
 		this.mobList = mobList;
-		this.disguise.put(e, disguises);
+		disguise.put(e, disguises);
 		CustomName = mobList.getName();
 		if(isDisguiseEntityPlayer()) Height = getDisguiseEntityPlayer().getHeight();
 		else Height = e.getHeight();
+		minDmg = mobList.getMindamage();
+		maxDmg = mobList.getMaxdamage();
+		Level = mobList.getLevel();
 	}
 
 	public static Map<Entity, EntityManager> getEntityHealthManager() {
@@ -306,12 +311,22 @@ public class EntityManager {
 	public int getMaxHealth() {
 		return MaxHealth;
 	}
+	public int setMaxHealth(int Health) { return MaxHealth = Health; }
 
 	public ArmorStand getNameArmorStand() {
 		return Namear;
 	}
 
 	public String getCustomName() { return CustomName;}
+	public void setCustomName(String customName) { this.CustomName = customName; }
+
+	public void updateCustomName() {
+
+		CustomName = "§6[Lv."+Level+"] §c "+mobList.name().replaceAll("_", " ");
+		if(Namear != null)
+			Namear.remove();
+		Namear = null;
+	}
 
 	public void setCurrentHealth(int currentHealth) {
 		CurrentHealth = currentHealth;
@@ -392,9 +407,9 @@ public class EntityManager {
 				return;
 			}
 
-			if(Namear == null && showNameTag && CustomName != "") {
+			if(Namear == null && showNameTag && !CustomName.equals("")) {
 
-				Namear = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height, 0), EntityType.ARMOR_STAND);
+				Namear = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height+HeightTempAdd, 0), EntityType.ARMOR_STAND);
 
 				Namear.setCustomName(CustomName);
 				Namear.setCustomNameVisible(true);
@@ -408,7 +423,7 @@ public class EntityManager {
 			}
 
 			// 피해를 받았을때
-			if(((CurrentHealth < MaxHealth) && DamageAfterDelay == 100) && CustomName != "") {
+			if(((CurrentHealth < MaxHealth) && DamageAfterDelay == 100) && !CustomName.equals("")) {
 
 				if(Namear != null) Namear.remove();
 
@@ -465,11 +480,9 @@ public class EntityManager {
 			}
 
 			if(Namear != null && DamageAfterDelay != 0) {
-
 				Namear.teleport(e.getLocation().add(0, Height+0.25, 0));
 			}
 			else if(Namear != null) {
-
 				Namear.teleport(e.getLocation().add(0, Height, 0));
 			}
 		}
@@ -530,6 +543,9 @@ public class EntityManager {
 				Namear = null;
 			}
 
+
+			HeightTempAdd = 0.25;
+
 			if(Healthar != null) Healthar.remove();
 			Healthar = null;
 
@@ -538,7 +554,6 @@ public class EntityManager {
 
 		AmbientParticleCycle();
 		AmbientAbilityCycle();
-		AttackAbility();
 	}
 
 	public void AmbientParticleCycle() {

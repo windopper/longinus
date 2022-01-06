@@ -86,6 +86,11 @@ public class Gliese581cEntitySummon implements Listener {
         rageEagle.setPosition(location.getX(), location.getY(), location.getZ());
     }
 
+    public void summonMushBone(Location location) {
+        World nmsworld = ((CraftWorld) location.getWorld()).getHandle();
+        MushBone mushBone = new MushBone(EntityTypes.aD, nmsworld, location);
+    }
+
 
 
 }

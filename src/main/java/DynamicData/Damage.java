@@ -28,8 +28,7 @@ public class Damage {
 	
 	public void taken(int damage, LivingEntity taker, LivingEntity damager) {
 		
-		if(taker instanceof Player) {
-			Player user = (Player) taker;
+		if(taker instanceof Player user) {
 			taker.setMaximumNoDamageTicks(10);
 			taker.setNoDamageTicks(0);
 			user.damage(0.001);

@@ -29,13 +29,12 @@ public class MobEventManager implements Listener {
         event.setDamage(0.1);
 
         if(!EntityManager.checkinstance(Damager)) return;
+        EntityManager eM = EntityManager.getinstance(Damager);
 
         MobListManager.MobList mobList = EntityManager.getinstance(Damager).getMobList();
-
         if(mobList == null) return;
 
-        int damage = RandomRange.range(mobList.getMindamage(), mobList.getMaxdamage());
-
+        int damage = RandomRange.range(eM.minDmg, eM.maxDmg);
         if(Damager instanceof LivingEntity && Taker instanceof LivingEntity) {
 
             if(Taker.isInvulnerable()) return;
@@ -67,6 +66,7 @@ public class MobEventManager implements Listener {
             }
 
             Damage.getinstance().taken(damage, (LivingEntity)Taker, (LivingEntity)Damager);
+            EntityManager.getinstance(Damager).AttackAbility();
             return;
         }
 

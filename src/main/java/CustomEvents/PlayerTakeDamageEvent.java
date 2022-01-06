@@ -19,6 +19,7 @@ public class PlayerTakeDamageEvent extends Event implements Cancellable {
         this.damager = damager;
         this.target = target;
         this.damage = damage;
+        
     }
 
     public Entity getDamager() { return damager; }
