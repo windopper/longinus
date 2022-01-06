@@ -107,7 +107,6 @@ public class Combination {
 				PE.setEnergyOverloadCooldown(1);
 			}
 		}
-		
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -334,7 +333,7 @@ public class Combination {
 				(new CheironMelee(p)).Melee(combo);
 			}
 		}
-		else if(combo.equals("LL") || combo.equals("LR")) {
+		else if(combo.equals("LL") || combo.equals("LR") || combo.equals("SHIFTL") || combo.equals("FL")) {
 			(new Cheiron(p)).Skill(combo);
 		}
 

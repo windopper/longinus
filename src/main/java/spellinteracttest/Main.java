@@ -31,10 +31,7 @@ import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
 import ReturnToBase.ReturnMech;
-import SQL.PlayerAlarm;
-import SQL.PlayerAltera;
-import SQL.PlayerClass;
-import SQL.SQLManager;
+import SQL.*;
 import Shop.RightClickNPC;
 import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
@@ -159,6 +156,8 @@ public class Main extends JavaPlugin implements Listener {
 			reader.uninject(p);
 			
 			UnregisterInstance(p);
+
+			Connector.closeConnection();
 
 		}
 		
@@ -488,6 +487,16 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "body": {
+				(new PlayerDeadBodySetter(player)).init();
+				break;
+			}
+
+			case "exp": {
+				PlayerManager.getinstance(player).setexp(Integer.parseInt(args[1]));
+				break;
+			}
+
 			case "itemmarket": {
 				File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "config.yml");
 				FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -592,6 +601,11 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "summongb" : {
 				(new Gliese581cEntitySummon()).summonGlowingButterFly(player);
+				break;
+			}
+
+			case "summonre": {
+				(new Gliese581cEntitySummon()).summonRageEagle(player.getLocation());
 				break;
 			}
 
@@ -770,20 +784,7 @@ public class Main extends JavaPlugin implements Listener {
 			public void run() {
 				
 				PlayerManager.updateloop();
-				
 
-				
-//				for(World world : Bukkit.getWorlds()) {
-//					for(LivingEntity entity : world.getLivingEntities()) {
-//						if(entity instanceof Player) continue;
-//						if(entity instanceof ArmorStand) continue;
-//						if(entity.isInvulnerable()) continue;
-//						if(EntityManager.isRegister(entity)) {
-//							EntityManager.getinstance(entity).EntityWatcher();
-//							EntityStatusManager.getinstance(entity).BurnsLoop();
-//						}
-//					}
-//				}
 				for(Entity entity : EntityManager.getEntityManagerEntities()) {
 					EntityManager.getinstance(entity).EntityWatcher();
 				}
@@ -816,6 +817,8 @@ public class Main extends JavaPlugin implements Listener {
 				PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
 				Map.updateMap();
+
+				PlayerLevelManager.getInstance().expWatcher();
 				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);

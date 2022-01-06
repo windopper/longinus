@@ -1,6 +1,7 @@
 package Gliese581cMobs;
 
 import Mob.EntityManager;
+import Mob.FollowEntity;
 import Mob.MobListManager;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.level.EntityPlayer;

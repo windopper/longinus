@@ -4,19 +4,16 @@ import ClassAbility.entitycheck;
 import CustomEvents.ArrowFlyingEvent;
 import CustomEvents.ArrowOnGroundEvent;
 import DynamicData.Damage;
+import Mob.EntityManager;
 import PlayerManager.PlayerManager;
 import net.minecraft.world.entity.projectile.EntityArrow;
-import org.bukkit.Color;
-import org.bukkit.Particle;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArrow;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 
 public class CheironArrowEvent implements Listener {
 
@@ -31,6 +28,38 @@ public class CheironArrowEvent implements Listener {
         return cheironArrowEvent;
     }
 
+    private void invokeHitEvent(Arrow arrow, Entity shooter, Entity taker) {
+
+        if(shooter instanceof Player && taker instanceof LivingEntity) {
+            if(!PlayerManager.getinstance((Player) shooter).CurrentClass.equals("케이론")) return;
+            if(entitycheck.entitycheck(taker) && entitycheck.duelcheck(taker, shooter)) {
+                EntityArrow entityArrow = ((CraftArrow) arrow).getHandle();
+                try {
+                    int damage = Integer.parseInt(arrow.getScoreboardTags().toArray()[0].toString());
+                    Damage.getinstance().taken(damage, (LivingEntity) taker, (LivingEntity) shooter);
+                    ((Player) shooter).playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                }
+                catch(Exception e) {
+
+                }
+                if(arrow.getCustomName() != null) {
+                    String name = arrow.getCustomName();
+                    if(name.equals("StrongShot")) {
+                        CheironMelee.getInstance().StrongShotParticle(taker.getLocation());
+                    }
+                    else if(name.equals("ElecArrow")) {
+                        (new Cheiron((Player) shooter)).ElecArrowHit(arrow.getLocation());
+                    }
+                    else if(name.equals("VortexArrow")) {
+                        (new Cheiron((Player) shooter)).VortexArrowHit(arrow.getLocation().add(0, 0.2, 0));
+                    }
+                }
+                arrow.remove();
+            }
+        }
+    }
+
+
     @EventHandler
     public void ArrowHit(EntityDamageByEntityEvent event) {
         Entity damager = event.getDamager();
@@ -38,31 +67,7 @@ public class CheironArrowEvent implements Listener {
         if(damager instanceof Arrow) {
             Arrow arrow = (Arrow) damager;
             Entity shooter = (Entity) arrow.getShooter();
-            if(shooter instanceof Player && taker instanceof LivingEntity) {
-                if(!PlayerManager.getinstance((Player) shooter).CurrentClass.equals("케이론")) return;
-                if(entitycheck.entitycheck(taker) && entitycheck.duelcheck(taker, shooter)) {
-                    EntityArrow entityArrow = ((CraftArrow) arrow).getHandle();
-                    try {
-                        int damage = Integer.parseInt(arrow.getScoreboardTags().toArray()[0].toString());
-                        Damage.getinstance().taken(damage, (LivingEntity) taker, (LivingEntity) shooter);
-                        ((Player) shooter).playSound(shooter.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                    }
-                    catch(Exception e) {
-
-                    }
-                    if(arrow.getCustomName() != null) {
-                        if(arrow.getCustomName().equals("StrongShot")) {
-                            CheironMelee.getInstance().StrongShotParticle(taker.getLocation());
-                        }
-                        else if(arrow.getCustomName().equals("ElecArrow")) {
-                            (new Cheiron((Player) shooter)).ElecArrowHit(arrow.getLocation());
-                        }
-                    }
-
-
-                    arrow.remove();
-                }
-            }
+            invokeHitEvent(arrow, shooter, taker);
         }
     }
 
@@ -84,6 +89,9 @@ public class CheironArrowEvent implements Listener {
                 }
                 else if(name.equals("PiercingShot")) {
 
+                }
+                else if(name.equals("VortexArrow")) {
+                    (new Cheiron(shooter)).VortexArrowHit(arrow.getLocation().add(0, 0.2, 0));
                 }
             }
         }
@@ -108,6 +116,21 @@ public class CheironArrowEvent implements Listener {
                 else if(name.equals("ElecArrow")) {
                     arrow.getWorld().spawnParticle(Particle.END_ROD, arrow.getLocation(), 1, 0, 0, 0, 0);
                 }
+            }
+        }
+    }
+
+    /*
+    FallingBlock 엔티티가 Projectile을 팅겨내서 만든 이벤트
+     */
+    @EventHandler
+    public void ArrowBounceOff(ProjectileHitEvent event) {
+        Entity hitEntity = event.getHitEntity();
+        Entity shooter = (Entity) event.getEntity().getShooter();
+        if(hitEntity instanceof FallingBlock) {
+            Entity masterEntity = EntityManager.getDisguiseEntity(hitEntity);
+            if(shooter instanceof Player && masterEntity instanceof LivingEntity && event.getEntity() instanceof Arrow) {
+                invokeHitEvent((Arrow) event.getEntity(), shooter, masterEntity);
             }
         }
     }

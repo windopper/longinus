@@ -40,7 +40,7 @@ public class PlayerManager {
 	public int Dex = 0;
 	public int Def = 0;
 	public int Agi = 0;
-	public int lvl = 0;
+	public int lvl = 1;
 	public int exp = 0;
 	public int remainstat = 0;
 	
@@ -269,24 +269,17 @@ public class PlayerManager {
 				WeaponClass = tag.getString("클래스제한");
 			}
 
-			if(WeaponClass.equals(CurrentClass)) {
-
-				String damage[] = tag.getString("데미지").split("-");
-				mindamage += Integer.parseInt(damage[0]);
-				maxdamage += Integer.parseInt(damage[1]);
-			}
-
 			if(count==1) {
 				HelmetLevelreq = tag.getInt("레벨제한");
 				HelmetStrreq = tag.getInt("무기강화제한");
 				HelmetDexreq = tag.getInt("감각강화제한");
 				HelmetDefreq = tag.getInt("외피강화제한");
 				HelmetAgireq = tag.getInt("기동강화제한");
-				if(getlvl()<HelmetLevelreq) break;
-				if(getStr()<HelmetStrreq) break;
-				if(getDex()<HelmetDexreq) break;
-				if(getDef()<HelmetDefreq) break;
-				if(getAgi()<HelmetAgireq) break;
+				if(getlvl()<HelmetLevelreq) continue;
+				if(getStr()<HelmetStrreq) continue;
+				if(getDex()<HelmetDexreq) continue;
+				if(getDef()<HelmetDefreq) continue;
+				if(getAgi()<HelmetAgireq) continue;
 			}
 			else if(count==2) {
 				ChestplateLevelreq = tag.getInt("레벨제한");
@@ -294,11 +287,11 @@ public class PlayerManager {
 				ChestplateDexreq = tag.getInt("감각강화제한");
 				ChestplateDefreq = tag.getInt("외피강화제한");
 				ChestplateAgireq = tag.getInt("기동강화제한");
-				if(getlvl()<ChestplateLevelreq) break;
-				if(getStr()<ChestplateStrreq) break;
-				if(getDex()<ChestplateDexreq) break;
-				if(getDef()<ChestplateDefreq) break;
-				if(getAgi()<ChestplateAgireq) break;
+				if(getlvl()<ChestplateLevelreq) continue;
+				if(getStr()<ChestplateStrreq) continue;
+				if(getDex()<ChestplateDexreq) continue;
+				if(getDef()<ChestplateDefreq) continue;
+				if(getAgi()<ChestplateAgireq) continue;
 			}
 			else if(count==3) {
 				LeggingsLevelreq = tag.getInt("레벨제한");
@@ -306,11 +299,11 @@ public class PlayerManager {
 				LeggingsDexreq = tag.getInt("감각강화제한");
 				LeggingsDefreq = tag.getInt("외피강화제한");
 				LeggingsAgireq = tag.getInt("기동강화제한");
-				if(getlvl()<LeggingsLevelreq) break;
-				if(getStr()<LeggingsStrreq) break;
-				if(getDex()<LeggingsDexreq) break;
-				if(getDef()<LeggingsDefreq) break;
-				if(getAgi()<LeggingsAgireq) break;
+				if(getlvl()<LeggingsLevelreq) continue;
+				if(getStr()<LeggingsStrreq) continue;
+				if(getDex()<LeggingsDexreq) continue;
+				if(getDef()<LeggingsDefreq) continue;
+				if(getAgi()<LeggingsAgireq) continue;
 			}
 			else if(count==4) {
 				HelmetLevelreq = tag.getInt("레벨제한");
@@ -318,11 +311,11 @@ public class PlayerManager {
 				HelmetDexreq = tag.getInt("감각강화제한");
 				HelmetDefreq = tag.getInt("외피강화제한");
 				HelmetAgireq = tag.getInt("기동강화제한");
-				if(getlvl()<HelmetLevelreq) break;
-				if(getStr()<HelmetStrreq) break;
-				if(getDex()<HelmetDexreq) break;
-				if(getDef()<HelmetDefreq) break;
-				if(getAgi()<HelmetAgireq) break;
+				if(getlvl()<HelmetLevelreq) continue;
+				if(getStr()<HelmetStrreq) continue;
+				if(getDex()<HelmetDexreq) continue;
+				if(getDef()<HelmetDefreq) continue;
+				if(getAgi()<HelmetAgireq) continue;
 			}
 			else if(count==5) {
 				WeaponLevelreq = tag.getInt("레벨제한");
@@ -330,11 +323,18 @@ public class PlayerManager {
 				WeaponDexreq = tag.getInt("감각강화제한");
 				WeaponDefreq = tag.getInt("외피강화제한");
 				WeaponAgireq = tag.getInt("기동강화제한");
-				if(getlvl()<WeaponLevelreq) break;
-				if(getStr()<WeaponStrreq) break;
-				if(getDex()<WeaponDexreq) break;
-				if(getDef()<WeaponDefreq) break;
-				if(getAgi()<WeaponAgireq) break;
+				if(getlvl()<WeaponLevelreq) continue;
+				if(getStr()<WeaponStrreq) continue;
+				if(getDex()<WeaponDexreq) continue;
+				if(getDef()<WeaponDefreq) continue;
+				if(getAgi()<WeaponAgireq) continue;
+			}
+
+			if(WeaponClass.equals(CurrentClass)) {
+
+				String damage[] = tag.getString("데미지").split("-");
+				mindamage += Integer.parseInt(damage[0]);
+				maxdamage += Integer.parseInt(damage[1]);
 			}
 
 			health += getTag(tag, "생명력");

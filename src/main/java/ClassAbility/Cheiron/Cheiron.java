@@ -3,8 +3,10 @@ package ClassAbility.Cheiron;
 import ClassAbility.Combination;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
+import Mob.EntityManager;
 import Mob.EntityStatusManager;
 import PlayParticle.PlayParticle;
+import PlayParticle.Rotate;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
@@ -50,7 +52,7 @@ public class Cheiron implements Listener {
         LL(4, "§o§l방어태세§l§o §3§l-⚡§l"),
         LR(8, "§o§l전격 화살§l§o §3§l-⚡§l"),
         FL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l"),
-        SHIFL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
+        SHIFTL(8, "§o§l이유진 멋있다§l§o §3§l-⚡§l");
 
         private int mana;
         private String title;
@@ -82,6 +84,7 @@ public class Cheiron implements Listener {
             PlayerEnergy.getinstance(player).removeEnergy(mana);
             if(combo.equals("LL")) KnockBack();
             if(combo.equals("LR")) ElecArrow();
+            if(combo.equals("SHIFTL")) VortexArrow();
 
 
             Combination.getinstance().Sound(player);
@@ -229,39 +232,190 @@ public class Cheiron implements Listener {
 
         (new PlayParticle(Particle.CRIT)).CirCleHorizontalSmallImpact(player.getLocation().add(0, 0.2, 0));
 
-        new BukkitRunnable() {
-
-            double time = 0;
-            double angle = 0;
-
-            @Override
-            public void run() {
-
-                for(int i=0; i<10; i++) {
-
-                    for(double j=0; j<Math.PI*2; j+=Math.PI/4) {
-
-                        double x = Math.cos(j+Math.toRadians(angle));
-                        double y = angle / 60;
-                        double z = Math.sin(j+Math.toRadians(angle));
-
-                        Vector v = new Vector(x, y, z);
-                        v = rotate.
-
-                    }
-                    angle += 6;
-                }
-
-
-                if(time>=4) cancel();
-                time++;
-            }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+//        new BukkitRunnable() {
+//
+//            double time = 0;
+//            double angle = 0;
+//            final double xangle = -90;
+//            final double xcos = Math.cos(xangle);
+//            final double xsin = Math.sin(xangle);
+//            final double rpitch = Math.toRadians(loc.getPitch());
+//            final double ryaw = Math.toRadians(loc.getYaw());
+//
+//            @Override
+//            public void run() {
+//
+//                for(int i=0; i<10; i++) {
+//
+//                    for(double j=0; j<Math.PI*2; j+=Math.PI/4) {
+//
+//                        double x = (1 + angle / 100) * Math.cos(j+Math.toRadians(angle/10));
+//                        double y = angle / 90;
+//                        double z = (1 + angle / 100) * Math.sin(j+Math.toRadians(angle/10));
+//
+//                        Vector v = new Vector(x, y, z);
+//                        v = Rotate.rotateAroundAxisX(v, xcos, xsin);
+//                        v = Rotate.transform(v, ryaw, rpitch, 0);
+//                        loc.add(v);
+//                        player.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0, 0, 0, 0);
+//                        loc.subtract(v);
+//
+//                    }
+//                    angle += 6;
+//                }
+//
+//
+//                if(time>=4) cancel();
+//                time++;
+//            }
+//        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
 
     }
 
-    public void VortexArrowHit() {
+    public void VortexArrowHit(Location loc) {
+
+        loc.getWorld().playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 2, 2);
+        loc.getWorld().playSound(loc, Sound.ITEM_TRIDENT_THUNDER, 1, 2);
+        loc.getWorld().playSound(loc, Sound.ENTITY_LIGHTNING_BOLT_IMPACT, 2, 1.5f);
+
+        final List<Entity> Hit = new ArrayList<>();
+
+        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
+                Location eloc = entity.getEyeLocation();
+                BoundingBox box = entity.getBoundingBox();
+                if(eloc.distance(loc) <= 5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 3);
+                    Damage.getinstance().taken(dmg, entity, player);
+                    Hit.add(entity);
+                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                    loc.getWorld().playSound(player.getLocation(), Sound.ITEM_FLINTANDSTEEL_USE, 1f, 0f);
+                }
+            }
+        }
+
+        for(double j=0; j<Math.PI*2; j+=Math.PI/32) {
+            double x = Math.cos(j);
+            double y = 0;
+            double z = Math.sin(j);
+
+            Vector v = new Vector(x, y, z);
+
+            loc.add(v);
+            loc.getWorld().spawnParticle(Particle.CLOUD, loc, 0, v.getX(), v.getY(), v.getZ(), 0.4);
+            loc.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 0, v.getX(), v.getY(), v.getZ(), 0.4);
+            loc.subtract(v);
+
+        }
+
+        new BukkitRunnable() {
+
+            final Location origin = loc.clone();
+
+            double angle = 0;
+            double yangle = 0;
+            double time = 0;
+
+            double radius = 0.5;
+
+            double h = 6;
+            double an_ = 0;
+
+            @Override
+            public void run() {
+
+                if(time % 20 == 19) {
+                    for(Entity list : Hit) {
+                        if(EntityManager.checkinstance(list)) {
+                            int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.3);
+                            Damage.getinstance().taken(dmg, (LivingEntity) list, player);
+                            player.getWorld().spawnParticle(Particle.BLOCK_CRACK, list.getLocation(), 20, 0, 0, 0, 0, Material.GOLD_BLOCK.createBlockData());
+                        }
+                    }
+                }
+                if(time ==0 || time == 6) {
+                    for(double j=0; j<Math.PI*2; j+=Math.PI/16) {
+                        double x = Math.cos(j);
+                        double y = 0;
+                        double z = Math.sin(j);
+
+                        Vector v = new Vector(x, y, z);
+
+                        loc.add(v);
+                        loc.getWorld().spawnParticle(Particle.CLOUD, loc, 0, v.getX(), v.getY(), v.getZ(), 0.3);
+                        if(time == 0)
+                            loc.getWorld().spawnParticle(Particle.SMOKE_LARGE, loc, 0, v.getX(), v.getY(), v.getZ(), 0.3);
+                        loc.subtract(v);
+
+                    }
+                }
+                if(time <= 8) {
+
+                    for(double i=0; i<6; i+=0.2) {
+                        loc.getWorld().spawnParticle(Particle.REDSTONE, loc.clone().add(0,  i, 0), 1, 0, 0, 0, 0, new Particle.DustOptions(
+                                Color.YELLOW
+                                ,0.5f
+                        ));
+                    }
+                }
+                if(time <= 10) {
+                    for(int i=0; i<10; i++) {
+                        for(double j=0; j<Math.PI*2; j+=Math.PI/4) {
+                            double x = 1 * Math.cos(j + Math.toRadians(an_));
+                            double y = h;
+                            double z = 1 * Math.sin(j + Math.toRadians(an_));
+
+                            Vector v = new Vector(x, y, z);
+                            loc.add(v);
+                            loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0,new Particle.DustOptions(
+                                    Color.WHITE,
+                                    1
+                            ));
+                            loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, new Particle.DustOptions(
+                                    Color.YELLOW
+                                    ,0.5f
+                            ));
+                            loc.subtract(v);
+
+                        }
+
+                        h-=0.1;
+                        an_ += 2;
+                    }
+
+                }
+
+                if(time <= 15) {
+                    for(int i=0; i<3; i++) {
+
+                        for(double j=0; j<Math.PI*2; j+=Math.PI/4) {
+
+                            double x = 5 * Math.cos(j+Math.toRadians(angle/30));
+                            double y = 0;
+                            double z = 5 * Math.sin(j+Math.toRadians(angle/30));
+
+                            Vector v = new Vector(x, y, z);
+
+                            double ycos = Math.cos(Math.toRadians(yangle));
+                            double ysin = Math.sin(Math.toRadians(yangle));
+                            v = Rotate.rotateAroundAxisY(v, ycos, ysin);
+                            loc.add(v);
+                            //origin.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, origin, 0, v.getX(), v.getY(), v.getZ(), 0.1);
+                            loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc, 1, 0, 0.3, 0, 0);
+                            loc.subtract(v);
+
+                        }
+                        yangle += 1;
+                        angle += 6;
+                    }
+                }
+
+                if(time>=40) cancel();
+                time++;
+
+            }
+        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
     }
 }

@@ -27,6 +27,8 @@ public class PlayerCustomEventListener implements Listener {
         PlayerFunction.getinstance(player).resetFunctions();
         DuelManager.getDuelManager(player).setLoser(player);
 
+        SeveralMessages.ClassChangeMessage(player);
+
     }
 
     @EventHandler

@@ -22,7 +22,7 @@ public class EntityManager {
 	private static ConcurrentHashMap<Entity, EntityManager> instance = new ConcurrentHashMap<Entity, EntityManager>();
 	private static HashMap<Entity, HashMap<Entity, Location>> disguise = new HashMap<>();
 
-	private final HashMap<Player, Integer> contribute = new HashMap<>();
+	private final HashMap<Player, Integer> contribute = new HashMap<>(); // 플레이어 기여도
 	private LivingEntity teleportTo;  //텔레포트 하고자 하는 엔티티
 	private Location teleportToLoc; // 상대적인 좌표
 	private Entity e; // 마스터 엔티티
@@ -169,6 +169,17 @@ public class EntityManager {
 		return null;
 	}
 
+	public static Entity getDisguiseEntity(Entity e) {
+		for(Entity entity : disguise.keySet()) {
+			for(Entity disguise : disguise.get(entity).keySet()) {
+				if(disguise == e) {
+					return entity;
+				}
+			}
+		}
+		return null;
+	}
+
 	public static List<EntityPlayer> getDisguiseEntitiesPlayer() {
 
 		List<EntityPlayer> eP = new ArrayList<>();
@@ -210,6 +221,12 @@ public class EntityManager {
 		deathMethod = method;
 		EntityInstance = entityInstance;
 
+		return this;
+	}
+
+	public EntityManager setAttackAbility(Method method, Object entityInstance)	{
+		attackMethod = method;
+		EntityInstance = entityInstance;
 		return this;
 	}
 
@@ -281,9 +298,7 @@ public class EntityManager {
 				playerConnection.sendPacket(new PacketPlayOutAnimation(((CraftPlayer) wrapper).getHandle()
 						, 1));
 			}
-
 		}
-
 		DamageAfterDelay = 100;
 	}
 
@@ -523,7 +538,7 @@ public class EntityManager {
 
 		AmbientParticleCycle();
 		AmbientAbilityCycle();
-
+		AttackAbility();
 	}
 
 	public void AmbientParticleCycle() {

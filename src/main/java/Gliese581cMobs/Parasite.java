@@ -31,21 +31,10 @@ public class Parasite extends EntitySilverfish {
 
         MobListManager.MobList mobList = MobListManager.MobList.패러싯;
 
-//        Silverfish parasite = (Silverfish) world.spawnEntity(location, EntityType.SILVERFISH);
-
-//
-//        parasite.setCustomName(mobList.getName());
-//        parasite.setCustomNameVisible(true);
-//        ((LivingEntity)parasite).addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 99999, 2), true);
-
         IChatBaseComponent name = IChatBaseComponent.a(mobList.getName());
         this.setCustomName(name);
         this.setCustomNameVisible(true);
 
-
-        //craftFox.setFirstTrustedPlayer(player);
-
-        //initPathfinder();
         this.getWorld().addEntity(this);
         this.setPosition(location.getX(), location.getY(), location.getZ());
 

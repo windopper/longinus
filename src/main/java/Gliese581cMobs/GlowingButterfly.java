@@ -51,9 +51,12 @@ public class GlowingButterfly extends EntityZombie {
 
         MobListManager.MobList mobList = MobListManager.MobList.발광_나비;;
         Zombie glowingbutterfly = (Zombie) this.getBukkitEntity();
+
+
         Summon(glowingbutterfly, location, mobList, bat1);
         glowingbutterfly.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 5, true, true));
         glowingbutterfly.setInvulnerable(true);
+        glowingbutterfly.setCollidable(false);
         world.addEntity(this);
 
     }

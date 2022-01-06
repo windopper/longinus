@@ -20,38 +20,56 @@ public class SQLManager {
 
     public static void setUpMySQL() {
 
+        Statement stmt = null;
+
         try {
             Connection conn = Connector.getConnection();
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
             stmt.executeUpdate("CREATE SCHEMA `longinus` DEFAULT CHARACTER SET utf8mb4");
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
+        }
 
         try {
             Connection conn = Connector.getConnection();
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
 
             stmt.executeUpdate("create table if not exists longinus.mainmarket (" +
                     "milli BIGINT NOT NULL,"+
                     "itemname VARCHAR(45) NOT NULL,"+
                     "uuid VARCHAR(45) PRIMARY KEY NOT NULL,"+
                     "seller VARCHAR(45) NOT NULL,"+
-                    "altera BIGINT NOT NULL"+
+                    "altera BIGINT NOT NULL,"+
                     "count INT NOT NULL,"+
                     "item MEDIUMTEXT NOT NULL,"+
                     "selltime DATETIME NOT NULL)");
 
-            stmt.close();
+
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
+        }
 
         try {
             Connection conn = Connector.getConnection();
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
 
             stmt.executeUpdate("create table if not exists longinus.mainmarketlog ("+
                     "name TINYTEXT NOT NULL,"+
@@ -64,15 +82,23 @@ public class SQLManager {
                     "buytime DATETIME NOT NULL,"+
                     "milli VARCHAR(45) PRIMARY KEY NOT NULL)");
 
-            stmt.close();
+
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
+        }
 
         try {
             Connection conn = Connector.getConnection();
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
             stmt.executeUpdate("create table if not exists longinus.user ("+
                     "name VARCHAR(25) NOT NULL,"+
                     "uuid VARCHAR(45) PRIMARY KEY NOT NULL,"+
@@ -86,15 +112,22 @@ public class SQLManager {
                     "locz DOUBLE NOT NULL,"+
                     "marketitems MEDIUMTEXT NOT NULL)");
 
-            stmt.close();
         }
         catch(Exception e) {
             e.printStackTrace();
         }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
+        }
 
         try {
             Connection conn = Connector.getConnection();
-            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
             stmt.executeUpdate("create table if not exists longinus.userstorages ("+
                     "uuid VARCHAR(45) NOT NULL PRIMARY KEY,"+
                     "storagelimit INT NOT NULL DEFAULT '3',"+
@@ -109,10 +142,55 @@ public class SQLManager {
                     "storage9 MEDIUMTEXT DEFAULT NULL,"+
                     "storage10 MEDIUMTEXT DEFAULT NULL)");
 
-            stmt.close();
         }
         catch(Exception e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
+        }
+
+        try {
+            Connection conn = Connector.getConnection();
+            stmt = conn.createStatement();
+            stmt.executeUpdate("create table if not exists longinus.itemlist ("+
+                    "name VARCHAR(45) NOT NULL,"+
+                    "type VARCHAR(45) NOT NULL,"+
+                    "grade VARCHAR(45) NOT NULL,"+
+                    "class VARCHAR(45) NOT NULL,"+
+                    "str INT NOT NULL DEFAULT 0,"+
+                    "dex INT NOT NULL DEFAULT 0,"+
+                    "def INT NOT NULL DEFAULT 0,"+
+                    "agi INT NOT NULL DEFAULT 0,"+
+                    "lvl INT NOT NULL DEFAULT 0,"+
+                    "dmg VARCHAR(45) NOT NULL DEFAULT '0-0',"+
+                    "health VARCHAR(45) NOT NULL DEFAULT '0~0',"+
+                    "shieldP VARCHAR(45) NOT NULL DEFAULT '0~0'," +
+                    "skilldmgP VARCHAR(45) NOT NULL DEFAULT '0%~0%',"+
+                    "walkspeedP VARCHAR(45) NOT NULL DEFAULT '0%~0%',"+
+                    "energychargeP VARCHAR(45) NOT NULL DEFAULT '0%~0%',"+
+                    "shieldregentime VARCHAR(45) NOT NULL DEFAULT '0~0',"+
+                    "shieldaddP VARCHAR(45) NOT NULL DEFAULT '0%~0%',"+
+                    "healthregen VARCHAR(45) NOT NULL DEFAULT '0~0'," +
+                    "healP VARCHAR(45) NOT NULL DEFAULT '0%~0%',"+
+                    "meleedelay VARCHAR(45) NOT NULL DEFAULT '0~0',"+
+                    "costP VARCHAR(45) NOT NULL DEFAULT '0%~0%')");
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        finally {
+            try {
+                stmt.close();
+            }
+            catch(Exception e) {
+
+            }
         }
     }
 

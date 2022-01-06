@@ -12,12 +12,12 @@ import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.EntityArmorStand;
 import net.minecraft.world.level.World;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.meta.FireworkMeta;
+import spellinteracttest.Centermsg;
 import spellinteracttest.Main;
 
 import java.util.*;
@@ -25,6 +25,11 @@ import java.util.*;
 public class PlayerLevelManager {
 
     private static PlayerLevelManager playerLevelManager;
+
+    private static int[] exptable = {70, 133, 229, 360, 515, 671, 873, 1135, 1474, 1912, 2478, 3209, 4151, 5365, 6927, 8935, 10949, 13410, 16416, 20086, 24565, 30028, 36687, 44801, 54682, 66709, 81341, 99132, 120754, 147019, 178908, 217605, 264539,
+            321436, 390375, 473863, 574918, 697175, 845008, 1023676, 1239502, 1500081, 1814534, 2193806, 2651027, 3201938, 3865400, 4664003, 5624786, 6780098};
+
+    private int MAXLEVEL = 50;
 
     private PlayerLevelManager() {
 
@@ -161,6 +166,58 @@ public class PlayerLevelManager {
             }
         }
 
+
+    }
+
+    public void expWatcher() {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            PlayerManager pM = PlayerManager.getinstance(player);
+            if(pM.getlvl() >= MAXLEVEL) {
+                player.setLevel(MAXLEVEL);
+                player.setExp(0);
+                continue;
+            }
+
+            while(exptable[pM.getlvl()-1] < pM.getexp()) {
+                pM.setexp(pM.getexp() - exptable[pM.getlvl()-1]);
+                pM.setlvl(pM.getlvl()+1);
+                levelUpEvent(player, pM.getlvl());
+            }
+            player.setExp((float)pM.getexp() / (float)exptable[pM.getlvl()-1]);
+            player.setLevel(pM.getlvl());
+        }
+    }
+
+    private void levelUpEvent(Player player, int lvl) {
+
+        player.playSound(player.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+
+        for(Entity lE : player.getNearbyEntities(15, 15, 15)) {
+            if(lE instanceof Player) {
+                ((Player) lE).sendMessage("§d"+player.getName()+"님이 "+lvl+"레벨에 달성하였습니다");
+            }
+        }
+
+        Firework fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK);
+        FireworkMeta fireworkMeta = fw.getFireworkMeta();
+        fireworkMeta.setPower(1);
+        fireworkMeta.addEffect(FireworkEffect.builder().flicker(true).withColor(Color.WHITE).withTrail().build());
+        fw.setFireworkMeta(fireworkMeta);
+
+        PlayerManager pM = PlayerManager.getinstance(player);
+
+        Centermsg.CenteredMessage(player, "");
+        Centermsg.CenteredMessage(player, "");
+        Centermsg.CenteredMessage(player, "§e§l§o레벨업! "+pM.getlvl()+"레벨에 도달하였습니다!");
+        Centermsg.CenteredMessage(player, "");
+        Centermsg.CenteredMessage(player, "");
+
+        //TODO 직업 능력 해금, 퀘스트 해금, 레벨 상승으로 얻은 것들 표기
+
+        PlayerHealthShield pHS = PlayerHealthShield.getinstance(player);
+        pHS.setCurrentHealth(pM.Health);
+        PlayerEnergy pE = PlayerEnergy.getinstance(player);
+        pE.setEnergy(20);
 
     }
 

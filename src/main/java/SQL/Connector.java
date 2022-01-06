@@ -37,32 +37,16 @@ public class Connector {
         return null;
     }
 
-//    public void registerItem(String uuid, long altera, String item, int count, String selleruuid) {
-//
-//        try {
-//            con = DriverManager.getConnection("jdbc:mysql://" + server + "/" + "?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&serverTimezone=UTC"
-//                    , user_name, password);
-//
-//        } catch(SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            Statement statement = con.createStatement();
-//            int eu = statement.executeUpdate("insert into "+servername+"."+table+" values ('"+System.currentTimeMillis()+"', '" +
-//                    uuid+"', '"+selleruuid+"', '"+altera+"', '"+count+"', '"+item+"', '"+(new java.sql.Timestamp(new java.util.Date().getTime()))+"')");
-//
-//            statement.close();
-//        }
-//        catch(Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        try {
-//            if(con != null)
-//                con.close();
-//        } catch (SQLException e) {}
-//    }
+    public static void closeConnection() {
+
+        try {
+            con.close();
+        }
+        catch(Exception e) {
+
+        }
+    }
+
 
     public void QueryLogMarket(long altera, ItemStack itemStack, int count, String seller, String buyer, String selltime) {
 

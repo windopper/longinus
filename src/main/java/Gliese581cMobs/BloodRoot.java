@@ -34,13 +34,13 @@ public class BloodRoot extends EntitySkeleton {
         this.setSilent(true);
         bloodroot.setCollidable(false);
 
-        this.w().a(GenericAttributes.g, 10);
+        w().a(GenericAttributes.g, 10);
 
         bloodroot.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 99999, 100, true));
         bloodroot.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 99999, 100, true));
         bloodroot.setCustomName(mobList.getName());
         bloodroot.setCustomNameVisible(true);
-        bloodroot.setCollidable(false);
+        bloodroot.setCollidable(true);
 
         FallingBlock fallingBlock = bloodroot.getWorld().spawnFallingBlock(bloodroot.getLocation().clone().add(0, 0, 0), Material.CACTUS.createBlockData());
         FallingBlock fallingBlock2 = bloodroot.getWorld().spawnFallingBlock(bloodroot.getLocation().clone().add(0, 1, 0), Material.CACTUS.createBlockData());
@@ -51,11 +51,11 @@ public class BloodRoot extends EntitySkeleton {
         fallingBlock.setInvulnerable(true);
         fallingBlock.setGravity(false);
 
-        fallingBlock2.setHurtEntities(false);
-        fallingBlock2.setSilent(true);
-        fallingBlock2.setDropItem(false);
-        fallingBlock.setPersistent(true);
-        fallingBlock2.setInvulnerable(true);
+//        fallingBlock2.setHurtEntities(false);
+//        fallingBlock2.setSilent(true);
+//        fallingBlock2.setDropItem(false);
+        //fallingBlock2.setPersistent(true);
+//        fallingBlock2.setInvulnerable(true);
         fallingBlock2.setGravity(false);
 
         Location location = new Location(bloodroot.getWorld(), 0, 0, 0);

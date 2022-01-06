@@ -80,6 +80,12 @@ public class Gliese581cEntitySummon implements Listener {
 
     }
 
+    public void summonRageEagle(Location location) {
+        World nmsworld = ((CraftWorld) location.getWorld()).getHandle();
+        RageEagle rageEagle = new RageEagle(EntityTypes.g, nmsworld, location);
+        rageEagle.setPosition(location.getX(), location.getY(), location.getZ());
+    }
+
 
 
 }
