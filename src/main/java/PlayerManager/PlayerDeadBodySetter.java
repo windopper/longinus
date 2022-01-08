@@ -17,6 +17,7 @@ import net.minecraft.world.level.World;
 import net.minecraft.world.scores.ScoreboardTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
@@ -24,6 +25,8 @@ import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboard;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -151,17 +154,6 @@ public class PlayerDeadBodySetter {
                 time++;
             }
         }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
-
-//        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
-//            for(Player on : Bukkit.getOnlinePlayers()) {
-//                PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
-//                connection.sendPacket(new PacketPlayOutEntityDestroy(Body.getId()));
-//            }
-//            Body.setRemoved(Entity.RemovalReason.a);
-//            bodyMarker.setRemoved(Entity.RemovalReason.a);
-//            playerMarker.remove((ArmorStand) bodyMarker.getBukkitEntity().getHandle());
-//        }, REMAINTICK);
-
     }
 
     public class BodyMarker extends EntitySlime {
@@ -189,6 +181,20 @@ public class PlayerDeadBodySetter {
             bodymarker.addScoreboardTag(Name);
             bodymarker.addScoreboardTag("texture:"+texture);
             bodymarker.addScoreboardTag("signature:"+signature);
+            ItemStack weapon = player.getInventory().getItemInMainHand();
+            ItemStack chest = player.getInventory().getItem(EquipmentSlot.CHEST);
+            ItemStack helm = player.getInventory().getItem(EquipmentSlot.HEAD);
+            ItemStack leggings = player.getInventory().getItem(EquipmentSlot.LEGS);
+            ItemStack boots = player.getInventory().getItem(EquipmentSlot.FEET);
+            YamlConfiguration yaml = new YamlConfiguration();
+            yaml.set("weapon", weapon);
+            yaml.set("chest", chest);
+            yaml.set("helmet", helm);
+            yaml.set("leggings", leggings);
+            yaml.set("boots", boots);
+            String encoded = (new SQL.Converter()).encodeYaml(yaml);
+            bodymarker.addScoreboardTag("encoded:"+encoded);
+
             world.addEntity(this);
 
             this.setPosition(loc.getX(), loc.getY(), loc.getZ());

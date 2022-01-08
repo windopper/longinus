@@ -37,40 +37,33 @@ public class MobEventManager implements Listener {
         int damage = RandomRange.range(eM.minDmg, eM.maxDmg);
         if(Damager instanceof LivingEntity && Taker instanceof LivingEntity) {
 
-            if(Taker.isInvulnerable()) return;
+            if (Taker.isInvulnerable()) return;
+
+            // 플레이어 형태의 엔티티가 때리면
+            if (EntityManager.getinstance(Damager).isDisguiseEntityPlayer()) {
+                Player EntityPlayer = EntityManager.getinstance(Damager).getDisguiseEntityPlayer();
+                net.minecraft.server.level.EntityPlayer eP = ((CraftPlayer) EntityPlayer).getHandle();
+                PacketPlayOutAnimation packetPlayOutAnimation = new PacketPlayOutAnimation(eP, 0);
+                EntityPlayerWatcher.sendPacket(eP, packetPlayOutAnimation);
+            }
 
             // 맞은이가 플레이어 형식이라면
-            if(Taker instanceof Player) {
+            if (Taker instanceof Player) {
 
                 Player PTaker = (Player) Taker;
 
-                for(Player oP : Bukkit.getOnlinePlayers()) {
-                    if(oP.getName().equals(PTaker.getName())) {
+                for (Player oP : Bukkit.getOnlinePlayers()) {
+                    if (oP.getName().equals(PTaker.getName())) {
 
-                        Damage.getinstance().taken(damage, PTaker, (LivingEntity)Damager);
+                        Damage.getinstance().taken(damage, PTaker, (LivingEntity) Damager);
                     }
                 }
                 return;
             }
-            // 플레이어 형태의 엔티티가 때리면
-            if(EntityManager.getinstance((LivingEntity) Damager).isDisguiseEntityPlayer()) {
 
-                Player EntityPlayer = EntityManager.getinstance((LivingEntity) Damager).getDisguiseEntityPlayer();
-                net.minecraft.server.level.EntityPlayer eP = ((CraftPlayer) EntityPlayer).getHandle();
-
-                PacketPlayOutAnimation packetPlayOutAnimation = new PacketPlayOutAnimation(eP, 0);
-
-                EntityPlayerWatcher.sendPacket(eP, packetPlayOutAnimation);
-
-
-            }
-
-            Damage.getinstance().taken(damage, (LivingEntity)Taker, (LivingEntity)Damager);
+            Damage.getinstance().taken(damage, (LivingEntity) Taker, (LivingEntity) Damager);
             EntityManager.getinstance(Damager).AttackAbility();
-            return;
         }
-
-
     }
 
     @EventHandler

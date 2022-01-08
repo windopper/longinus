@@ -52,10 +52,6 @@ public class PlayerLevelManager {
         //오름차순
         entryList.sort((o1, o2) -> o2.getValue() - o1.getValue());
 
-//        for(Map.Entry<Player, Integer> en : entryList) {
-//            Bukkit.broadcastMessage(en.getKey().getName()+"  "+en.getValue());
-//        }
-
         int sum = 0;
         double average = 0;
         int size = entryList.size();
@@ -70,10 +66,8 @@ public class PlayerLevelManager {
 
         double halfaverage = average / 2;
 
-
         for(Player player : getContributor) {
 
-            //Bukkit.broadcastMessage(player.getName());
             // 기여도가 평균의 절반 보다 적으면
             if(CBList.get(player) < halfaverage) continue;
             // 아니면
@@ -85,7 +79,6 @@ public class PlayerLevelManager {
                 GiveExp = DecreaseExpPerLevel(GiveExp, mobList.getLevel(), psm.getlvl());
                 ShowEXPArmorStand(entity, player, GiveExp);
                 DistributePartyXP(GiveExp, player);
-
 
                 psm.setexp(psm.getexp() + GiveExp);
             }

@@ -304,7 +304,6 @@ public class Classgui {
 		int GUIlocation = 11;
 		
 		if(!(new SQL.PlayerClass(p)).isExist()) { // 등록된 클래스가 없으면
-			
 			gui.setItem(GUIlocation, ClassAddItem(p));
 			return;
 		}

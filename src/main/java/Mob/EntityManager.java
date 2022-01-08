@@ -7,9 +7,12 @@ import EntityPlayerManager.EntityPlayerWatcher;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.entity.EntityPose;
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.ItemStack;
+import spellinteracttest.Main;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -42,12 +45,16 @@ public class EntityManager {
 	private boolean showNameTag = true;
 	public int minDmg = 1;
 	public int maxDmg = 1;
+	public Entity latestDamager;
 
 	private Object EntityInstance;
 	private Method particleMethod;
 	private Method ambientAbilityMethod;
 	private Method deathMethod;
 	private Method attackMethod;
+	private Method attackedByMethod;
+	//private Method dropTable;
+	private final HashMap<ItemStack, Double> dropTable = new HashMap<>();
 	
 	private EntityManager(@Nonnull Entity e) {
 		this.e = e;
@@ -235,6 +242,11 @@ public class EntityManager {
 		return this;
 	}
 
+	public EntityManager addDropTable(ItemStack itemStack, double percent) {
+		dropTable.put(itemStack, percent);
+		return this;
+	}
+
 	public EntityManager setTeleportToEntity(LivingEntity teleportTo) {
 		this.teleportTo = teleportTo;
 		return this;
@@ -263,18 +275,20 @@ public class EntityManager {
 		HologramIndicator.getinstance().HealIndicator(var0, e.getLocation());
 	}
 
-	public void setDamageValue(int var0, Player damager) {
+	public void setDamageValue(int var0, Entity damager) {
 
 		Location loc = e.getBoundingBox().getCenter().toLocation(e.getWorld());
 		loc.getWorld().spawnParticle(Particle.BLOCK_DUST, loc,10, 0.1, 0.1, 0.1, 0, Material.REDSTONE_BLOCK.createBlockData());
 
 		if(var0 > getCurrentHealth()) var0 = getCurrentHealth();
 
-		if(contribute.containsKey(damager)) {
-			contribute.replace(damager, contribute.get(damager) + var0);
-		}
-		else {
-			contribute.put(damager, var0);
+		if(damager instanceof Player player) {
+			if(contribute.containsKey(player)) {
+				contribute.replace(player, contribute.get(player) + var0);
+			}
+			else {
+				contribute.put(player, var0);
+			}
 		}
 
 		if(isDisguiseEntityPlayer()) {
@@ -289,11 +303,12 @@ public class EntityManager {
 
 		CurrentHealth -= var0;
 		DamageAfterDelay = 100;
+		AttackedByAbility();
+		latestDamager = damager;
 	}
 
 	public void setDamageValue(int var0) {
 		CurrentHealth -= var0;
-
 
 		if(isDisguiseEntityPlayer()) {
 			Player wrapper = getDisguiseEntityPlayer();
@@ -321,10 +336,8 @@ public class EntityManager {
 	public void setCustomName(String customName) { this.CustomName = customName; }
 
 	public void updateCustomName() {
-
 		CustomName = "§6[Lv."+Level+"] §c "+mobList.name().replaceAll("_", " ");
-		if(Namear != null)
-			Namear.remove();
+		if(Namear != null) Namear.remove();
 		Namear = null;
 	}
 
@@ -337,6 +350,13 @@ public class EntityManager {
 	}
 
 	public HashMap<Player, Integer> getContribute() { return contribute; }
+	public List<Player> getDropItemContribute() {
+		List<Player> list = new ArrayList<>();
+		for(Player p : contribute.keySet()) {
+			if((double)contribute.get(p) / (double)MaxHealth > 0.05) list.add(p);
+		}
+		return list;
+	}
 	
 	@SuppressWarnings("deprecation")
 	public synchronized void EntityWatcher() {
@@ -390,16 +410,30 @@ public class EntityManager {
 						if(disguise instanceof Player) {
 							EntityPlayer entityPlayer = ((CraftPlayer) disguise).getHandle();
 
-							EntityPlayerWatcher.Remove(entityPlayer);
-							((CraftPlayer) disguise).getHandle().setRemoved(net.minecraft.world.entity.Entity.RemovalReason.a);
+							((CraftPlayer) disguise).getHandle().setHealth(0);
+							Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+								EntityPlayerWatcher.Remove(entityPlayer);
+								((CraftPlayer) disguise).getHandle().setRemoved(net.minecraft.world.entity.Entity.RemovalReason.a);
+							}, 20);
 						}
-						disguise.remove();
+						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+							disguise.remove();
+						}, 20);
 					}
 				}
+
+				if(isDisguiseEntityPlayer()) {
+					Player wrapper = getDisguiseEntityPlayer();
+					EntityPlayer eP = ((CraftPlayer) wrapper).getHandle();
+					eP.setPose(EntityPose.h);
+				}
+
 				if(teleportTo != null) {
 					teleportTo.setHealth(0);
 				}
+
 				DeathAbility();
+				invokeDropTable();
 
 				if(e instanceof LivingEntity)
 					EntityStatusManager.getinstance((LivingEntity) e).removeinstance();
@@ -594,6 +628,28 @@ public class EntityManager {
 		}
 		catch(Exception e){
 
+		}
+	}
+
+	public void AttackedByAbility() {
+		if(attackedByMethod == null) return;
+		try {
+			attackedByMethod.invoke(EntityInstance);
+		}
+		catch(Exception e) {
+
+		}
+	}
+
+	public void invokeDropTable() {
+		for(Player player : getDropItemContribute()) {
+			for(ItemStack item : dropTable.keySet()) {
+				if(Math.random() <= dropTable.get(item)) {
+					Item it = (Item) e.getWorld().spawnEntity(e.getLocation(), EntityType.DROPPED_ITEM);
+					it.setItemStack(item);
+					it.setOwner(player.getUniqueId());
+				}
+			}
 		}
 	}
 

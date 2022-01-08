@@ -441,11 +441,9 @@ public class KhaosMelee {
             ArmorStand dagger = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0, -0.5, 0), EntityType.ARMOR_STAND);
             dagger.setInvisible(true);
             dagger.setSilent(true);
-            //dagger.setMarker(true);
             dagger.setInvulnerable(true);
             dagger.setArms(true);
             dagger.setSmall(true);
-            //dagger.setGravity(false);
             dagger.getEquipment().setItem(EquipmentSlot.HAND, new ItemStack(Material.NETHERITE_SWORD));
             dagger.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
             dagger.setRightArmPose(new EulerAngle(Math.toRadians(165f), Math.toRadians(180f-loc.getPitch()), Math.toRadians(90f)));

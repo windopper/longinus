@@ -52,16 +52,14 @@ public class PlayerCustomEventListener implements Listener {
         }
 
         Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-
             EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> EntityPlayerWatcher.Remove(value, player));
-
         }, 5);
 
         Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-
             EntityManager.getDisguiseEntitiesPlayer().stream().forEach(value -> EntityPlayerManager.getInstance().showTo(value, player));
-
         },20);
+
+        (new PlayerDeadBodySetter(player)).init();
 
     }
 

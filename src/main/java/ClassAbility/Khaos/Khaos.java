@@ -11,17 +11,16 @@ import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
 import com.google.common.base.Enums;
 import org.bukkit.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
+import spellinteracttest.Main;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Khaos {
 
@@ -85,6 +84,7 @@ public class Khaos {
             PlayerEnergy.getinstance(player).removeEnergy(mana);
             if(combo.equals("SHIFTR")) SHIFTR(player);
             if(combo.equals("RL")) HalfMoon();
+            if(combo.equals("FR")) FR();
 
 
             Combination.getinstance().Sound(player);
@@ -250,6 +250,89 @@ public class Khaos {
 
     public void RR() {
         Location loc = player.getEyeLocation();
+
+    }
+
+    public void FR() {
+        Location loc = player.getEyeLocation();
+        Location loc_ = player.getEyeLocation();
+        Location loc__ = player.getEyeLocation();
+        loc_.setYaw(loc.getYaw() - 20);
+        loc__.setYaw(loc.getYaw() + 20);
+        List<ArmorStand> list = new ArrayList<>(Arrays.asList(dagger(loc), dagger(loc_), dagger(loc__)));
+
+        new BukkitRunnable() {
+
+            int time = 0;
+
+            @Override
+            public void run() {
+
+                List<ArmorStand> DBukkit = new ArrayList<>();
+
+                for(int i=0; i<list.size(); i++) {
+                    Boolean hit = false;
+                    ArmorStand a = list.get(i);
+                    Location loc = a.getLocation();
+                    Vector v = a.getLocation().getDirection().normalize().multiply(1);
+                    a.setVelocity(v);
+                    a.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, a.getLocation(), 1, 0, 0, 0, 0);
+
+                    for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+                        if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player) {
+                            Location eloc = entity.getEyeLocation();
+                            BoundingBox box = entity.getBoundingBox();
+                            if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+                                int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5);
+                                Damage.getinstance().taken(dmg, entity, player);
+                                EntityStatusManager.getinstance(entity).KnockBack(a, 0.5);
+                                player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f);
+                                DBukkit.add(a);
+                                a.remove();
+                                hit = true;
+                            }
+                        }
+                        if(hit) break;
+                    }
+                }
+
+                for(int i=0; i<DBukkit.size(); i++) {
+                    list.remove(DBukkit.get(i));
+                }
+
+                if(time>20) {
+                    list.forEach(ArmorStand::remove);
+                    cancel();
+                }
+                time++;
+            }
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+
+    }
+
+    private ArmorStand dagger(Location loc) {
+        ArmorStand dagger = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0, -0.5, 0), EntityType.ARMOR_STAND);
+        dagger.setInvisible(true);
+        dagger.setSilent(true);
+        dagger.setInvulnerable(true);
+        dagger.setArms(true);
+        dagger.setSmall(true);
+        dagger.setMarker(true);
+        dagger.setCollidable(true);
+        dagger.getEquipment().setItem(EquipmentSlot.HAND, new ItemStack(Material.NETHERITE_SWORD));
+        dagger.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
+        dagger.setRightArmPose(new EulerAngle(Math.toRadians(165f), Math.toRadians(180f-loc.getPitch()), Math.toRadians(90f)));
+        return dagger;
+    }
+
+    private void FREffect(Location loc) {
+
+        double rpitch = Math.toRadians(loc.getPitch());
+        double ryaw = Math.toRadians(loc.getYaw());
+        double rroll = Math.toRadians(Math.random() * 60 - 30);
+
+
 
     }
 

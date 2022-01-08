@@ -7,6 +7,7 @@ import PlayerManager.EntityHealthBossBar;
 import PlayerManager.PlayerHealthShield;
 import PlayerManager.PlayerManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -52,6 +53,7 @@ public class Damage {
 		else if(!(taker instanceof ArmorStand) && (taker instanceof LivingEntity)) {
 
 			if(taker.isInvulnerable()) return;
+			taker.getWorld().playSound(taker.getLocation(), Sound.ENTITY_GENERIC_HURT, 1, 1);
 
 			MobListManager.MobList mobList = EntityManager.getinstance(taker).getMobList();
 
@@ -73,8 +75,7 @@ public class Damage {
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, taker);
 			}
 
-			if(damager instanceof Player) EH.setDamageValue(damage, (Player) damager);
-			else EH.setDamageValue(damage);
+			EH.setDamageValue(damage, damager);
 			// 엔티티의 변화 감지
 			//EH.EntityWatcher();
 

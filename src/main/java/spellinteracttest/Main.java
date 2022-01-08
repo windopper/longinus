@@ -5,10 +5,11 @@ import Auction.AuctionNPC;
 import ClassAbility.Accelerator;
 import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
-import ClassAbility.Phlox;
+import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
+import Items.ModuleChips;
 import Items.WeaponManager;
 import Map.Map;
 import Mob.EntityManager;
@@ -107,6 +108,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new Map(), this);
 		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Auction(), this);
+		getServer().getPluginManager().registerEvents(new ModuleChips(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -487,6 +489,18 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "installChip" : {
+				ModuleChips moduleChips = new ModuleChips();
+				(moduleChips.new install()).openGUI(player);
+				break;
+			}
+
+			case "getChip": {
+				ModuleChips moduleChips = new ModuleChips();
+				player.getInventory().addItem(moduleChips.getChip(args[1]));
+				break;
+			}
+
 			case "body": {
 				(new PlayerDeadBodySetter(player)).init();
 				break;
@@ -606,6 +620,16 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "summonre": {
 				(new Gliese581cEntitySummon()).summonRageEagle(player.getLocation());
+				break;
+			}
+
+			case "summonmb": {
+				(new Gliese581cEntitySummon()).summonMushBone(player.getLocation());
+				break;
+			}
+
+			case "summonmob": {
+				(new Gliese581cEntitySummon()).summonMob(player.getLocation(), args[1]);
 				break;
 			}
 

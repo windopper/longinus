@@ -91,6 +91,13 @@ public class Gliese581cEntitySummon implements Listener {
         MushBone mushBone = new MushBone(EntityTypes.aD, nmsworld, location);
     }
 
+    public void summonMob(Location location, String mobName) {
+        World nmsworld = ((CraftWorld) location.getWorld()).getHandle();
+        if(mobName.equals("dm")) {
+            DessertMammoth dm = new DessertMammoth(EntityTypes.L, nmsworld, location);
+        }
+    }
+
 
 
 }

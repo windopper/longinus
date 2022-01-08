@@ -115,6 +115,7 @@ public class WeaponManager {
 			int arr[] = { getMinValue(configvalue), getRandomPercent(), getMaxValue(configvalue) };
 			// 중복 방지
 			Registered.put(stats, arr);
+
 		}
 
 		ItemMeta itemmeta = item.getItemMeta();
@@ -136,11 +137,11 @@ public class WeaponManager {
 
 			if(Integer.parseInt(str) > 0) {
 				if(percent == 1) str+="%";
-				statColoredContainer.put(stats, "§f"+stats+"§f §a+"+str+"§a");
+				statColoredContainer.put(stats, "§5§o"+stats+"§f §a+"+str+"§a");
 			}
 			else {
 				if(percent == 1) str+="%";
-				statColoredContainer.put(stats, "§f"+stats+"§f §c"+str+"§c");
+				statColoredContainer.put(stats, "§5§o"+stats+"§f §c"+str+"§c");
 			}
 		}
 
@@ -154,10 +155,10 @@ public class WeaponManager {
 
 		ArrayList<String> list = new ArrayList<>();
 		list.add("");
-		list.add("§6데미지: "+config.getString(IName+".데미지")+"§6");
+		list.add("§c§l§o데미지: "+config.getString(IName+".데미지"));
 		list.add("");
-		list.add("§7클래스제한 : "+config.getString(IName+".클래스제한")+"§f");
-		list.add("§7레벨제한 : "+config.getString(IName+".레벨제한")+"§f");
+		list.add("§6§o클래스제한 : "+config.getString(IName+".클래스제한"));
+		list.add("§7§o레벨제한 : "+config.getString(IName+".레벨제한"));
 		if(config.contains(IName+".무기강화최소")) list.add("§7무기강화최소 : "+config.getString(IName+".무기강화최소")+"§f");
 		if(config.contains(IName+".감각강화최소")) list.add("§7감각강화최소 : "+config.getString(IName+".감각강화최소")+"§f");
 		if(config.contains(IName+".외피강화최소")) list.add("§7외피강화최소 : "+config.getString(IName+".외피강화최소")+"§f");
@@ -167,7 +168,6 @@ public class WeaponManager {
 			if(config.contains(IName+"."+stats)) {
 
 				list.add(statColoredContainer.get(stats));
-				list.add("");
 			}
 		}
 
@@ -194,6 +194,9 @@ public class WeaponManager {
 		nbtTagCompound.setInt("기동강화제한", config.getInt(IName+"."+"기동강화최소"));
 		nbtTagCompound.setBoolean("교환", true);
 		nbtTagCompound.setString("UUID", UUID.randomUUID().toString());
+
+		int[] chips = new int[3];
+		nbtTagCompound.setIntArray("chips", chips);
 
 		// 태그 저장
 		nmsStack.setTag(nbtTagCompound);

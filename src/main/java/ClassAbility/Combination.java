@@ -6,6 +6,7 @@ import ClassAbility.Cheiron.Cheiron;
 import ClassAbility.Cheiron.CheironMelee;
 import ClassAbility.Khaos.Khaos;
 import ClassAbility.Khaos.KhaosMelee;
+import ClassAbility.Phlox.Phlox;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
@@ -371,103 +372,6 @@ public class Combination {
 		else if(combo.equals("RR") || combo.equals("RL") || combo.equals("FR")) {
 			(new Aether(p)).Skill(combo);
 		}
-//		if(combo.equals("RL")) {
-//
-//			if(CurrentMana >= impulseswitchshieldmana ) {
-//				Sound(p);
-//				p.sendTitle(" ",blank+RL, 5, 20, 10);
-//				energyoverload(p, combo);
-//				Aether.getinstance().ImpulseSwitchShield(p, impulseswitchshieldmana);
-//			}
-//			else {
-//				Warning(p);
-//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-//			}
-//
-//		}
-//		else if(combo.equals("RR")) {
-//
-//			if(lvl<10) {
-//				Warning(p);
-//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-//				return;
-//			}
-//
-//			if(CurrentMana >= shieldswitchchargemana ) {
-//				Sound(p);
-//				p.sendTitle(" ",blank+RR, 5, 20, 10);
-//				energyoverload(p, combo);
-//				Aether.getinstance().ShieldSwitchCharge(p, shieldswitchchargemana);
-//			}
-//			else {
-//				Warning(p);
-//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-//			}
-//
-//
-//		}
-//		else if(combo.equals("FR")) {
-//
-//			if(lvl<15) {
-//				Warning(p);
-//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-//				return;
-//			}
-//
-//			if(CurrentMana >= WeaponModeChangemana) {
-//				Sound(p);
-//				p.sendTitle(" ",blank+FR, 5, 20, 10);
-//				energyoverload(p, combo);
-//				Aether.getinstance().SweepWeapon(p, WeaponModeChangemana);
-//			}
-//			else {
-//				Warning(p);
-//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-//			}
-//
-//		}
-//		else if(combo.equals("RF")) {
-//
-//			if(lvl<5) {
-//				Warning(p);
-//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-//				return;
-//			}
-//
-//			if(CurrentMana >= impulseswitchweaponmana) {
-//				Sound(p);
-//				p.sendTitle(" ",blank+RF, 5, 20, 10);
-//				energyoverload(p, combo);
-//				Aether.getinstance().ImpulseSwitchWeapon(p, impulseswitchweaponmana);
-//			}
-//			else {
-//				Warning(p);
-//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-//			}
-//
-//		}
-//		else if(combo.equals("FF")) {
-//
-//			if(lvl<20) {
-//				Warning(p);
-//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-//				return;
-//			}
-//
-//			if(PF.AEImpulse >= 100d) {
-//				Sound(p);
-//				p.sendTitle(" ",blank+FF, 5, 20, 10);
-//				Aether.getinstance().ImpulseSwitchEnergy(p);
-//			}
-//			else {
-//				Warning(p);
-//				p.sendTitle(" ",blank+impulseexhaustion, 5, 20, 10);
-//			}
-//
-//		}
-		
-		
-		
 	}
 
 	public void Accelerator(Player p, String combo) {
@@ -747,152 +651,163 @@ public class Combination {
 	}
 
 	public void Phlox(Player p, String combo) {
-		
-		int lvl = PlayerManager.getinstance(p).getlvl();
-		
-		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
-		int CurrentRobot = PlayerFunction.getinstance(p).PHNanoRobot;
-		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
-		
-		int RLrobot = ClassAbility.Phlox.healrobot;
-		int RRrobot = ClassAbility.Phlox.escaperobot;
-		int RFrobot = ClassAbility.Phlox.annihilationrobot;
-		int FRrobot = ClassAbility.Phlox.interruptrobot;
-		
-		int RLmana = ClassAbility.Phlox.healmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int RRmana = ClassAbility.Phlox.escapemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int RFmana = ClassAbility.Phlox.annihilationmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int FRmana = ClassAbility.Phlox.interruptmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		int FFmana = ClassAbility.Phlox.robotmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
-		
-		String RL = "§o§l정밀치료§l§o §3§l-⚡§l"+(RLmana);
-		String RR = "§o§l긴급탈출§l§o §3§l-⚡§l"+(RRmana);
-		String FR = "§o§l방해장 가동§l§o §3§l-⚡§l"+(FRmana);
-		String RF = "§o§l섬멸개시§l§o §3§l-⚡§l"+(RFmana);
-		String FF = "§o§l로봇급조§l§o §3§l-⚡§l"+(FFmana);
-		
-		if(combo.equals("L")) {
-			
-			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) Phlox.getinstance().melee(p);
 
-		}
-		if(combo.equals("RL")) {
-			
-			if(CurrentMana >= RLmana && CurrentRobot >= RLrobot) {
-				Sound(p);
-				p.sendTitle(" ",blank+RL, 5, 20, 10);
-				energyoverload(p, combo);
-				Phlox.getinstance().heal(p, RLmana);
-			}
-			else {
-				Warning(p);
-				if(CurrentMana < RLmana) {
-					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-				}
-				else {
-					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
-				}
+		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
 
+			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) {
+				(new AetherMelee(p)).Melee(combo);
 			}
 
 		}
-		else if(combo.equals("RR")) {
-			
-			if(lvl<10) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= RRmana && CurrentRobot >= RRrobot) {
-				Sound(p);
-				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				energyoverload(p, combo);
-				Phlox.getinstance().escape(p, RRmana);
-			}
-			else {
-				Warning(p);
-				if(CurrentMana < RRmana) {
-					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-				}
-				else {
-					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
-				}
-			}
-			
-
-		}
-		else if(combo.equals("FR")) {
-			
-			if(lvl<15) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= FRmana && CurrentRobot >= FRrobot) {
-				Sound(p);
-				p.sendTitle(" ",blank+FR, 5, 20, 10);
-				energyoverload(p, combo);
-				Phlox.getinstance().interrupt(p, FRmana);
-			}
-			else {
-				Warning(p);
-				if(CurrentMana < FRmana) {
-					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-				}
-				else {
-					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
-				}
-			}
-
-		}
-		else if(combo.equals("RF")) {
-			
-			if(lvl<5) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= RFmana && CurrentRobot >= RFrobot) {
-				Sound(p);
-				p.sendTitle(" ",blank+RF, 5, 20, 10);
-				energyoverload(p, combo);
-				Phlox.getinstance().annihilation(p, RFmana);
-			}
-			else {
-				Warning(p);
-				if(CurrentMana < RFmana) {
-					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-				}
-				else {
-					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
-				}
-			}
-
-		}
-		else if(combo.equals("FF")) {
-			
-			if(lvl<20) {
-				Warning(p);
-				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
-				return;
-			}
-			
-			if(CurrentMana >= FFmana) {
-				Sound(p);
-				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				energyoverload(p, combo);
-				Phlox.getinstance().robot(p, FFmana);
-			}
-			else {
-				Warning(p);
-				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
-			}
-
+		else if(combo.equals("RR") || combo.equals("RL") || combo.equals("FR") || combo.equals("SHIFTR")) {
+			(new Phlox(p)).Skill(combo);
 		}
 		
+//		int lvl = PlayerManager.getinstance(p).getlvl();
+//
+//		int CurrentMana = PlayerEnergy.getinstance(p).getEnergy();
+//		int CurrentRobot = PlayerFunction.getinstance(p).PHNanoRobot;
+//		int ManaDecrease = PlayerManager.getinstance(p).ManaDecrease;
+//
+//		int RLrobot = Phlox.healrobot;
+//		int RRrobot = Phlox.escaperobot;
+//		int RFrobot = Phlox.annihilationrobot;
+//		int FRrobot = Phlox.interruptrobot;
+//
+//		int RLmana = Phlox.healmana - ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int RRmana = Phlox.escapemana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int RFmana = Phlox.annihilationmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int FRmana = Phlox.interruptmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//		int FFmana = Phlox.robotmana -ManaDecrease + PlayerEnergy.getinstance(p).getEnergyOverload();
+//
+//		String RL = "§o§l정밀치료§l§o §3§l-⚡§l"+(RLmana);
+//		String RR = "§o§l긴급탈출§l§o §3§l-⚡§l"+(RRmana);
+//		String FR = "§o§l방해장 가동§l§o §3§l-⚡§l"+(FRmana);
+//		String RF = "§o§l섬멸개시§l§o §3§l-⚡§l"+(RFmana);
+//		String FF = "§o§l로봇급조§l§o §3§l-⚡§l"+(FFmana);
+//
+//		if(combo.equals("L")) {
+//
+//			if(PlayerFunction.getinstance(p).getMeleeDelay()==0) Phlox.getinstance().melee(p);
+//
+//		}
+//		if(combo.equals("RL")) {
+//
+//			if(CurrentMana >= RLmana && CurrentRobot >= RLrobot) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RL, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Phlox.getinstance().heal(p, RLmana);
+//			}
+//			else {
+//				Warning(p);
+//				if(CurrentMana < RLmana) {
+//					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//				}
+//				else {
+//					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
+//				}
+//
+//			}
+//
+//		}
+//		else if(combo.equals("RR")) {
+//
+//			if(lvl<10) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= RRmana && CurrentRobot >= RRrobot) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RR, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Phlox.getinstance().escape(p, RRmana);
+//			}
+//			else {
+//				Warning(p);
+//				if(CurrentMana < RRmana) {
+//					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//				}
+//				else {
+//					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
+//				}
+//			}
+//
+//
+//		}
+//		else if(combo.equals("FR")) {
+//
+//			if(lvl<15) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= FRmana && CurrentRobot >= FRrobot) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+FR, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Phlox.getinstance().interrupt(p, FRmana);
+//			}
+//			else {
+//				Warning(p);
+//				if(CurrentMana < FRmana) {
+//					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//				}
+//				else {
+//					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
+//				}
+//			}
+//
+//		}
+//		else if(combo.equals("RF")) {
+//
+//			if(lvl<5) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= RFmana && CurrentRobot >= RFrobot) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+RF, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Phlox.getinstance().annihilation(p, RFmana);
+//			}
+//			else {
+//				Warning(p);
+//				if(CurrentMana < RFmana) {
+//					p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//				}
+//				else {
+//					p.sendTitle(" ",blank+robotexhaustion, 5, 20, 10);
+//				}
+//			}
+//
+//		}
+//		else if(combo.equals("FF")) {
+//
+//			if(lvl<20) {
+//				Warning(p);
+//				p.sendTitle(" ",blank+levelrequire, 5, 20, 10);
+//				return;
+//			}
+//
+//			if(CurrentMana >= FFmana) {
+//				Sound(p);
+//				p.sendTitle(" ",blank+FF, 5, 20, 10);
+//				energyoverload(p, combo);
+//				Phlox.getinstance().robot(p, FFmana);
+//			}
+//			else {
+//				Warning(p);
+//				p.sendTitle(" ",blank+manaexhaustion, 5, 20, 10);
+//			}
+//
+//		}
+//
 		
 		
 	}

@@ -42,7 +42,6 @@ public class GatherLocation extends PathfinderGoal {
 
             return true; // c메소드 실행
         }
-
     }
 
     @Override

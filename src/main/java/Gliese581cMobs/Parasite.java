@@ -58,7 +58,6 @@ public class Parasite extends EntitySilverfish {
         }
 
         EntityManager.getinstance(craftsilverfish, mobList).setAttackAbility(method, this);
-
         EntityStatusManager.getinstance(craftsilverfish).setCanKnockback(false);
     }
 
@@ -70,9 +69,9 @@ public class Parasite extends EntitySilverfish {
 
         this.bP.a(1, new PathfinderGoalFloat(this));
         this.bP.a(0, new PathfinderGoalMeleeAttack(this, 1D, false));
-        this.bP.a(2, new PathfinderGoalRandomStroll(this, 0.6D));
-        this.bP.a(3, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F));
-        this.bP.a(4, new PathfinderGoalRandomLookaround(this));
+        this.bP.a(3, new PathfinderGoalRandomStroll(this, 0.6D));
+        this.bP.a(4, new PathfinderGoalLookAtPlayer(this, EntityPlayer.class, 8.0F));
+        this.bP.a(5, new PathfinderGoalRandomLookaround(this));
 
         this.bQ.a(2, new PathfinderGoalNearestAttackableTarget(this, EntityLiving.class,10, true, true, entityliving -> {
             if(((net.minecraft.world.entity.Entity) entityliving).isInvulnerable()) return false;
@@ -99,7 +98,10 @@ public class Parasite extends EntitySilverfish {
                             .filter((i) -> i.contains("texture")).toList().get(0).split(":")[1],
                     entity.getScoreboardTags()
                             .stream()
-                            .filter((i) -> i.contains("signature")).toList().get(0).split(":")[1]);
+                            .filter((i) -> i.contains("signature")).toList().get(0).split(":")[1],
+                    entity.getScoreboardTags()
+                            .stream()
+                            .filter((i) -> i.contains("encoded")).toList().get(0).split(":")[1]);
 
                 Zombie infEntity = (Zombie) infectedDiscoverer.getBukkitEntity();
                 EntityManager eM = EntityManager.getinstance(infEntity);
