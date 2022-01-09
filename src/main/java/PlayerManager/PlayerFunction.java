@@ -42,6 +42,11 @@ public class PlayerFunction implements Listener {
 	public boolean takedown = false;
 	public int essence = 0;
 
+	/*
+	Khaos Functions
+	 */
+	public int KhaosFR = 0;
+
 	private PlayerFunction(Player p) {
 		this.p = p;
 	}
@@ -108,6 +113,8 @@ public class PlayerFunction implements Listener {
 		if(meleedelay == 1) this.meleerot = !meleerot;
 		if(meleedelay != 0) meleedelay--;
 		else if(meleecombodelay != 0) meleecombodelay--;
+
+		if(KhaosFR > 0) KhaosFR--;
 
 	}
 

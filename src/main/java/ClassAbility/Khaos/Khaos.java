@@ -12,17 +12,16 @@ import PlayerManager.PlayerManager;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
-import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 import spellinteracttest.Main;
 
 import java.util.*;
 
 public class Khaos {
+
+    private ArmorStand FRA;
 
     private static Khaos khaos;
     private Player player;
@@ -85,6 +84,7 @@ public class Khaos {
             if(combo.equals("SHIFTR")) SHIFTR(player);
             if(combo.equals("RL")) HalfMoon();
             if(combo.equals("FR")) FR();
+            if(combo.equals("RR")) RR();
 
 
             Combination.getinstance().Sound(player);
@@ -250,17 +250,121 @@ public class Khaos {
 
     public void RR() {
         Location loc = player.getEyeLocation();
+        Vector dir = loc.getDirection().normalize().multiply(4);
 
+        player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1, 1);
+
+        new BukkitRunnable() {
+
+            double yA = -45;
+            double yB = 45;
+
+            int time = 0;
+
+            final Set<Entity> Hit = new HashSet<>();
+
+            @Override
+            public void run() {
+
+
+
+                player.setVelocity(dir);
+
+                if(time>=1) player.setVelocity(new Vector(0, 0, 0));
+                if(time>1) {
+
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1, 0);
+                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1.5f);
+
+                    Location loc_ = player.getEyeLocation().add(0, -0.3, 0);
+                    double rP = Math.toRadians(loc_.getPitch());
+                    double rY = Math.toRadians(loc_.getYaw());
+
+                    for(double j = -60; j<60; j+=2) {
+                        for(double z = 1.5; z<4; z+=0.3) {
+                            double radian = Math.toRadians(j);
+                            double x = 0;
+                            double y = 0;
+                            Vector v = new Vector(x, y, z);
+                            v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
+                            v = Rotate.transform(v, rY, rP, 0);
+                            loc_.add(v);
+                            player.getWorld().spawnParticle(Particle.BLOCK_DUST, loc_, 1, 0.2, 0.2, 0.2, 0
+                            ,Material.AMETHYST_BLOCK.createBlockData());
+
+                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
+                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
+                                    Location eloc = entity.getEyeLocation();
+                                    BoundingBox box = entity.getBoundingBox();
+                                    if(eloc.distance(loc_) < 2.5 || box.contains(loc_.getX(), loc_.getY(), loc_.getZ())) {
+                                        int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 3);
+                                        Damage.getinstance().taken(dmg, entity, player);
+                                        EntityStatusManager.getinstance(entity).KnockBack(player, 1.2);
+                                        Hit.add(entity);
+                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
+                                    }
+                                }
+                            }
+
+                            loc_.subtract(v);
+                        }
+                    }
+
+
+                    for(double j = -60; j<60; j+=2) {
+                        double radian = Math.toRadians(j);
+                        double x = 0;
+                        double y = 0;
+                        double z = 2;
+                        Vector v = new Vector(x, y, z);
+                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
+                        v = Rotate.transform(v, rY, rP , Math.toRadians(45));
+                        loc_.add(v);
+                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
+                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
+                        loc_.subtract(v);
+                    }
+
+                    for(double j = 60; j>-60; j-=2) {
+                        double radian = Math.toRadians(j);
+                        double x = 0;
+                        double y = 0;
+                        double z = 2;
+                        Vector v = new Vector(x, y, z);
+                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
+                        v = Rotate.transform(v, rY, rP , Math.toRadians(-45));
+                        loc_.add(v);
+                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
+                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
+                        loc_.subtract(v);
+                    }
+
+
+                    cancel();
+                }
+                time++;
+            }
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
     }
 
     public void FR() {
-        Location loc = player.getEyeLocation();
-        Location loc_ = player.getEyeLocation();
-        Location loc__ = player.getEyeLocation();
-        loc_.setYaw(loc.getYaw() - 20);
-        loc__.setYaw(loc.getYaw() + 20);
-        List<ArmorStand> list = new ArrayList<>(Arrays.asList(dagger(loc), dagger(loc_), dagger(loc__)));
+        playerFunction.KhaosFR = 60;
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1.5f);
+        FREffect(60);
 
+//        ArmorStand a = (ArmorStand) player.getWorld().spawnEntity(player.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
+//        FRA = a;
+//        a.setSmall(true);
+//        a.setInvisible(true);
+//        a.setInvulnerable(true);
+//        a.setMarker(true);
+//        a.setCollidable(false);
+//        char c = '\ue238';
+//        a.setCustomName(""+c);
+//        a.setCustomNameVisible(true);
+    }
+
+    private void FREffect(int tick) {
         new BukkitRunnable() {
 
             int time = 0;
@@ -268,72 +372,20 @@ public class Khaos {
             @Override
             public void run() {
 
-                List<ArmorStand> DBukkit = new ArrayList<>();
+                //FRA.teleport(player.getEyeLocation().add(0, 0.5, 0));
 
-                for(int i=0; i<list.size(); i++) {
-                    Boolean hit = false;
-                    ArmorStand a = list.get(i);
-                    Location loc = a.getLocation();
-                    Vector v = a.getLocation().getDirection().normalize().multiply(1);
-                    a.setVelocity(v);
-                    a.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, a.getLocation(), 1, 0, 0, 0, 0);
+                player.getWorld().spawnParticle(Particle.BLOCK_CRACK, player.getLocation()
+                        , 3, 0.3, 0.3, 0.3, 0, Material.BLUE_ICE.createBlockData());
+                player.getWorld().spawnParticle(Particle.SNOW_SHOVEL, player.getLocation()
+                        , 3, 0.3, 0.3, 0.3, 0);
 
-                    for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                        if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player) {
-                            Location eloc = entity.getEyeLocation();
-                            BoundingBox box = entity.getBoundingBox();
-                            if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5);
-                                Damage.getinstance().taken(dmg, entity, player);
-                                EntityStatusManager.getinstance(entity).KnockBack(a, 0.5);
-                                player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f);
-                                DBukkit.add(a);
-                                a.remove();
-                                hit = true;
-                            }
-                        }
-                        if(hit) break;
-                    }
-                }
-
-                for(int i=0; i<DBukkit.size(); i++) {
-                    list.remove(DBukkit.get(i));
-                }
-
-                if(time>20) {
-                    list.forEach(ArmorStand::remove);
+                if(time>tick) {
+                    if(FRA != null) FRA.remove();
                     cancel();
                 }
                 time++;
             }
         }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
-
-    }
-
-    private ArmorStand dagger(Location loc) {
-        ArmorStand dagger = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0, -0.5, 0), EntityType.ARMOR_STAND);
-        dagger.setInvisible(true);
-        dagger.setSilent(true);
-        dagger.setInvulnerable(true);
-        dagger.setArms(true);
-        dagger.setSmall(true);
-        dagger.setMarker(true);
-        dagger.setCollidable(true);
-        dagger.getEquipment().setItem(EquipmentSlot.HAND, new ItemStack(Material.NETHERITE_SWORD));
-        dagger.addEquipmentLock(EquipmentSlot.HAND, ArmorStand.LockType.REMOVING_OR_CHANGING);
-        dagger.setRightArmPose(new EulerAngle(Math.toRadians(165f), Math.toRadians(180f-loc.getPitch()), Math.toRadians(90f)));
-        return dagger;
-    }
-
-    private void FREffect(Location loc) {
-
-        double rpitch = Math.toRadians(loc.getPitch());
-        double ryaw = Math.toRadians(loc.getYaw());
-        double rroll = Math.toRadians(Math.random() * 60 - 30);
-
-
-
     }
 
 

@@ -17,6 +17,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import spellinteracttest.Main;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -188,7 +189,7 @@ public class Cheiron implements Listener {
                 Location eloc = entity.getEyeLocation();
                 BoundingBox box = entity.getBoundingBox();
                 if((eloc.distance(loc) < 4.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) && !Hit.contains(entity)) {
-                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 2.5);
+                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.5);
                     Hit.add(entity);
                     Damage.getinstance().taken(dmg, entity, player);
                     EntityStatusManager.getinstance(entity).Stun(player, 10);
@@ -196,6 +197,21 @@ public class Cheiron implements Listener {
                 }
             }
         }
+
+        new BukkitRunnable() {
+
+            int time = 0;
+            @Override
+            public void run() {
+
+                for(Entity entity : Hit) {
+                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 0.15);
+                    Damage.getinstance().taken(dmg, (LivingEntity) entity, player);
+                }
+                if(time>6) cancel();
+                time++;
+            }
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 4);
     }
 
     public void TrackingArrow() {

@@ -77,7 +77,7 @@ public class PlayerCombination {
 
 		if(p.isSneaking() && keybind.equals("F")) {
 			ModuleChips moduleChips = new ModuleChips();
-
+			(moduleChips.new functions(p)).invokeChipAbility();
 		}
 
 		if(PlayerManager.getinstance(p).CurrentClass.equals("케이론")) {

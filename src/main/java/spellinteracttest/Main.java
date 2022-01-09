@@ -489,6 +489,12 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "font": {
+				char c = '\ue238';
+				player.sendMessage(""+c);
+				break;
+			}
+
 			case "installChip" : {
 				ModuleChips moduleChips = new ModuleChips();
 				(moduleChips.new install()).openGUI(player);

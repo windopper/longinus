@@ -4,8 +4,10 @@ import CustomEvents.PlayerTakeDamageEvent;
 import Mob.EntityManager;
 import Mob.MobListManager;
 import PlayerManager.EntityHealthBossBar;
+import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerHealthShield;
 import PlayerManager.PlayerManager;
+import PlayerManager.PlayerEnergy;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
@@ -35,16 +37,22 @@ public class Damage {
 			user.damage(0.001);
 			//플레이어 체력 & 쉴드 객체 가져오기
 			PlayerHealthShield PH = PlayerHealthShield.getinstance(user);
+			PlayerFunction PF = PlayerFunction.getinstance(user);
+			PlayerEnergy PE = PlayerEnergy.getinstance(user);
 			// 방어도 계산
-			final int dmg = (int)(damage * PlayerManager.getinstance(user).defcalculate(user));
+			int dmg = (int)(damage * PlayerManager.getinstance(user).defcalculate(user));
+			// 카오스 FR 스킬
+			if(PF.KhaosFR > 0 && PE.getEnergy()>1) dmg = (int)((double)dmg / 2);
 
 			HologramIndicator.getinstance().DamageIndicator(dmg, taker);
-			PlayerHealthShield.getinstance(user).setDamage(damage);
+			PlayerHealthShield.getinstance(user).setDamage(dmg);
 
+
+			final int fidmg = dmg;
 			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), new Runnable() {
 				@Override
 				public void run() {
-					Bukkit.getPluginManager().callEvent(new PlayerTakeDamageEvent(damager, user, dmg));
+					Bukkit.getPluginManager().callEvent(new PlayerTakeDamageEvent(damager, user, fidmg));
 				}
 			}, 0);
 
@@ -71,8 +79,17 @@ public class Damage {
 			
 			EntityManager EH = EntityManager.getinstance(taker);
 
-			if(damager instanceof Player) { // 보스바
-				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar((Player)damager, taker);
+			if(damager instanceof Player player) { // 보스바
+				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar(player, taker);
+
+				PlayerFunction PF = PlayerFunction.getinstance(player);
+				PlayerEnergy PE = PlayerEnergy.getinstance(player);
+
+				// 카오스 FR 스킬
+				if(PF.KhaosFR > 0 && PE.getEnergy()>1 && PE.getEnergy() < 20) {
+					DynamicData.HologramIndicator.getinstance().ManaIndicator(1, player.getLocation());
+					PE.setEnergy(PE.getEnergy() + 1);
+				}
 			}
 
 			EH.setDamageValue(damage, damager);

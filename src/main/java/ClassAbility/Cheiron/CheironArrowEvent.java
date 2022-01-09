@@ -7,12 +7,13 @@ import DynamicData.Damage;
 import Mob.EntityManager;
 import PlayerManager.PlayerManager;
 import net.minecraft.world.entity.projectile.EntityArrow;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftArrow;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 
 public class CheironArrowEvent implements Listener {
@@ -60,16 +61,16 @@ public class CheironArrowEvent implements Listener {
     }
 
 
-    @EventHandler
-    public void ArrowHit(EntityDamageByEntityEvent event) {
-        Entity damager = event.getDamager();
-        Entity taker = event.getEntity();
-        if(damager instanceof Arrow) {
-            Arrow arrow = (Arrow) damager;
-            Entity shooter = (Entity) arrow.getShooter();
-            invokeHitEvent(arrow, shooter, taker);
-        }
-    }
+//    @EventHandler
+//    public void ArrowHit(EntityDamageByEntityEvent event) {
+//        Entity damager = event.getDamager();
+//        Entity taker = event.getEntity();
+//        if(damager instanceof Arrow) {
+//            Arrow arrow = (Arrow) damager;
+//            Entity shooter = (Entity) arrow.getShooter();
+//            invokeHitEvent(arrow, shooter, taker);
+//        }
+//    }
 
     @EventHandler
     public void ArrowOnGroundEvent(ArrowOnGroundEvent event) {
@@ -127,11 +128,24 @@ public class CheironArrowEvent implements Listener {
     public void ArrowBounceOff(ProjectileHitEvent event) {
         Entity hitEntity = event.getHitEntity();
         Entity shooter = (Entity) event.getEntity().getShooter();
-        if(hitEntity instanceof FallingBlock) {
-            Entity masterEntity = EntityManager.getDisguiseEntity(hitEntity);
-            if(shooter instanceof Player && masterEntity instanceof LivingEntity && event.getEntity() instanceof Arrow) {
-                invokeHitEvent((Arrow) event.getEntity(), shooter, masterEntity);
+        Entity Damager = event.getEntity();
+        if(Damager instanceof Arrow arrow) {
+            if(hitEntity instanceof FallingBlock) {
+                Entity masterEntity = EntityManager.getDisguiseEntity(hitEntity);
+                if(shooter instanceof Player && masterEntity instanceof LivingEntity && event.getEntity() instanceof Arrow) {
+                    invokeHitEvent((Arrow) event.getEntity(), shooter, masterEntity);
+                    return;
+                }
             }
+            invokeHitEvent((Arrow) event.getEntity(), shooter, hitEntity);
+            return;
         }
+
+//        if(hitEntity instanceof FallingBlock) {
+//            Entity masterEntity = EntityManager.getDisguiseEntity(hitEntity);
+//            if(shooter instanceof Player && masterEntity instanceof LivingEntity && event.getEntity() instanceof Arrow) {
+//                invokeHitEvent((Arrow) event.getEntity(), shooter, masterEntity);
+//            }
+//        }
     }
 }

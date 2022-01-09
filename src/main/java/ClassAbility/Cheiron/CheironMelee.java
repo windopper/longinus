@@ -196,6 +196,9 @@ public class CheironMelee implements Listener {
         Location loc = player.getEyeLocation();
         Vector dir = loc.getDirection().normalize().multiply(2.5);
         Vector v = loc.getDirection().normalize().multiply(3);
+
+        double rY = Math.toRadians(-30);
+
         for(int i=0; i<9; i++) {
             player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1, 1);
             double random1 = Math.random() * 1 - 0.5;

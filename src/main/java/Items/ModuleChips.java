@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.Main;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -448,8 +449,14 @@ public class ModuleChips implements Listener {
                 int[] chips = tag.getIntArray("chips");
                 List<ChipList> list = Arrays.stream(ChipList.values())
                         .filter((a) -> Arrays.stream(chips).anyMatch((b) -> b == a.getCode())).toList();
-
-
+                for(ChipList chip : list) {
+                    try {
+                        Class c = this.getClass();
+                        Method method = c.getMethod(chip.name());
+                        method.invoke(this);
+                    }
+                    catch(Exception e) {}
+                }
             }
             catch(Exception e) {
 
@@ -460,8 +467,8 @@ public class ModuleChips implements Listener {
         public void 테스트_칩() {
 
         }
-        public void 프로토타입V2() {
-
+        public void 프로토타입() {
+            Bukkit.broadcastMessage("hi");
         }
     }
 }

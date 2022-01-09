@@ -106,10 +106,6 @@ public class HologramIndicator {
 					as.setCustomNameVisible(true);
 					
 				}
-				
-					
-
-					
 					if(time > 30) {
 						
 						as.remove();
@@ -117,13 +113,7 @@ public class HologramIndicator {
 						return;
 						
 					}
-
-
-				
 				time++;
-
-				
-				
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}
@@ -134,8 +124,7 @@ public class HologramIndicator {
 
 			int time = 0;
 			ArmorStand as;
-			
-			
+
 			@Override
 			public void run() {
 				
@@ -169,13 +158,52 @@ public class HologramIndicator {
 
 						
 					}
-
-
-				
 				time++;
+			}
+		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+	}
 
-				
-				
+	public void ManaIndicator(final int r, final Location loc) {
+		new BukkitRunnable() {
+
+			int time = 0;
+			ArmorStand as;
+
+
+			@Override
+			public void run() {
+
+				if(time == 0) {
+
+					Random random = new Random();
+					double x = random.nextDouble() *2;
+					double y = random.nextDouble() *2;
+					double z = random.nextDouble() *2;
+					x -= 1;
+					z -= 1;
+					loc.setX(loc.getX()+x);
+					loc.setY(loc.getY()+y);
+					loc.setZ(loc.getZ()+z);
+					as = (ArmorStand) loc.getWorld().spawn(loc, ArmorStand.class);
+					if(r>0)
+						as.setCustomName("§3+⚡ "+r+"§r§3");
+					else
+						as.setCustomName("§c+⚡ "+r+"§r§c");
+					as.setVisible(false);
+					as.setCollidable(false);
+					as.setGravity(false);
+					as.setSmall(true);
+					as.setInvulnerable(true);
+					as.setCustomNameVisible(true);
+
+				}
+
+				if(time > 20) {
+					as.remove();
+					cancel();
+					return;
+				}
+				time++;
 			}
 		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 	}

@@ -74,6 +74,8 @@ public class PlayerManager {
 	public int BootsDefreq = 0;
 	public int BootsAgireq = 0;
 
+	public int ChipAbilityCoolDown = 0;
+
 	private Player p;
 
 	public PlayerManager() {}
