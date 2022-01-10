@@ -13,7 +13,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Elevator_Events implements Listener
 {
@@ -40,10 +39,10 @@ public class Elevator_Events implements Listener
     Location captain_room = new Location(Bukkit.getServer().getWorld("world"), -52.5, 235, -12.5);
     Location captain_room_exit = new Location(Bukkit.getServer().getWorld("world"), -52.5, 235, -16, -90, 0);
 
-    Location LocArr[] = {hangar, hangar_exit, lobby1, lobby1_exit, lobby2, lobby2_exit, inf_ctr, inf_ctr_exit, meeting_room, meeting_room_exit,
+    /*Location LocArr[] = {hangar, hangar_exit, lobby1, lobby1_exit, lobby2, lobby2_exit, inf_ctr, inf_ctr_exit, meeting_room, meeting_room_exit,
             lab, lab_exit, captain_room, captain_room_exit};
 
-    List<String> inv_list = Arrays.asList(new String[]{"격납고로 이동","로비1로 이동","로비2로 이동", "<함내시설>", "회의실로 이동", "연구실로 이동", "함장실로 이동"});
+    List<String> inv_list = Arrays.asList(new String[]{"격납고로 이동","로비1로 이동","로비2로 이동", "<함내시설>", "회의실로 이동", "연구실로 이동", "함장실로 이동"});*/
 
     @EventHandler
     public void EL_B(InventoryClickEvent event)
@@ -54,7 +53,6 @@ public class Elevator_Events implements Listener
         if(ChatColor.stripColor(event.getView().getTitle()).equals("<함내시설>")) event.setCancelled(true);
 
         if((event.getCurrentItem()==null) || !event.getCurrentItem().hasItemMeta() || (event.getCurrentItem().getType() == null)) return;
-
 
         EL_Teleport(event, p, "격납고", hangar, hangar_exit);
         EL_Teleport(event, p, "로비1", lobby1, lobby1_exit);
@@ -86,31 +84,32 @@ public class Elevator_Events implements Listener
             }
         }
     }
-    List<Player> Player_list = new ArrayList<>();
+    public static final List<Player> Player_list = new ArrayList<>();
     public void runnable()
     {
         //플레이어의 위치를 실시간으로 받아와 GUI를 보여준다
         List<ItemStack> Player_items = new ArrayList<>();
-
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (Player_list.contains(p)) GUI.EL_GUI(p);
+        for (Player p : Bukkit.getOnlinePlayers())
+        {
             for (int i = 0; i < 40; i++) {
                 Player_items.add(p.getInventory().getItem(i));
             }
             for (ItemStack item : Player_items) {
                 if (item == null) continue;
                 if (item.getItemMeta() == null) continue;
-                if (item.getItemMeta().getDisplayName() == null) continue;
-                for (String inv_items : inv_list) {
+                for (String inv_items : inv_list)
+                {
                     if (ChatColor.stripColor(item.getItemMeta().getDisplayName()).equals(inv_items))
                         p.getInventory().remove(item);
                 }
             }
-            if (p.getWorld().getName().equals(Bukkit.getWorlds().get(0).getName())) {
-
+            if (p.getWorld().getName().equals(Bukkit.getServer().getWorld("world").getName()))
+            {
                 if ((p.getLocation().distance(hangar) < 1.5) || (p.getLocation().distance(lobby1) < 1.5) || (p.getLocation().distance(lobby2) < 1.5) || (p.getLocation().distance(inf_ctr) < 1.5) ||
-                        (p.getLocation().distance(meeting_room) < 1.5) || (p.getLocation().distance(lab) < 1.5) || (p.getLocation().distance(captain_room) < 1.5)) {
-                    if (!Player_list.contains(p)) {
+                        (p.getLocation().distance(meeting_room) < 1.5) || (p.getLocation().distance(lab) < 1.5) || (p.getLocation().distance(captain_room) < 1.5))
+                {
+                    if (!Player_list.contains(p))
+                    {
                         GUI.EL_GUI(p);
                         Player_list.add(p);
                     }

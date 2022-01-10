@@ -108,7 +108,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new Map(), this);
 		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Auction(), this);
-
+		getServer().getPluginManager().registerEvents(new Elevator_Events(), this);
 
 		getCommand("party").setTabCompleter(new TabCompleter());
 		saveConfig();
