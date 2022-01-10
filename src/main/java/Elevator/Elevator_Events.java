@@ -85,6 +85,7 @@ public class Elevator_Events implements Listener
         }
     }
     public static final List<Player> Player_list = new ArrayList<>();
+    public static final List<String> inv_list = new ArrayList<>();
     public void runnable()
     {
         //플레이어의 위치를 실시간으로 받아와 GUI를 보여준다
