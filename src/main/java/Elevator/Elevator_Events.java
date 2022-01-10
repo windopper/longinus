@@ -51,7 +51,7 @@ public class Elevator_Events implements Listener
         if(ChatColor.stripColor(event.getView().getTitle()).equals("엘리베이터")) event.setCancelled(true);
         if(ChatColor.stripColor(event.getView().getTitle()).equals("<함내시설>")) event.setCancelled(true);
 
-        if((event.getCurrentItem()==null) || !event.getCurrentItem().hasItemMeta() || (event.getCurrentItem().getType() == null)) return;
+        if((event.getCurrentItem()==null) || !event.getCurrentItem().hasItemMeta()) return;
 
         EL_Teleport(event, p, "격납고", hangar, hangar_exit);
         EL_Teleport(event, p, "로비1", lobby1, lobby1_exit);
