@@ -46,6 +46,7 @@ public class EntityManager {
 	public int minDmg = 1;
 	public int maxDmg = 1;
 	public Entity latestDamager;
+	private boolean canDamagedByPlayer = false;
 
 	private Object EntityInstance;
 	private Method particleMethod;
@@ -328,6 +329,9 @@ public class EntityManager {
 	}
 	public int setMaxHealth(int Health) { return MaxHealth = Health; }
 
+	public boolean canDamagedByPlayer() { return canDamagedByPlayer; }
+	public void setCanDamagedByPlayer(boolean value) { canDamagedByPlayer = value; }
+
 	public ArmorStand getNameArmorStand() {
 		return Namear;
 	}
@@ -526,16 +530,10 @@ public class EntityManager {
 
 		patterntime++;
 
-		// disguise 엔티티 텔레포트
-		for(Entity entity : disguise.keySet()) {
-
-			// 기준 엔티티의 좌표
-			final Location location = entity.getLocation();
-
-			// 엔티티가 변신한 엔티티의 목록과 좌표
-			HashMap<Entity, Location> disguises = this.disguise.get(entity);
-
-			// 변신할 엔티티를 순환하며 좌표로 이동
+		if(disguise.containsKey(e)) {
+			EntityFunctions.hideFromPlayer(e);
+			final Location location = e.getLocation();
+			HashMap<Entity, Location> disguises = disguise.get(e);
 			for(Entity disentity : disguises.keySet()) {
 
 				// set fallingblock's time to 1
@@ -552,9 +550,37 @@ public class EntityManager {
 				}
 			}
 		}
+
+//		// disguise 엔티티 텔레포트
+//		for(Entity entity : disguise.keySet()) {
+//
+//			// 기준 엔티티의 좌표
+//			final Location location = entity.getLocation();
+//
+//			// 엔티티가 변신한 엔티티의 목록과 좌표
+//			HashMap<Entity, Location> disguises = disguise.get(entity);
+//
+//			// 변신할 엔티티를 순환하며 좌표로 이동
+//			for(Entity disentity : disguises.keySet()) {
+//
+//				// set fallingblock's time to 1
+//				if(disentity instanceof FallingBlock) {
+//					((FallingBlock) disentity).setTicksLived(1);
+//					disentity.teleport(location.clone().add(disguises.get(disentity)));
+//				}
+//				if(disentity instanceof Player) {
+//					Location loc = disguises.get(disentity).add(location);
+//					((CraftPlayer) disentity).getHandle().setPositionRotation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+//				}
+//				else {
+//					disentity.teleport(location.clone().add(disguises.get(disentity)));
+//				}
+//			}
+//		}
 		// TeleportTo 엔티티에게 텔레포트
 		if(teleportTo != null) {
 			e.teleport(teleportTo.getLocation().clone().add(teleportToLoc));
+			EntityFunctions.hideFromPlayer(e);
 		}
 
 

@@ -45,6 +45,7 @@ public class Classgui {
 		gui.setItem(15, PhloxItem(p));
 		gui.setItem(20, KhaosItem(p));
 		gui.setItem(21, CheironItem(p));
+		gui.setItem(22, ShieldItem(p));
 		gui.setItem(27, backtomenuitem());
 		
 		
@@ -112,6 +113,21 @@ public class Classgui {
 		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
 		ItemMeta itemMeta = item.getItemMeta();
 		itemMeta.setDisplayName("§6§o§l클래스 : 카오스§l§o§6");
+		itemMeta.setLore(Arrays.asList(
+				"",
+				"§b클릭하여 클래스 생성하기",
+				"",
+				"§7테스트 버전 클래스",
+				"",
+				""));
+		item.setItemMeta(itemMeta);
+		return item;
+	}
+
+	public ItemStack ShieldItem(Player p) {
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
+		ItemMeta itemMeta = item.getItemMeta();
+		itemMeta.setDisplayName("§6§o§l클래스 : 쉴드§l§o§6");
 		itemMeta.setLore(Arrays.asList(
 				"",
 				"§b클릭하여 클래스 생성하기",
@@ -321,6 +337,7 @@ public class Classgui {
 			else if(Class.split("/")[0].equals("플록스")) gui.setItem(GUIlocation, PhloxSelectItem(p, Class));
 			else if(Class.split("/")[0].equals("카오스")) gui.setItem(GUIlocation, KhaosSelectItem(p, Class));
 			else if(Class.split("/")[0].equals("케이론")) gui.setItem(GUIlocation, CheironSelectItem(p, Class));
+			else if(Class.split("/")[0].equals("쉴드")) gui.setItem(GUIlocation, ShieldSelectItem(p, Class));
 			
 			GUIlocation ++;
 		}	
@@ -340,6 +357,25 @@ public class Classgui {
 		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
 		ItemMeta meta = item.getItemMeta();
 		meta.setDisplayName("§6§o§l클래스 : 카오스§l§o§6");
+		meta.setLore(Arrays.asList(
+				"",
+				"§o§bLevel : "+lvl,
+				"",
+				"",
+				"§7좌클릭 : 클래스 선택",
+				"§7쉬프트 + 좌클릭 : 클래스 삭제"));
+
+
+		item.setItemMeta(meta);
+		return item;
+	}
+
+	private ItemStack ShieldSelectItem(Player p, String classname) {
+		int lvl = (new SQL.PlayerClass(p)).getClassFile().getInt(classname+".lvl");
+
+		ItemStack item = new ItemStack(Material.NETHERITE_SWORD, 1);
+		ItemMeta meta = item.getItemMeta();
+		meta.setDisplayName("§6§o§l클래스 : 쉴드§l§o§6");
 		meta.setLore(Arrays.asList(
 				"",
 				"§o§bLevel : "+lvl,

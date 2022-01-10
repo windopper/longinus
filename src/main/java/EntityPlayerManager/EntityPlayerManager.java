@@ -7,6 +7,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawn;
 import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo;
+import net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.network.syncher.DataWatcherRegistry;
@@ -14,7 +15,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.server.network.PlayerConnection;
-import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.ScoreboardTeam;
 import net.minecraft.world.scores.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
@@ -24,9 +24,10 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboard;
-import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboardManager;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.DummyNetworkManager;
+import spellinteracttest.Main;
 
 import java.util.UUID;
 
@@ -85,52 +86,83 @@ public class EntityPlayerManager {
 
     public void showTo(EntityPlayer npc, Player player) {
 
-        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(
-                PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
-                npc
-        );
+//        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(
+//                PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
+//                npc
+//        );
+//
+//        PacketPlayOutNamedEntitySpawn packetPlayOutNamedEntitySpawn = new PacketPlayOutNamedEntitySpawn(
+//                npc
+//        );
+//
+//        sendpacket(player, packetPlayOutPlayerInfo);
+//        sendpacket(player, packetPlayOutNamedEntitySpawn);
+//
+//        CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
+//        assert scoreboardManager != null;
+//
+//        CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
+//        Scoreboard scoreboard = mainScoreboard.getHandle();
+//
+//        ScoreboardTeam scoreboardTeam = scoreboard.getPlayerTeam(npc.getName());
+//
+//
+//        if (scoreboardTeam == null) {
+//            scoreboardTeam = scoreboard.createTeam("NPC");
+//            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
+//        }
+//        else {
+//            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
+//        }
+//
+//        scoreboardTeam.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
+//
+//        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+//            try {
+//                PacketPlayOutPlayerInfo removeFromTabPacket = new PacketPlayOutPlayerInfo(
+//                        PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e,
+//                        npc
+//                );
+//                sendpacket(player, removeFromTabPacket);
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//        }, 10);
+//
+//        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+//            fixSkinHelmetLayerForPlayer(npc, player);
+//        }, 8);
 
-        PacketPlayOutNamedEntitySpawn packetPlayOutNamedEntitySpawn = new PacketPlayOutNamedEntitySpawn(
-                npc
-        );
-
-        sendpacket(player, packetPlayOutPlayerInfo);
-        sendpacket(player, packetPlayOutNamedEntitySpawn);
-
-        CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
-        assert scoreboardManager != null;
-
-        CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
-        Scoreboard scoreboard = mainScoreboard.getHandle();
-
-        ScoreboardTeam scoreboardTeam = scoreboard.getPlayerTeam(npc.getName());
 
 
-        if (scoreboardTeam == null) {
-            scoreboardTeam = scoreboard.createTeam("NPC");
-            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
+        ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Bukkit.getScoreboardManager().getMainScoreboard())
+                .getHandle(), player.getName()+"a");
+        team.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
+        PacketPlayOutScoreboardTeam score1 = PacketPlayOutScoreboardTeam.a(team);
+        PacketPlayOutScoreboardTeam score2 = PacketPlayOutScoreboardTeam.a(team, true);
+        PacketPlayOutScoreboardTeam score3 = PacketPlayOutScoreboardTeam.a(team, npc.getName(), PacketPlayOutScoreboardTeam.a.a);
+
+        DataWatcher watcher = npc.getDataWatcher();
+        byte b = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40;
+        watcher.set(DataWatcherRegistry.a.a(17), b);
+
+        for(Player on : Bukkit.getOnlinePlayers()) {
+            PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
+            connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, npc));
+            connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
+            connection.sendPacket(score1);
+            connection.sendPacket(score2);
+            connection.sendPacket(score3);
+
+            connection.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), watcher, true));
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc));
+                }
+            }.runTaskAsynchronously(Main.getPlugin(Main.class));
         }
-        else {
-            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
-        }
-
-        scoreboardTeam.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.d);
-
-        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-            try {
-                PacketPlayOutPlayerInfo removeFromTabPacket = new PacketPlayOutPlayerInfo(
-                        PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e,
-                        npc
-                );
-                sendpacket(player, removeFromTabPacket);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }, 10);
-
-        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-            fixSkinHelmetLayerForPlayer(npc, player);
-        }, 8);
 
 
     }

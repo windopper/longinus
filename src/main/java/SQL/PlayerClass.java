@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static SQL.Connector.getConnection;
@@ -137,6 +138,8 @@ public class PlayerClass {
         player.getInventory().clear();
         player.updateInventory();
 
+        PlayerManager pm = PlayerManager.getinstance(player);
+
         PlayerManager.getinstance(player).CurrentClass = className.split("/")[0];
         PlayerManager.getinstance(player).CurrentClassNumber = Integer.parseInt(className.split("/")[1]);
         PlayerManager.getinstance(player).setStr(yaml.getInt(className+".str"));
@@ -145,6 +148,14 @@ public class PlayerClass {
         PlayerManager.getinstance(player).setAgi(yaml.getInt(className+".agi"));
         PlayerManager.getinstance(player).setlvl(yaml.getInt(className+".lvl") <= 0 ? 1 : yaml.getInt(className+".lvl"));
         PlayerManager.getinstance(player).setexp(yaml.getInt(className+".exp"));
+        List<Integer> rrlist = yaml.getIntegerList(className+".rrtalent");
+        List<Integer> rllist = yaml.getIntegerList(className+".rltalent");
+        List<Integer> frlist = yaml.getIntegerList(className+".frtalent");
+        List<Integer> srlist = yaml.getIntegerList(className+".srtalent");
+        pm.setTalent(rrlist, "RR");
+        pm.setTalent(frlist, "FR");
+        pm.setTalent(srlist, "SR");
+        pm.setTalent(rllist, "RL");
 
         //LastClassLocation.getinstance().classchangeteleport(player, className);
         Location location = (new Converter()).stringToCoord(player, className);
@@ -185,6 +196,10 @@ public class PlayerClass {
         yaml.set(className+".lvl", pM.getlvl());
         yaml.set(className+".exp", pM.getexp());
         yaml.set(className+".coord", (new Converter()).coordToString(player.getLocation()));
+        yaml.set(className+".rltalent", pM.getTalentList("RL"));
+        yaml.set(className+".rrtalent", pM.getTalentList("RR"));
+        yaml.set(className+".frtalent", pM.getTalentList("FR"));
+        yaml.set(className+".srtalent", pM.getTalentList("SR"));
 
         for(int i=0; i<41; i++) {
             if(player.getInventory().getItem(i) != null) {

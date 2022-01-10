@@ -1,0 +1,195 @@
+플록스:
+  Skill:
+    RL:
+      Name: "정밀치료"
+      Lore:
+        - "하이"
+    RR:
+      Name: "긴급추진"
+      Lore:
+        - "test"
+    FR:
+      Name: "test"
+      Lore:
+        - "test"
+    SR:
+      Name: "섬멸개시"
+      Lore:
+        - "test"
+  Talent:
+    RL:
+      1:
+        1:
+          Name: "급속치유"
+          Lore:
+            - "치료 광선의 발동 간격이 0.5초에서 0.3초로 짧아집니다"
+        2:
+          Name: "d"
+          Lore:
+            - "치료 광선의 치유량이 50% 증가합니다"
+        3:
+          Name: ""
+          Lore:
+            - "치료하는 동안 대상의 이동속도가 15% 증가합니다"
+      2:
+        1:
+          Name: ""
+          Lore:
+            - "치료광선의 시전이 종료될 때 모든 상태이상을 회복합니다"
+        2:
+          Name: ""
+          Lore:
+            - "시전 중 자가치유량이 50% 증가합니다"
+        3:
+          Name: ""
+          Lore:
+            - "치료광선의 시전이 종료될 때 보호막의 5%가 회복됩니다"
+      3:
+        1:
+          Name: ""
+          Lore:
+            - "치유 광선이 대상을 치유하는 동안 대상이 사용한 에너지의 50%를 얻습니다"
+        2:
+          Name: ""
+          Lore:
+            - "치유 대상 주변의 아군들도 치유량의 50%만큼 회복됩니다"
+            - "이 특성으로 회복되는 주변의 아군들은 특성의 영향을 받지 않습니다"
+        3:
+          Name: ""
+          Lore:
+            - "치유광선의 사거리가 50% 길어집니다"
+      4:
+        1:
+          Name: ""
+          Lore:
+            - "치유대상의 이동속도를 80% 감소시키지만 치유량이 300% 증가합니다"
+        2:
+          Name: ""
+          Lore:
+            - "마나 미용이 1이 되고, 나노로봇 비용이 절반이 됩니다"
+        3:
+          Name:
+          Lore:
+    RR:
+      1:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      2:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      3:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      4:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+    FR:
+      1:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      2:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      3:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      4:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+    SR:
+      1:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      2:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      3:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:
+      4:
+        1:
+          Name:
+          Lore:
+        2:
+          Name:
+          Lore:
+        3:
+          Name:
+          Lore:

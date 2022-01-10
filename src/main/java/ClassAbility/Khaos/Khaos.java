@@ -28,8 +28,6 @@ public class Khaos {
     private PlayerFunction playerFunction;
     private int CurrentMana;
     private int ManaDecrease;
-    private static Cheiron cheiron;
-
 
     public Khaos(Player player) {
         this.player = player;

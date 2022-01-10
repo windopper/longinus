@@ -2,6 +2,7 @@ package Gliese581cMobs;
 
 import EntityPlayerManager.EntityPlayerManager;
 import EntityPlayerManager.EntityPlayerWatcher;
+import Mob.EntityFunctions;
 import Mob.MobListManager;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.sounds.SoundEffect;
@@ -24,8 +25,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.attribute.CraftAttributeMap;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.entity.Villager;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class Defender extends EntityVillager {
         Villager defenderai = (Villager) this.getBukkitEntity();
         MobListManager.MobList mobList = MobListManager.MobList.edison1304;
 
-        defenderai.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10, true, true));
+        //defenderai.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10, true, true));
         defenderai.setCustomName(mobList.getName());
         defenderai.setCustomNameVisible(true);
 
@@ -61,10 +60,11 @@ public class Defender extends EntityVillager {
 
         }
         //this.w().a(GenericAttributes.f, 1).a(GenericAttributes.g, 1).a(GenericAttributes.h, 1);
-
+        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
         this.getWorld().addEntity(this);
 
-        this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        EntityFunctions.hideFromPlayer(defenderai);
+
 
         EntityPlayer entityPlayer = EntityPlayerManager.getInstance().dummyNetworkNPC(loc.getWorld(), loc, "ewogICJ0aW1lc3RhbXAiIDogMTYxNzk1MTkyNzUzOCwKICAicHJvZmlsZUlkIiA6ICI3MzlkYzg4OThmODg0OTRmOGNkNDE4NDI4NjUxNzBkYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJlZGlzb24xMzA0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzM4MjYwNjkzNjQwYzIxYWJjZDNiYTQwYjI4N2ZmMzhiMGIxNGMyYTljM2FlMmFlOGVhYmIwZTNiNDU3YzJiMmUiCiAgICB9CiAgfQp9"
                 , "N0/34BBcnfe8x2gF8xwdhQ1fpFuU5bT1y3/uh0NsSja0UwTblI0qK0UzF7EPpye+O+ZrbVAp82DuDioC6LH/Al0dQRqUFRETgQuJRSJRNavpgikDCKE7TRqFclMELvxQ5xika0HpoR6+bI80H82+9H+4ePrhL8W9JVacCDiq9m8/TEG9SlUKsHxbg0cjXKi7xfOouk6LvIZl68PtdZlkVCmOzgTDZgX3fJ6lXjl0gSmu+afLZ7bKumoKBFWYddacwlBLIqnuxHK+byd9wb5Kg45Lle0CH2edcNxVydcPgEG9wSwf8aHJbryQQFtJMjRooZQgGBn/aFFM7hpo+CuG7w2B2kZ6YPMyTzRhJoEvJDdyeweAPssyTqTkLn32/cJ2Mot18PJHJSnekp/CFJaqIKRbGkNBkYZIzuy/IuC5noAftI41J4Ty3IumEIeLyRRD4w2Bh68pIBSwOe5rxmGrkF4USfumdejUtHo4C6AxhQ/N9kbvv6Yn/Z8+wX7srIhDuqBtYBv/31q30G/cGI0aq3MIFR2dueTNO3Oj2+4XVlp7Dpz5g2K5Cg0UhS8xdHsj38SjLJA+TWaT9fnXAkBUnNLoQ8McXUOe9WKwqleDmSszQiMBR66t3zWE17XeGvOznIMYmBfW//GN1VYQPNjUyGr3T2vPgmQF8AMV72YlLYQ=");

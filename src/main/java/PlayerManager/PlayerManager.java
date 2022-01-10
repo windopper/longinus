@@ -11,6 +11,7 @@ import spellinteracttest.RandomRange;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -43,6 +44,12 @@ public class PlayerManager {
 	public int lvl = 1;
 	public int exp = 0;
 	public int remainstat = 0;
+
+	private int[] FRTalent = {0, 0, 0, 0};
+	private int[] RLTalent = {0, 0, 0, 0};
+	private int[] RRTalent = {0, 0, 0, 0};
+	private int[] SRTalent = {0, 0, 0, 0};
+	private int talentPoint = 0;
 	
 	public int WeaponLevelreq = 0;
 	public int WeaponStrreq = 0;
@@ -142,6 +149,96 @@ public class PlayerManager {
 	}
 	public void setexp(int exp) {
 		this.exp = exp;
+	}
+	public int getTalentPoint() {
+		updateTalentPoint();
+		return talentPoint;
+	}
+	public List<Integer> getTalentList(String skill) {
+		if(skill.equals("FR")) return Arrays.stream(FRTalent).boxed().toList();
+		else if(skill.equals("RL")) return Arrays.stream(RLTalent).boxed().toList();
+		else if(skill.equals("RR")) return Arrays.stream(RRTalent).boxed().toList();
+		else if(skill.equals("SR")) return Arrays.stream(SRTalent).boxed().toList();
+		return Arrays.asList(0, 0, 0, 0);
+	}
+	public int getTalent(String skill, int tier) {
+
+		updateTalentPoint();
+
+		if(tier>4) return 0;
+		if(skill.equals("FR")) return FRTalent[tier-1];
+		else if(skill.equals("RL")) return RLTalent[tier-1];
+		else if(skill.equals("RR")) return RRTalent[tier-1];
+		else if(skill.equals("SR")) return SRTalent[tier-1];
+		return 0;
+	}
+	public void setTalent(String skill, int tier, int talent) {
+		if(talentPoint - tier < 0) {
+			p.sendMessage("§c특성 포인트가 부족합니다!");
+			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
+			return;
+		}
+		if(tier>4) return;
+		if(skill.equals("FR")) FRTalent[tier-1] = talent;
+		else if(skill.equals("RL")) RLTalent[tier-1] = talent;
+		else if(skill.equals("RR")) RRTalent[tier-1] = talent;
+		else if(skill.equals("SR")) SRTalent[tier-1] = talent;
+
+		updateTalentPoint();
+	}
+	public void setTalent(List<Integer> list, String skill) {
+		if(skill.equals("FR")) FRTalent =  list.stream().mapToInt(i -> i).toArray();
+		else if(skill.equals("RL")) RLTalent = list.stream().mapToInt(i -> i).toArray();
+		else if(skill.equals("RR")) RRTalent = list.stream().mapToInt(i -> i).toArray();
+		else if(skill.equals("SR")) SRTalent = list.stream().mapToInt(i -> i).toArray();
+	}
+	public void resetTalent(String skill) {
+		if(skill.equals("FR")) FRTalent = Arrays.asList(0, 0, 0, 0).stream().mapToInt(i->i).toArray();
+		else if(skill.equals("RL")) RLTalent = Arrays.asList(0, 0, 0, 0).stream().mapToInt(i->i).toArray();
+		else if(skill.equals("RR")) RRTalent = Arrays.asList(0, 0, 0, 0).stream().mapToInt(i->i).toArray();
+		else if(skill.equals("SR")) SRTalent = Arrays.asList(0, 0, 0, 0).stream().mapToInt(i->i).toArray();
+		updateTalentPoint();
+	}
+	public void resetAllTalent() {
+		resetTalent("RR");
+		resetTalent("RL");
+		resetTalent("SR");
+		resetTalent("FR");
+
+		updateTalentPoint();
+	}
+	public int getNextTier(String skill) {
+		if(skill.equals("FR")) {
+			for(int i=0; i<4; i++) {
+				if(FRTalent[i] == 0) return i+1;
+			}
+		}
+		else if(skill.equals("RL")) {
+			for(int i=0; i<4; i++) {
+				if(RLTalent[i] == 0) return i+1;
+			}
+		}
+		else if(skill.equals("RR")) {
+			for(int i=0; i<4; i++) {
+				if(RRTalent[i] == 0) return i+1;
+			}
+		}
+		else if(skill.equals("SR")) {
+			for(int i=0; i<4; i++) {
+				if(SRTalent[i] == 0) return i+1;
+			}
+		}
+		return 4;
+	}
+	public void updateTalentPoint() {
+		int point = (int)((double)lvl/5);
+		for(int i=0; i<4; i++) {
+			if(FRTalent[i] != 0) point -= i+1;
+			if(RRTalent[i] != 0) point -= i+1;
+			if(SRTalent[i] != 0) point -= i+1;
+			if(RLTalent[i] != 0) point -= i+1;
+		}
+		talentPoint = point;
 	}
 	
 	public void setmap() {

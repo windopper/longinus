@@ -7,6 +7,8 @@ import ClassAbility.Cheiron.CheironMelee;
 import ClassAbility.Khaos.Khaos;
 import ClassAbility.Khaos.KhaosMelee;
 import ClassAbility.Phlox.Phlox;
+import ClassAbility.Shield.Shield;
+import ClassAbility.Shield.ShieldMelee;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
@@ -67,6 +69,7 @@ public class Combination {
 		else if(name.equals("카오스")) Khaos(p, combo);
 		else if(name.equals("없음")) Trainer(p, combo);
 		else if(name.equals("케이론")) Cheiron(p, combo);
+		else if(name.equals("쉴드")) Shield(p, combo);
 
 		//p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
 	}
@@ -323,6 +326,19 @@ public class Combination {
 		}
 		if(combo.equals("SHIFTR") || combo.equals("RL") || combo.equals("RR") || combo.equals("FR")) {
 			(new Khaos(p)).Skill(combo);
+		}
+	}
+
+	public void Shield(Player p, String combo) {
+		PlayerFunction PF = PlayerFunction.getinstance(p);
+
+		if(combo.equals("L") || combo.equals("SHIFTL") || combo.equals("R")) {
+			if(PF.getMeleeDelay() == 0) {
+				(new ShieldMelee(p)).Melee(combo);
+			}
+		}
+		if(combo.equals("SHIFTR") || combo.equals("RL") || combo.equals("RR") || combo.equals("FR")) {
+			(new Shield(p)).Skill(combo);
 		}
 	}
 

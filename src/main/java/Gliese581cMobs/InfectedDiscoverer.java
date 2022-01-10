@@ -2,6 +2,7 @@ package Gliese581cMobs;
 
 import EntityPlayerManager.EntityPlayerManager;
 import EntityPlayerManager.EntityPlayerWatcher;
+import Mob.EntityFunctions;
 import Mob.MobListManager;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment;
@@ -21,8 +22,6 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 
@@ -34,9 +33,10 @@ public class InfectedDiscoverer extends EntityZombie {
         super(entitytypes, world);
         MobListManager.MobList mobList = MobListManager.MobList.감염된_개척자;
         Zombie infDcr = (Zombie) this.getBukkitEntity();
-        infDcr.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10));
-        world.addEntity(this);
         this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+        world.addEntity(this);
+        EntityFunctions.hideFromPlayer(infDcr);
+        //infDcr.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10));
 
         EntityPlayer eP = EntityPlayerManager.getInstance().dummyNetworkNPC(loc.getWorld(), loc, texture, signature);
         EntityPlayerWatcher.EntityWrapper(eP, infDcr, mobList)

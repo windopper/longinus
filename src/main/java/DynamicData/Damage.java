@@ -60,6 +60,12 @@ public class Damage {
 		}
 		else if(!(taker instanceof ArmorStand) && (taker instanceof LivingEntity)) {
 
+			EntityManager EH = EntityManager.getinstance(taker);
+
+			if(EH.canDamagedByPlayer()) {
+				if(damager instanceof Player) return;
+			}
+
 			if(taker.isInvulnerable()) return;
 			taker.getWorld().playSound(taker.getLocation(), Sound.ENTITY_GENERIC_HURT, 1, 1);
 
@@ -76,8 +82,6 @@ public class Damage {
 			taker.setMaximumNoDamageTicks(1);
 			taker.setNoDamageTicks(0);
 			taker.damage(0.0001);
-			
-			EntityManager EH = EntityManager.getinstance(taker);
 
 			if(damager instanceof Player player) { // 보스바
 				EntityHealthBossBar.getinstance((Player)damager).EntityShowHealthBossbar(player, taker);

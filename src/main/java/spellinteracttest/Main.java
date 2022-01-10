@@ -7,6 +7,7 @@ import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
+import GUIManager.GUIManager;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.ModuleChips;
@@ -26,6 +27,7 @@ import PlanetSelect.planetSelectEvent;
 import PlayParticle.PlayParticle;
 import PlayerChip.Goldgui;
 import PlayerChip.GuiEvent;
+import PlayerChip.SkillTalent.TalentUI;
 import PlayerChip.UserChipEvent;
 import PlayerManager.*;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
@@ -109,6 +111,8 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Auction(), this);
 		getServer().getPluginManager().registerEvents(new ModuleChips(), this);
+		getServer().getPluginManager().registerEvents(new GUIManager(), this);
+		getServer().getPluginManager().registerEvents(new TalentUI(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -937,7 +941,6 @@ public class Main extends JavaPlugin implements Listener {
 		(new SQL.SQLManager(p)).updateData();
 		(new SQL.SQLManager(p)).initData();
 
-		//PlayerStatManager.getinstance(p);
 		PlayerManager.getinstance(p);
 		LeavingWhileQuestAndJoinAgain leavingwhilequestandjoinagain = new LeavingWhileQuestAndJoinAgain();
 		leavingwhilequestandjoinagain.restore(p); // 튜토리얼 도중 포기 감지

@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import Mob.EntityFunctions;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import net.minecraft.core.BlockPosition;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.decoration.EntityArmorStand;
 import net.minecraft.world.entity.monster.EntitySlime;
 import net.minecraft.world.level.World;
 import net.minecraft.world.scores.ScoreboardTeam;
+import net.minecraft.world.scores.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -27,8 +29,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.Slime;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.Main;
 
@@ -68,6 +68,7 @@ public class PlayerDeadBodySetter {
 
         ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Bukkit.getScoreboardManager().getMainScoreboard())
                 .getHandle(), player.getName()+"a");
+        team.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
         PacketPlayOutScoreboardTeam score1 = PacketPlayOutScoreboardTeam.a(team);
         PacketPlayOutScoreboardTeam score2 = PacketPlayOutScoreboardTeam.a(team, true);
         PacketPlayOutScoreboardTeam score3 = PacketPlayOutScoreboardTeam.a(team, Body.getName(), PacketPlayOutScoreboardTeam.a.a);
@@ -95,6 +96,12 @@ public class PlayerDeadBodySetter {
         PacketPlayOutEntityHeadRotation headRotationPacket = new PacketPlayOutEntityHeadRotation(Body, yaw);
 
 
+        final EntitySlime bodyMarker = new BodyMarker(EntityTypes.aD, ((CraftWorld) player.getWorld()).getHandle(),
+                player.getName(), player.getLocation(), texture, signature, player);
+        final EntityArmorStand bodyMarker_ = new BodyMarker1(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle(),
+                player.getName(), player.getEyeLocation().add(0, -1.75, 0), texture, signature, player);
+        Slime slime = (Slime) bodyMarker.getBukkitEntity();
+
         for(Player on : Bukkit.getOnlinePlayers()) {
             PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
             connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, Body));
@@ -110,15 +117,10 @@ public class PlayerDeadBodySetter {
                 @Override
                 public void run() {
                     connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, Body));
+                    connection.sendPacket(new PacketPlayOutAttachEntity(Body, bodyMarker_));
                 }
             }.runTaskAsynchronously(Main.getPlugin(Main.class));
         }
-
-        final EntitySlime bodyMarker = new BodyMarker(EntityTypes.aD, ((CraftWorld) player.getWorld()).getHandle(),
-                player.getName(), player.getLocation(), texture, signature, player);
-        final EntityArmorStand bodyMarker_ = new BodyMarker1(EntityTypes.c, ((CraftWorld) player.getWorld()).getHandle(),
-                player.getName(), player.getLocation(), texture, signature, player);
-        Slime slime = (Slime) bodyMarker.getBukkitEntity();
 
         playerMarker.put(slime, player);
 
@@ -171,7 +173,7 @@ public class PlayerDeadBodySetter {
             Slime bodymarker = (Slime) this.getBukkitEntity();
             bodymarker.setCustomNameVisible(true);
             bodymarker.setCustomName("§c§o"+Name+"의 시체");
-            bodymarker.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10));
+            //bodymarker.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, 10));
             bodymarker.setInvulnerable(false);
             bodymarker.setCollidable(false);
             bodymarker.setAI(false);
@@ -194,10 +196,11 @@ public class PlayerDeadBodySetter {
             yaml.set("boots", boots);
             String encoded = (new SQL.Converter()).encodeYaml(yaml);
             bodymarker.addScoreboardTag("encoded:"+encoded);
-
-            world.addEntity(this);
-
             this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+            world.addEntity(this);
+            EntityFunctions.hideFromPlayer(bodymarker);
+
+
         }
     }
 
@@ -220,15 +223,15 @@ public class PlayerDeadBodySetter {
             bodymarker.setInvulnerable(false);
             bodymarker.setCollidable(false);
             bodymarker.setAI(false);
-
+            bodymarker.setSmall(true);
             bodymarker.setSilent(true);
             bodymarker.setGravity(false);
             bodymarker.addScoreboardTag(Name);
             bodymarker.addScoreboardTag("texture:"+texture);
             bodymarker.addScoreboardTag("signature:"+signature);
-            world.addEntity(this);
 
             this.setPosition(loc.getX(), loc.getY(), loc.getZ());
+            world.addEntity(this);
         }
     }
 }

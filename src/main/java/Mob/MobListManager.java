@@ -28,7 +28,8 @@ public class MobListManager {
         클로_울프팽("Gliese581c", 5, 200,10, 10, 20, true),
         패러싯_알파("Gliese581c", 5, 200,10, 10, 20, true),
         edison1304("Gliese581c", 5, 200,10, 10, 20, false),
-        감염된_개척자("Gliese581c", 5, 200, 10, 10, 20, true);
+        감염된_개척자("Gliese581c", 5, 200, 10, 10, 20, true),
+        illusion("Gliese581c", 5, 200, 10, 10, 20, false);
 
 
         private String planet;
@@ -38,7 +39,6 @@ public class MobListManager {
         private int mindamage = 0;
         private int maxdamage = 10;
         private int exp = 10;
-
         private float rawhealth;
         private String name;
         private boolean scannable = true;

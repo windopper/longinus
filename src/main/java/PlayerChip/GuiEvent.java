@@ -47,14 +47,14 @@ public class GuiEvent implements Listener {
 				if(e.getClick().isLeftClick()) GoldSendPlayerAllowChat(e);
 			}
 			if(rawslot == Mg.alarmslot) AlarmClickEvent(e);
-			if(rawslot == Mg.questbookslot) QuestsOpenEvent(e);
-			if(rawslot == Mg.classitemslot) ClassSelectEvent(e);
-			if(rawslot == Mg.statsettingslot) StatClickEvent(e);
-			if(rawslot == Mg.partymanageitemslot) partyGuiClickEvent(e);
-			if(rawslot == Mg.collectingitemslot) openCollectingGui(e);
+			else if(rawslot == Mg.questbookslot) QuestsOpenEvent(e);
+			else if(rawslot == Mg.classitemslot) ClassSelectEvent(e);
+			else if(rawslot == Mg.statsettingslot) StatClickEvent(e);
+			else if(rawslot == Mg.partymanageitemslot) partyGuiClickEvent(e);
+			else if(rawslot == Mg.collectingitemslot) openCollectingGui(e);
 			//if(rawslot == Mg.biochips)
-			if(rawslot == Mg.returnitemslot) ReturnEvent(e);
-	
+			else if(rawslot == Mg.skilltraits) PlayerChip.SkillTalent.ClickEvent.run((Player) e.getWhoClicked());
+			else if(rawslot == Mg.returnitemslot) ReturnEvent(e);
 			e.setCancelled(true);
 		}
 		
@@ -413,6 +413,12 @@ public class GuiEvent implements Listener {
 			PlayerClass pC = new PlayerClass(p);
 			pC.classSave();
 			pC.classCall(pC.classRegister("케이론"));
+			pC.classSave();
+		}
+		else if(rawslot == 22) {
+			PlayerClass pC = new PlayerClass(p);
+			pC.classSave();
+			pC.classCall(pC.classRegister("쉴드"));
 			pC.classSave();
 		}
 		else if(rawslot == 27) {
