@@ -25,6 +25,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import spellinteracttest.Main;
 
 import java.io.File;
 import java.sql.Connection;
@@ -86,7 +87,7 @@ public class Auction implements Listener {
                 OnSearching.remove(player);
             }
             else {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
                     MarketOpen(player, 1, msg);
                 }, 0);
 

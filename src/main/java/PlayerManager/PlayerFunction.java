@@ -3,7 +3,9 @@ package PlayerManager;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
+import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class PlayerFunction implements Listener {
@@ -116,6 +118,10 @@ public class PlayerFunction implements Listener {
 
 		if(KhaosFR > 0) KhaosFR--;
 
+	}
+
+	public void removeAllAbnormalStatus() {
+		Arrays.stream(PotionEffectType.values()).forEach(p::removePotionEffect);
 	}
 
 }

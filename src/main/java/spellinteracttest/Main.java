@@ -743,7 +743,7 @@ public class Main extends JavaPlugin implements Listener {
 				player.sendMessage("EXP:"+Integer.toString(PlayerManager.getinstance(player).getexp()));
 				player.sendMessage("Damage:" + Integer.toString(PlayerManager.getinstance(player).MinDamage)+"-"+Integer.toString(PlayerManager.getinstance(player).MaxDamage));
 				player.sendMessage("Health: " + Integer.toString(PlayerManager.getinstance(player).Health));
-				player.sendMessage("Shield: " + Integer.toString(PlayerManager.getinstance(player).ShieldRaw));
+				player.sendMessage("Shield: " + Integer.toString(PlayerManager.getinstance(player).MaxShield));
 				player.sendMessage("WalkSpeed: " + PlayerManager.getinstance(player).WalkSpeed);
 				player.sendMessage("CurrentClass " + PlayerManager.getinstance(player).CurrentClass);
 				player.sendMessage("WeaponClass " + PlayerManager.getinstance(player).WeaponClass);
@@ -835,6 +835,7 @@ public class Main extends JavaPlugin implements Listener {
 					PlayerHealthShield.getinstance(p).HealthWatcher();
 					PlayerHealthShield.getinstance(p).ShieldRegeneration();
 					PlayerEnergy.getinstance(p).OverloadCoolDown();
+					PlayerEnergy.getinstance(p).watchPreviousManaUsed();
 					PlayerCombination.getinstance(p).KeyBind();
 					PlayerFunction.getinstance(p).PlayerFunctionLoop();
 					EntityHealthBossBar.getinstance(p).healthBarLoop();

@@ -3,15 +3,19 @@ package PlayerManager;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerEnergy extends PlayerManager {
 	
 	private static final HashMap<Player, PlayerEnergy> PlayerEnergy = new HashMap<>();
 	
 	private Player p;
-	
+	public ConcurrentHashMap<Player, Double> getUsedManaFromPlayer = new ConcurrentHashMap<>();
+
 	private int Energy = 4;
 	private String PreviousSkill = "none";
+	private int PreviousManaUsed = 0;
 	private int EnergyOverload = 0;
 	private int EnergyOverloadCooldown = 0;
 	private int EnergyRate = 1;
@@ -48,6 +52,10 @@ public class PlayerEnergy extends PlayerManager {
 	public void setEnergy(int energy) {
 		Energy = energy;
 	}
+	public void addEnergy(int energy) {
+		if(this.Energy + energy <= 20) this.Energy += energy;
+	}
+
 	public void setEnergyOverload(int energyOverload) {
 		EnergyOverload = energyOverload;
 	}
@@ -60,6 +68,8 @@ public class PlayerEnergy extends PlayerManager {
 	public void setPreviousSkill(String previousSkill) {
 		PreviousSkill = previousSkill;
 	}
+	public void setPreviousManaUsed(int manaUsed) { this.PreviousManaUsed = manaUsed; }
+	public int getPreviousManaUsed() { return this.PreviousManaUsed; }
 
 	public void Regeneration() {
 		
@@ -76,7 +86,6 @@ public class PlayerEnergy extends PlayerManager {
 	public void OverloadCoolDown() {
 		
 		if(EnergyOverloadCooldown >= 1) { // 에너지 과부하 쿨다운 활성화 시
-			
 			EnergyOverloadCooldown++;// 쿨다운 시작
 			
 			if(EnergyOverloadCooldown>60) { // 쿨다운 지나면
@@ -84,11 +93,14 @@ public class PlayerEnergy extends PlayerManager {
 				EnergyOverload = 0;
 				PreviousSkill = "none";
 			}
-			
-
 		}
-
-				
 	}
 
+	public void watchPreviousManaUsed() {
+		for(Player player : getUsedManaFromPlayer.keySet()) {
+			getinstance(player).addEnergy((int) (this.PreviousManaUsed * this.getUsedManaFromPlayer.get(player)));
+		}
+		getUsedManaFromPlayer.clear();
+		PreviousManaUsed = 0;
+	}
 }

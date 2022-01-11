@@ -179,17 +179,22 @@ public class TalentUI implements Listener {
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
 
         itemMeta.setDisplayName(yaml.getString(currentClass+".Talent."+skill+"."+tier+"."+talent+".Name"));
-        List<String> list = new ArrayList<>();
 
-        list.addAll(yaml.getStringList(currentClass+".Talent."+skill+"."+tier+"."+talent+".Lore"));
+        List<String> list = new ArrayList<>();
+        list.addAll(yaml.getStringList(currentClass + ".Talent." + skill + "." + tier + "." + talent + ".Lore"));
+        for(int i=0; i<list.size(); i++) {
+            list.set(i, "§7"+list.get(i));
+        }
 
         if(pm.getNextTier(skill) < tier) {
             list.add("§c아직 선택할 수 없습니다 "+(tier-1)+"티어 특성 선택시 해금");
+            list.add(0, "");
         }
         else {
             list.add(0, "");
             if(selectedTalent == talent) list.add(0, "§a>>선택됨<<");
             else list.add(0, "§7>>선택되지 않음<<");
+
         }
 
         itemMeta.setLore(list);

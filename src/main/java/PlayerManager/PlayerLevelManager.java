@@ -187,7 +187,7 @@ public class PlayerLevelManager {
 
         for(Entity lE : player.getNearbyEntities(15, 15, 15)) {
             if(lE instanceof Player) {
-                ((Player) lE).sendMessage("§d"+player.getName()+"님이 "+lvl+"레벨에 달성하였습니다");
+                ((Player) lE).sendMessage("§d"+player.getName()+"님이 "+lvl+"레벨을 달성하였습니다");
             }
         }
 

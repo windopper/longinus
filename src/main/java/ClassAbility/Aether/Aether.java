@@ -79,9 +79,9 @@ public class Aether {
 		}
 	}
 
-	public void Skill(String combo) {
+	public int Skill(String combo) {
 
-		if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return;
+		if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
 		int mana = ENUM.valueOf(combo).getMana() - ManaDecrease <= 0 ? 1 : ENUM.valueOf(combo).getMana() - ManaDecrease
 				+ PlayerEnergy.getinstance(player).getEnergyOverload();
@@ -89,6 +89,7 @@ public class Aether {
 
 		if(mana <= CurrentMana) {
 			PlayerEnergy.getinstance(player).removeEnergy(mana);
+			PlayerEnergy.getinstance(player).setPreviousManaUsed(mana);
 			if(combo.equals("RR")) ShieldSwitchCharge();
 			if(combo.equals("RL")) ImpulseSwitchShield();
 			if(combo.equals("FR")) ImpulseSwitchWeapon();
@@ -97,11 +98,14 @@ public class Aether {
 			Combination.getinstance().Sound(player);
 			player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
 			Combination.getinstance().energyoverload(player, combo);
+			return mana;
 		}
 		else {
 			player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1f);
 			player.sendTitle(" ", Combination.blank+Combination.manaexhaustion, 0, 20, 10);
 		}
+
+		return 0;
 	}
 	
 	public void ImpulseSwitchShield() {
@@ -112,7 +116,7 @@ public class Aether {
 		
 		summonCircle4(player.getLocation(), 1);
 		
-		PlayerHealthShield.getinstance(player).ShieldAdd(add);
+		PlayerHealthShield.getinstance(player).ShieldAdd(add, player);
 		
 		
 		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
@@ -127,9 +131,7 @@ public class Aether {
 				Player pla = (Player) pl;
 				add = (int)((double) PlayerManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (PlayerManager.getinstance(player).Shield + 100) / 100);
 				
-				PlayerHealthShield.getinstance(pla).ShieldAdd(add);
-				
-				pl.sendMessage("§d"+player.getName()+" §d§5§l🛡§l§5§r §5"+add+"§5§d 부여§d");
+				PlayerHealthShield.getinstance(pla).ShieldAdd(add, player);
 				
 				summonCircle4(pla.getLocation(), 1);
 				
@@ -198,7 +200,7 @@ public class Aether {
 		Spell.setEntityPassable(true);
 		Spell.setDamageRate(1);
 		Spell.addDestinationSound(Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 0);
-		Spell.setmultiplyDamage((double) PlayerHealthShield.getinstance(player).getCurrentShield() / (double) PlayerManager.getinstance(player).ShieldRaw);
+		Spell.setmultiplyDamage((double) PlayerHealthShield.getinstance(player).getCurrentShield() / (double) PlayerManager.getinstance(player).MaxShield);
 
 		new BukkitRunnable() {
 			

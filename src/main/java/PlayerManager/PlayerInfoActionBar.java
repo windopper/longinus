@@ -23,7 +23,7 @@ public class PlayerInfoActionBar {
 
 			int CurrentHealth = PlayerHealthShield.getinstance(player).getCurrentHealth();
 			int CurrentShield = PlayerHealthShield.getinstance(player).getCurrentShield();
-			int MaxShield = PlayerManager.getinstance(player).ShieldRaw;
+			int MaxShield = PlayerManager.getinstance(player).MaxShield;
 			int MaxHealth = PlayerManager.getinstance(player).Health;
 			String CurrentClass = PlayerManager.getinstance(player).CurrentClass;
 			

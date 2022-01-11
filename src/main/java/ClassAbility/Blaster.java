@@ -129,7 +129,7 @@ public class Blaster {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		
 		final double recoverrate = mana * 0.05;
-		PlayerHealthShield.getinstance(p).ShieldAdd((int)(PlayerManager.getinstance(p).Health * recoverrate));
+		PlayerHealthShield.getinstance(p).ShieldAdd((int)(PlayerManager.getinstance(p).Health * recoverrate), p);
 		
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_SPLASH_POTION_BREAK, 2, 0);
 

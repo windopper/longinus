@@ -28,7 +28,7 @@ public class PlayerHealthShield {
 	
 	private PlayerHealthShield(Player p) {
 		this.p = p;
-		CurrentShield = PlayerManager.getinstance(p).ShieldRaw;
+		CurrentShield = PlayerManager.getinstance(p).MaxShield;
 		CurrentHealth = PlayerManager.getinstance(p).Health;
 	}
 	
@@ -76,8 +76,7 @@ public class PlayerHealthShield {
 		Bukkit.broadcastMessage(Integer.toString(instance.size()));
 	}
 
-	public void HealthAdd(int addhealth) {
-
+	public void HealthAdd(int addhealth, Player giver) {
 		if(CurrentHealth > 0) {
 			if(CurrentHealth + addhealth > PlayerManager.getinstance(p).Health) {
 				CurrentHealth = PlayerManager.getinstance(p).Health;
@@ -85,16 +84,22 @@ public class PlayerHealthShield {
 				HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
 				return;
 			}
-
+			if(giver != p)
+				p.sendMessage("§e"+giver.getName()+" §6§l♥§r§6 "+addhealth+"§e 치유");
 			CurrentHealth += addhealth;
 			HologramIndicator.getinstance().HealIndicator(addhealth, p.getLocation());
 		}
 	}
 
-	public void ShieldAdd(int addshield) {
+	public void ShieldAdd(int addshield, Player giver) {
 		if(CurrentHealth > 0) {
 			CurrentShield += addshield;
+			if(giver != p)
+				p.sendMessage("§d"+giver.getName()+" §d§5§l🛡§l§5§r §5"+addshield+"§5§d 부여§d");
 		}
+	}
+	public void ShieldAdd(double rate, Player giver) {
+		ShieldAdd((int)(PlayerManager.getinstance(p).MaxShield * rate), giver);
 	}
 
 	public void setDamage(int damage) {
@@ -112,7 +117,6 @@ public class PlayerHealthShield {
 				p.getWorld().spawnParticle(Particle.BLOCK_CRACK, p.getLocation(), 50, 0.5, 0.5, 0.5, Material.PURPLE_GLAZED_TERRACOTTA.createBlockData());
 				HologramIndicator.getinstance().ShieldBroken(p);
 				PlayerEffectEvent.getInstance().ShieldBrokenEffect(p);
-
 			}
 			else {
 				setCurrentShield(getCurrentShield()-damage);
@@ -168,7 +172,7 @@ public class PlayerHealthShield {
 	
 	public void ShieldRegeneration() {
 		
-		final int MaxShield = PlayerManager.getinstance(p).ShieldRaw;
+		final int MaxShield = PlayerManager.getinstance(p).MaxShield;
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		
 		if(CurrentShield > MaxShield) { // 현재 보호막이 최대를 넘을때

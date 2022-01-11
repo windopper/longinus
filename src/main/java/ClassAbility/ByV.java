@@ -68,12 +68,12 @@ public class ByV {
 		PlayerEnergy.getinstance(p).removeEnergy(mana);
 		PlayerFunction.getinstance(p).essence --;
 		
-		PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health /10);
+		PlayerHealthShield.getinstance(p).HealthAdd(PlayerManager.getinstance(p).Health /10, p);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			if(p.getWorld().getName().equals(player.getWorld().getName())) {
 				if(!entitycheck.duelcheck(player, p) && player != p) {
-					PlayerHealthShield.getinstance(player).HealthAdd(PlayerManager.getinstance(p).Health/10);
+					PlayerHealthShield.getinstance(player).HealthAdd(PlayerManager.getinstance(p).Health/10, p);
 				}
 			}
 		}

@@ -73,9 +73,9 @@ public class Cheiron implements Listener {
         }
     }
 
-    public void Skill(String combo) {
+    public int Skill(String combo) {
 
-        if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return;
+        if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
         int mana = ENUM.valueOf(combo).getMana() - ManaDecrease <= 0 ? 1 : ENUM.valueOf(combo).getMana() - ManaDecrease
                 + PlayerEnergy.getinstance(player).getEnergyOverload();
@@ -83,6 +83,7 @@ public class Cheiron implements Listener {
 
         if(mana <= CurrentMana) {
             PlayerEnergy.getinstance(player).removeEnergy(mana);
+            PlayerEnergy.getinstance(player).setPreviousManaUsed(mana);
             if(combo.equals("LL")) KnockBack();
             if(combo.equals("LR")) ElecArrow();
             if(combo.equals("SHIFTL")) VortexArrow();
@@ -91,11 +92,13 @@ public class Cheiron implements Listener {
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
             Combination.getinstance().energyoverload(player, combo);
+            return mana;
         }
         else {
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1f);
             player.sendTitle(" ", Combination.blank+Combination.manaexhaustion, 0, 20, 10);
         }
+        return 0;
     }
 
     public void KnockBack() {

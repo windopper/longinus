@@ -30,12 +30,14 @@ public class PlayerManager {
 	public int MinDamage = 0;
 	public int MaxDamage = 0;
 	public int Health = DEFAULT_HEALTH;
-	public int ShieldRaw = (int)(Health / 10);
+	public int MaxShield = (int)(Health / 10);
 	public int SpellDamage = 0;
 	public int EnergyPerSecond = 1;
 	public int Shield = 0;
 	public int WalkSpeed = 0;
 	public int ManaDecrease = 0;
+
+	public int addiWalkSpeed = 0;
 
 	public int Str = 0;
 	public int Dex = 0;
@@ -173,6 +175,16 @@ public class PlayerManager {
 		return 0;
 	}
 	public void setTalent(String skill, int tier, int talent) {
+		boolean canchange = false;
+		if(skill.equals("FR") && FRTalent[tier-1] != 0) canchange = true;
+		else if(skill.equals("RL") && RLTalent[tier-1] != 0) canchange = true;
+		else if(skill.equals("RR") && RRTalent[tier-1] != 0) canchange = true;
+		else if(skill.equals("SR") && SRTalent[tier-1] != 0) canchange = true;
+		if(canchange) {
+			changeTalent(skill, tier, talent);
+			return;
+		}
+
 		if(talentPoint - tier < 0) {
 			p.sendMessage("§c특성 포인트가 부족합니다!");
 			p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1, 1);
@@ -185,6 +197,12 @@ public class PlayerManager {
 		else if(skill.equals("SR")) SRTalent[tier-1] = talent;
 
 		updateTalentPoint();
+	}
+	public void changeTalent(String skill, int tier, int talent) {
+		if(skill.equals("FR")) FRTalent[tier-1] = talent;
+		else if(skill.equals("RL")) RLTalent[tier-1] = talent;
+		else if(skill.equals("RR")) RRTalent[tier-1] = talent;
+		else if(skill.equals("SR")) SRTalent[tier-1] = talent;
 	}
 	public void setTalent(List<Integer> list, String skill) {
 		if(skill.equals("FR")) FRTalent =  list.stream().mapToInt(i -> i).toArray();
@@ -246,7 +264,7 @@ public class PlayerManager {
 		MinDamage = 0;
 		MaxDamage = 0;
 		Health = DEFAULT_HEALTH;
-		ShieldRaw = (int)(Health / 10);
+		MaxShield = (int)(Health / 10);
 		SpellDamage = 0;
 		EnergyPerSecond = 1;
 		Shield = 0;
@@ -448,10 +466,10 @@ public class PlayerManager {
 		Health = health;
 		SpellDamage = spelldamage;
 		Shield = shield;
-		WalkSpeed = walkspeed;
+		WalkSpeed = walkspeed + addiWalkSpeed;
 		EnergyPerSecond = energypersecond;
 		ManaDecrease = manadecrease;
-		ShieldRaw =  (int)((double)shieldraw * ((double)(Shield+100)/100));
+		MaxShield =  (int)((double)shieldraw * ((double)(Shield+100)/100));
 
 
 		SetWalkSpeed();

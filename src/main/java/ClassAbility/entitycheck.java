@@ -18,7 +18,7 @@ public class entitycheck {
 	}
 	
 	public static boolean duelcheck(Entity p, Entity me) {
-		if(p instanceof Player && me instanceof Player && !p.equals(me) && p != me) {
+		if(p instanceof Player && me instanceof Player && !p.equals(me)) {
 			// 사람이고 듀얼목록이 있으면
 			
 			if(DuelManager.checkInSameDuel((Player) me, (Player) p)) {
