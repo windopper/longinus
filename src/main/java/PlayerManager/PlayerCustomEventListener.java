@@ -94,7 +94,7 @@ public class PlayerCustomEventListener implements Listener {
         // 카오스 FR 스킬
         if(PF.KhaosFR > 0 && PE.getEnergy()>1) {
             DynamicData.HologramIndicator.getinstance().ManaIndicator(-2, target.getLocation());
-            PE.setEnergy(PE.getEnergy() -2);
+            PE.setEnergy(PE.getEnergy() - 2);
         }
 
         ReturnToBase.ReturnMech.getinstance().ReturnCancel(target); // 귀환을 하고 있다면 귀환을 취소해 버리기

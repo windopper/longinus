@@ -7,6 +7,7 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import spellinteracttest.Main;
 
 import java.util.Random;
 
@@ -21,6 +22,47 @@ public class HologramIndicator {
 	public static HologramIndicator getinstance() {
 		if(HologramIndicator == null) HologramIndicator = new HologramIndicator();
 		return HologramIndicator;
+	}
+
+	public void Indicator(final String name, final Location loc, int tick) {
+
+		new BukkitRunnable() {
+			int time = 0;
+			ArmorStand as;
+
+			@Override
+			public void run() {
+
+				if(time == 0) {
+
+					Random random = new Random();
+					double x = random.nextDouble() *2;
+					double y = random.nextDouble() * 1 + 1;
+					double z = random.nextDouble() *2;
+					x -= 1;
+					z -= 1;
+					loc.setX(loc.getX()+x);
+					loc.setY(loc.getY()+y);
+					loc.setZ(loc.getZ()+z);
+					as = (ArmorStand) loc.getWorld().spawn(loc, ArmorStand.class);
+					as.setCustomName(name);
+					as.setVisible(false);
+					as.setCollidable(false);
+					as.setGravity(false);
+					as.setSmall(true);
+					as.setMarker(true);
+					as.setInvulnerable(true);
+					as.setCustomNameVisible(true);
+
+				}
+				if(time > tick) {
+					as.remove();
+					cancel();
+					return;
+				}
+				time++;
+			}
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 	}
 	
 	

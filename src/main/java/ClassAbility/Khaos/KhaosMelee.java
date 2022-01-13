@@ -2,6 +2,7 @@ package ClassAbility.Khaos;
 
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
+import DynamicData.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerFunction;
@@ -16,7 +17,9 @@ import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static PlayParticle.Rotate.*;
@@ -119,10 +122,16 @@ public class KhaosMelee {
     public void Horizon() {
 
         final Location loc = player.getEyeLocation().add(0, -0.5, 0);
-        final List<Entity> Hit = new ArrayList<>();
+        final Set<Entity> Hit = new HashSet<>();
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(1.5)
+                .setLocation(loc)
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         new BukkitRunnable() {
 
@@ -160,23 +169,9 @@ public class KhaosMelee {
                         player.getWorld().spawnParticle(Particle.ASH, loc, 1, 0, 0, 0, 0);
                         player.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(Color.WHITE, 1));
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
-                                    Hit.add(entity);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                }
-                            }
-                        }
+                        tb.setLocation(loc).build();
+
                         loc.subtract(v);
-
-
-
                     }
                     angle = angle + (PlayerFunction.getinstance(player).getMeleeRot() ? 6 : -6);
                 }
@@ -212,10 +207,16 @@ public class KhaosMelee {
     public void Vertical() {
 
         final Location loc = player.getEyeLocation().add(0, -0.5, 0);
-        final List<Entity> Hit = new ArrayList<>();
+        final Set<Entity> Hit = new HashSet<>();
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
+
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(1.5)
+                .setLocation(loc)
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         new BukkitRunnable() {
 
@@ -253,24 +254,9 @@ public class KhaosMelee {
                         player.getWorld().spawnParticle(Particle.ASH, loc, 1, 0, 0, 0, 0);
                         player.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(Color.WHITE, 1));
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    Vector vec = new Vector(0, 0.3, 0);
-                                    EntityStatusManager.getinstance(entity).KnockBack(vec);
-                                    Hit.add(entity);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                }
-                            }
-                        }
+                        tb.setLocation(loc).build();
+
                         loc.subtract(v);
-
-
-
                     }
                     angle = angle + 6;
                 }
@@ -288,7 +274,12 @@ public class KhaosMelee {
         Location loc = player.getEyeLocation();
         Location location = player.getLocation();
         Vector dir = loc.getDirection().normalize();
-        final List<Entity> Hit = new ArrayList<>();
+
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(1.5)
+                .setLocation(loc)
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2);
 
@@ -309,19 +300,9 @@ public class KhaosMelee {
             player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc,
                     10, 0.1, 0.1, 0.1, 0);
 
-            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                    Location eloc = entity.getEyeLocation();
-                    BoundingBox box = entity.getBoundingBox();
-                    if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                        Damage.getinstance().taken(dmg, entity, player);
-                        Hit.add(entity);
-                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                    }
-                }
-            }
 
+
+            tb.setLocation(loc).build();
             loc.subtract(dir.clone().multiply(i));
 
         }
@@ -346,12 +327,18 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(2.5)
+                .setLocation(loc)
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
+
         Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
 
             new BukkitRunnable() {
 
                 final Location loc = player.getEyeLocation().add(0, -0.5, 0);
-                final List<Entity> Hit = new ArrayList<>();
+                final Set<Entity> Hit = new HashSet<>();
                 double rpitch = Math.toRadians(player.getLocation().getPitch());
                 double ryaw = Math.toRadians(player.getLocation().getYaw());
                 double rroll = Math.toRadians(Math.random() * 40 + 70);
@@ -389,22 +376,9 @@ public class KhaosMelee {
                             player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
                             player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0);
 
-                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                    Location eloc = entity.getEyeLocation();
-                                    BoundingBox box = entity.getBoundingBox();
-                                    if(eloc.distance(loc) < 2.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                        Damage.getinstance().taken(dmg, entity, player);
-                                        Vector vec = new Vector(0, 0.3, 0);
-                                        EntityStatusManager.getinstance(entity).KnockBack(vec);
-                                        Hit.add(entity);
-                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                    }
-                                }
-                            }
-                            loc.subtract(v);
+                            tb.setLocation(loc).build();
 
+                            loc.subtract(v);
                         }
                         angle = angle - 6;
                     }
@@ -434,9 +408,15 @@ public class KhaosMelee {
 
         player.getWorld().playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, 1, 1);
 
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(1.5)
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .addPlaySound((e) -> player.getWorld().playSound(e.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 1))
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
+                .setHitOnlyOne(true);
 
-//        Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-            final List<Entity> Hit = new ArrayList<>();
+
+            final Set<Entity> Hit = new HashSet<>();
 
             ArmorStand dagger = (ArmorStand) loc.getWorld().spawnEntity(loc.clone().add(0, -0.5, 0), EntityType.ARMOR_STAND);
             dagger.setInvisible(true);
@@ -473,23 +453,9 @@ public class KhaosMelee {
                         player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, dagger.getEyeLocation().add(0, 0.25, 0), 0, vector.clone().multiply(-1).getX()
                                 , vector.clone().multiply(-1).getY(), vector.clone().multiply(-1).getZ(), 0.5f);
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(dagger.getEyeLocation()) < 1.5 || box.contains(dagger.getEyeLocation().getX()
-                                        , dagger.getEyeLocation().getY(), dagger.getEyeLocation().getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    EntityStatusManager.getinstance(entity).KnockBack(dagger, 0.5);
-                                    Hit.add(entity);
-                                    player.getWorld().playSound(entity.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 1);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                    t = 11;
-                                    break;
-                                }
-                            }
-                        }
+                        tb.setLocation(dagger.getEyeLocation()).build();
+                        if(tb.getHitEntity().size()>=1) { t=11; }
+
                     }
 
                     
@@ -528,10 +494,6 @@ public class KhaosMelee {
                                 , new Particle.DustOptions(Color.PURPLE, 0.5f));
                                 if(player.getLocation().add(betvec.clone().multiply(i)).distance(mloc)<1.5) break;
                             }
-//                            player.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME, player.getEyeLocation().add(0, -1, 0),
-//                                    0, betvec.getX(), betvec.getY(), betvec.getZ(), 1);
-
-
 
                             double x = 1.5 * Math.cos((double)t * Math.PI / 16);
                             double y = 0;
@@ -547,8 +509,6 @@ public class KhaosMelee {
                             v = new Vector(x, y, z);
                             player.getWorld().spawnParticle(Particle.TOTEM, mloc.clone().add(v), 1, 0, 0, 0, 0);
 
-
-
                             for(int i =0; i<10; i++) {
                                 double r1 = Math.random() * 2 - 1;
                                 double r2 = Math.random() * 4 - 2;
@@ -558,12 +518,8 @@ public class KhaosMelee {
                             }
                         }
                         catch(Exception e) {
-
                         }
-
                     }
-
-
                     // 시간이 지나거나 단검이 없어지면 종료
                     if(!throwns.containsKey(player) || t > 211) {
                         tasks.remove(player);
@@ -597,12 +553,18 @@ public class KhaosMelee {
 
     private void SweepAround() {
 
-        final List<Entity> Hit = new ArrayList<>();
+        final Set<Entity> Hit = new HashSet<>();
         Location loc = player.getEyeLocation().add(0, -0.5, 0);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_WEAK, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
+
+        targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(2.5)
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 2))
+                .entityExcept(Hit)
+                .setLocation(loc);
 
         new BukkitRunnable() {
 
@@ -646,19 +608,8 @@ public class KhaosMelee {
                             player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
                             player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
 
-                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                    Location eloc = entity.getEyeLocation();
-                                    BoundingBox box = entity.getBoundingBox();
-                                    if(eloc.distance(loc) < 2.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 2);
-                                        Damage.getinstance().taken(dmg, entity, player);
-                                        Hit.add(entity);
-                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                        break;
-                                    }
-                                }
-                            }
+                            tb.setLocation(loc).build();
+
                         }
                         player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
                         loc.subtract(v);
@@ -668,19 +619,8 @@ public class KhaosMelee {
                             player.getWorld().spawnParticle(Particle.SPELL_WITCH, loc, 1, 0, 0, 0, 0);
                             player.getWorld().spawnParticle(Particle.SMOKE_NORMAL, loc, 1, 0, 0, 0, 0);
 
-                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                    Location eloc = entity.getEyeLocation();
-                                    BoundingBox box = entity.getBoundingBox();
-                                    if(eloc.distance(loc) < 2.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                        int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 2);
-                                        Damage.getinstance().taken(dmg, entity, player);
-                                        Hit.add(entity);
-                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                        break;
-                                    }
-                                }
-                            }
+                            tb.setLocation(loc).build();
+
                         }
                         player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
                         loc.subtract(v2);
@@ -698,11 +638,17 @@ public class KhaosMelee {
 
     private void KhaosOneofTripleHit(Double roll, Location loc) {
 
-        final List<Entity> Hit = new ArrayList<>();
+        final Set<Entity> Hit = new HashSet<>();
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+
+        final targetBuilder tb = targetBuilder.builder(player)
+                .setRadius(1.5)
+                .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
+                .setLocation(loc);
 
 
         new BukkitRunnable() {
@@ -740,19 +686,8 @@ public class KhaosMelee {
                         player.getWorld().spawnParticle(Particle.ASH, loc, 1, 0, 0, 0, 0);
                         player.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, new Particle.DustOptions(Color.WHITE, 1));
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).meleedmgcalculate(player, 1);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
-                                    Hit.add(entity);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                }
-                            }
-                        }
+                        tb.setLocation(loc).build();
+
                         loc.subtract(v);
 
 

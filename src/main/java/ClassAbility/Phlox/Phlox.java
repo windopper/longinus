@@ -3,6 +3,7 @@ package ClassAbility.Phlox;
 import ClassAbility.Combination;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
+import DynamicData.targetBuilder;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerHealthShield;
@@ -11,6 +12,8 @@ import Mob.*;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.BoundingBox;
@@ -94,9 +97,20 @@ public class Phlox {
 		int robot = ENUM.valueOf(combo).getRobot();
 
 		int RLtIV = pm.getTalent("RL", 4);
+		int SRtIII = pm.getTalent("SR", 3);
+		int SRtIV = pm.getTalent("SR", 4);
 		if(RLtIV == 2 && combo.equals("RL")) {
 			mana = 1 + PlayerEnergy.getinstance(player).getEnergyOverload();
 			robot /= 2;
+		}
+		if(SRtIII == 2 && combo.equals("SHIFTR")) {
+			robot -= 10;
+		}
+		if(SRtIV == 3 && combo.equals("SHIFTR")) {
+			robot += 30;
+		}
+		if(SRtIV == 2  && combo.equals("SHIFTR")) {
+			mana = Math.max(mana - pm.nextManaDecrease, 1);
 		}
 
 		String title = ENUM.valueOf(combo).getTitle()+mana;
@@ -107,8 +121,7 @@ public class Phlox {
 			return 0;
 		}
 		if(mana <= CurrentMana) {
-			PlayerEnergy.getinstance(player).removeEnergy(mana);
-			PlayerEnergy.getinstance(player).setPreviousManaUsed(mana);
+			PlayerEnergy.getinstance(player).useEnergy(mana);
 			if(combo.equals("RR")) escape();
 			if(combo.equals("RL")) heal();
 			if(combo.equals("FR")) {};
@@ -228,7 +241,9 @@ public class Phlox {
 		if(tI==2) healvalue *= 1.5;
 		if(tIV==1) healvalue *= 3;
 		if(tI==3) pm.addiWalkSpeed += 15;
-		if(tIV==1) pm.addiWalkSpeed -= 500;
+		if(tIV==1) {
+			pm.addiWalkSpeed -= 500;
+		}
 		if(tIII==3) dist *= 1.5;
 
 		final int fiheal = healvalue;
@@ -281,7 +296,10 @@ public class Phlox {
 						healhit = 1;
 						final PlayerManager pm_ = PlayerManager.getinstance(pl);
 						if(tI==3) pm_.addiWalkSpeed += 15;
-						if(tIV==1) pm_.addiWalkSpeed -= 500;
+						if(tIV==1) {
+							pl.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 2, 5));
+							pm_.addiWalkSpeed -= 500;
+						}
 
 						final BukkitTask runnable = new BukkitRunnable() {
 							@Override
@@ -419,7 +437,7 @@ public class Phlox {
 	}
 
 	public void annihilation() {
-		annihilationlaser(player);
+		annihilationlaser();
 	}
 
 	public void escape() {
@@ -448,9 +466,6 @@ public class Phlox {
 				
 			}
 		}
-		
-		
-		
 		new BukkitRunnable() {
 			
 			double i=0;
@@ -700,58 +715,94 @@ public class Phlox {
 		}
 	}
 	
-	public void annihilationlaser(final Player me) {
-		
+	public void annihilationlaser() {
+
+		int SRtI = pm.getTalent("SR", 1);
+		int SRtII = pm.getTalent("SR", 2);
+		int SRtIII = pm.getTalent("SR", 3);
+		int SRtIV = pm.getTalent("SR", 4);
+
+		double dist = 70;
+		double spellrate1 = 1.5;
+		double spellrate2 = 1;
+		if(SRtI == 1) dist *= 1.2;
+		else if(SRtI == 2) {
+			spellrate1 *= 1.1;
+			spellrate2 *= 1.1;
+		}
+		if(SRtIV == 3) {
+			spellrate1 *= 2.5;
+			spellrate2 *= 2.5;
+		}
+
+		double finaldist = dist;
+		double finalspellrate1 = spellrate1;
+		double finalspellrate2 = spellrate2;
+
 		HashMap<Entity, Integer> laserhit = new HashMap<>();
 		HashMap<Entity, Integer> bombhit = new HashMap<>();
 		List<Location> bombpoint = new ArrayList<>();
-		
+
+		targetBuilder tb = targetBuilder.builder(this.player)
+				.setRadius(2)
+				.setDamage(() -> PlayerManager.getinstance(this.player).spelldmgcalculate(this.player, finalspellrate1));
+
+		targetBuilder tb2 = targetBuilder.builder(this.player)
+				.setRadius(2)
+				.setDamage(() -> PlayerManager.getinstance(this.player).spelldmgcalculate(this.player, finalspellrate2));
+
+		if(SRtI == 3) {
+			tb.addStatus((e) -> {
+				if(!EntityManager.getinstance(e).isUnstoppable())
+					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
+			});
+		}
+		if(SRtII == 2) {
+			tb.addStatus((e) -> {
+				new BukkitRunnable() {
+					int time = 0;
+					@Override
+					public void run() {
+						Damage.getinstance().taken(PlayerManager.getinstance(player).spelldmgcalculate(player, 0.2),
+								e, player);
+						if(time>=2) cancel();
+						time++;
+					}
+				}.runTaskTimer(Main.getPlugin(Main.class), 0, 15);
+			});
+		}
+
 		new BukkitRunnable() {
 			
 			int i=0;
 			ShulkerBullet e;
 			Location target[] = new Location[2];
-			
-			
+
 			@Override
 			public void run() {
-				
-				
-				Location ploc = me.getEyeLocation();
+
+				Location ploc = player.getEyeLocation();
 				Vector pdir = ploc.getDirection();
 				pdir.normalize();
 				pdir.multiply(0.2);
 				
 				for(int i=0; i<200; i++) { // 타겟 설정
-					
 					if(ploc.getBlock().getType().isSolid()) {
 						break;
 					}
-						
 					ploc.add(pdir);
 				}
 				if(i==0) target[0] = ploc;
 				if(i==4) target[1] = ploc;
 				//	로봇 위치
-				
-				Location loc = me.getEyeLocation();
+				Location loc = player.getEyeLocation();
 				Vector dir = loc.getDirection();
 				dir.normalize();
 				Vector vec = new Vector(-dir.getZ(), 0, dir.getX());
-				vec.normalize();
-				vec.multiply(0.5);
-				
-//				Vector reverse = new Vector(-dir.getX(), 0, -dir.getZ());
-//				reverse.normalize();
-//				reverse.multiply(0.5);
-				
-				
+				vec.normalize().multiply(0.5);
 				loc.add(vec).add(0, 1, 0);
-				
 				Location robot = loc.clone();
-				// 
-				
-				
+
 				if(i>=4) {
 					Vector target1 = target[0].toVector();
 					Vector target2 = target[1].toVector();
@@ -771,43 +822,30 @@ public class Phlox {
 					laserroad.normalize();
 					laserroad.multiply(0.4);
 					
-					for(int i=0; i<100; i++) {
+					for(int i=0; i<finaldist; i++) {
 						
-						me.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.RED, 1));
+						player.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0, new Particle.DustOptions(Color.RED, 1));
 						if(loc.getBlock().getType().isSolid()){
-							me.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.clone(), 10, 1, 1, 1, 0, loc.clone().add(0, 0, 0).getBlock().getType().createBlockData());
+							player.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.clone(), 10, 1, 1, 1, 0, loc.clone().add(0, 0, 0).getBlock().getType().createBlockData());
+						}
+						tb.setLocation(loc).build();
+						if(SRtIV == 2) {
+							int nextDecrease = tb.getHitEntity().size();
+							pm.nextManaDecrease = nextDecrease;
 						}
 
-						
-						// 레이저가 엔티티를 스치는지
-						for(LivingEntity e : me.getWorld().getLivingEntities()) {
-							Location eloc = e.getBoundingBox().getCenter().toLocation(e.getWorld());
-							BoundingBox ebox = e.getBoundingBox();
-							double edist = eloc.distance(loc);
-							
-							
-							if((edist<2 || ebox.contains(loc.getX(), loc.getY(), loc.getZ())) && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !laserhit.containsKey(e)) {
-								laserhit.put(e, 0);
-								me.playSound(me.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 1.5);
-								Damage.getinstance().taken(dmg, e, me);
-							}
-						}
-						
-						
 						// 땅에 닿으면
 						double dist = loc.distance(targetloc);
-						if(dist<0.7 || loc.getBlock().getType().isSolid()) {
-							me.getWorld().spawnParticle(Particle.SOUL, loc, 5, 0.5, 0.5, 0.5, 0, null);
-							me.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.clone(), 40, 1, 1, 1, 0, loc.clone().add(0, 1, 0).getBlock().getType().createBlockData());
-							me.getWorld().playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 2, 1);
-							
+						if(dist<0.7 || !loc.getBlock().isPassable()) {
+							player.getWorld().spawnParticle(Particle.SOUL, loc, 5, 0.5, 0.5, 0.5, 0, null);
+							player.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.clone(), 40, 1, 1, 1, 0, loc.clone().add(0, 1, 0).getBlock().getType().createBlockData());
+							player.getWorld().playSound(loc, Sound.BLOCK_LAVA_EXTINGUISH, 2, 1);
 							bombpoint.add(loc);
 							break;
 						}			
 						// 아니면
 						if(i==99) {
-							me.getWorld().spawnParticle(Particle.SOUL, loc, 5, 0.5, 0.5, 0.5, 0, null);
+							player.getWorld().spawnParticle(Particle.SOUL, loc, 5, 0.5, 0.5, 0.5, 0, null);
 							bombpoint.add(loc);
 						}
 						loc.add(laserroad);
@@ -815,76 +853,38 @@ public class Phlox {
 					
 					
 				}
-				
-				
-				
-				
-				
-
 				// 로봇 텔포 및 소환
 				
 				if(i==0) {
-					e = (ShulkerBullet) me.getWorld().spawnEntity(robot, EntityType.SHULKER_BULLET);
+					e = (ShulkerBullet) player.getWorld().spawnEntity(robot, EntityType.SHULKER_BULLET);
 					e.setGravity(false);
 					e.setSilent(true);
 					e.setInvulnerable(true);
 				}
 				e.teleport(robot);
 				
-				// 
-				
 				if(i>30) {
-					
-					for(int i=0; i<bombpoint.size(); i++) {
-						
-						me.getWorld().spawnParticle(Particle.LANDING_LAVA, bombpoint.get(i), 5, 0.5, 0.5, 0.5, 0, null);
-						me.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, bombpoint.get(i), 2, 0.5, 0.5, 0.5, 0, null);
-						if(i==10) {
-							me.getWorld().playSound(bombpoint.get(i), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
-						}
-						
-						for(LivingEntity e : me.getWorld().getLivingEntities()) {
-							Location eloc = e.getLocation();
-							double dist = eloc.distance(bombpoint.get(i));
-							
-							
-							if(dist<2 && entitycheck.entitycheck(e) && entitycheck.duelcheck(e, me) && e != me && !bombhit.containsKey(e)) {
-								bombhit.put(e, 0);
-								me.getWorld().playSound(loc, Sound.ENTITY_ARROW_HIT_PLAYER, 1, 2);
-								int dmg = PlayerManager.getinstance(me).spelldmgcalculate(me, 3);
-								Damage.getinstance().taken(dmg, (LivingEntity) e, me);
+
+					if(SRtII == 3) {
+						for(int i=0; i<bombpoint.size(); i++) {
+
+							player.getWorld().spawnParticle(Particle.LANDING_LAVA, bombpoint.get(i), 5, 0.5, 0.5, 0.5, 0, null);
+							player.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, bombpoint.get(i), 2, 0.5, 0.5, 0.5, 0, null);
+							if(i==10) {
+								player.getWorld().playSound(bombpoint.get(i), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
 							}
-							
+
+							tb2.setLocation(bombpoint.get(i)).build();
 						}
-						
 					}
-					
-					
-					
-					
-					
 					e.remove();
 					cancel();
 				}
-				
 				i++;
-				
 			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-		
-		
-
-		
-		
-		
-		
-		
-		
-		
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 	}
-	
-	
-	
+
 	public void meleerobotcountloop() {
 		
 		for(Player p : Bukkit.getOnlinePlayers()) {

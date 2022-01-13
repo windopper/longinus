@@ -493,9 +493,9 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
-			case "font": {
-				char c = '\ue238';
-				player.sendMessage(""+c);
+			case "damage": {
+				int dmg = Integer.parseInt(args[1]);
+				PlayerHealthShield.getinstance(player).setDamage(dmg);
 				break;
 			}
 

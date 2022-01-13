@@ -1,17 +1,21 @@
 package ClassAbility.Khaos;
 
-import ClassAbility.Cheiron.Cheiron;
 import ClassAbility.Combination;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
+import DynamicData.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
+import PlayerManager.PlayerHealthShield;
+import Mob.EntityManager;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -26,6 +30,7 @@ public class Khaos {
     private static Khaos khaos;
     private Player player;
     private PlayerFunction playerFunction;
+    private PlayerManager pm;
     private int CurrentMana;
     private int ManaDecrease;
 
@@ -34,6 +39,7 @@ public class Khaos {
         this.playerFunction = PlayerFunction.getinstance(player);
         this.CurrentMana = PlayerEnergy.getinstance(player).getEnergy();
         this.ManaDecrease = PlayerManager.getinstance(player).ManaDecrease;
+        this.pm = PlayerManager.getinstance(player);
     }
 
     private Khaos() {
@@ -73,18 +79,21 @@ public class Khaos {
 
         if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
-        int mana = ENUM.valueOf(combo).getMana() - ManaDecrease <= 0 ? 1 : ENUM.valueOf(combo).getMana() - ManaDecrease
+        int RLtII = pm.getTalent("RL", 2);
+        int originmana = ENUM.valueOf(combo).getMana();
+
+        if(RLtII == 1 && combo.equals("RL")) originmana -= 1;
+
+        int mana = originmana - ManaDecrease <= 0 ? 1 : originmana - ManaDecrease
                 + PlayerEnergy.getinstance(player).getEnergyOverload();
         String title = ENUM.valueOf(combo).getTitle()+mana;
 
         if(mana <= CurrentMana) {
-            PlayerEnergy.getinstance(player).removeEnergy(mana);
-            PlayerEnergy.getinstance(player).setPreviousManaUsed(mana);
+            PlayerEnergy.getinstance(player).useEnergy(mana);
             if(combo.equals("SHIFTR")) SHIFTR(player);
             if(combo.equals("RL")) HalfMoon();
             if(combo.equals("FR")) FR();
             if(combo.equals("RR")) RR();
-
 
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
@@ -121,20 +130,17 @@ public class Khaos {
 
                         Location loc = player.getLocation();
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(loc) < 4 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
-                                    Hit.add(entity);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                    player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f);
-                                }
-                            }
-                        }
+                        targetBuilder tb = targetBuilder.builder(player)
+                                .setRadius(4)
+                                .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5))
+                                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f ))
+                                .addPlaySound(() -> player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f))
+                                .addStatus((aE) -> EntityStatusManager.getinstance(aE).KnockBack(player, 0.5))
+                                .entityExcept(Hit)
+                                .setLocation(loc)
+                                .build();
+
+                        Hit.addAll(tb.getHitEntity());
 
                         new BukkitRunnable() {
 
@@ -176,13 +182,22 @@ public class Khaos {
 
     public void HalfMoon() {
 
+        int RLtI = pm.getTalent("RL", 1);
+        int RLtII = pm.getTalent("RL", 2);
+        int RLtIII = pm.getTalent("RL", 3);
+        int RLtIV = pm.getTalent("RL", 4);
+
         Location loc = player.getEyeLocation();
         PlayerEnergy pe = PlayerEnergy.getinstance(player);
         boolean isPreSkillSame = pe.getPreviousSkill().equals("RL");
         int overload = pe.getEnergyOverload();
-        double rate = 1 * Math.pow(1.25, isPreSkillSame ? overload + 1 : 0);
+        double rate = (RLtI == 2 ? 1.75 : 1.5) + 0.25 * (isPreSkillSame ? overload : 0);
 
-        List<Entity> Hit = new ArrayList<>();
+        if(RLtIV == 1) rate *= 1 + 2 * (1 - (double)PlayerHealthShield.getinstance(player).getCurrentHealth() / (double)pm.Health);
+
+        final double finalrate = rate;
+
+        Set<Entity> Hit = new HashSet<>();
         player.getWorld().playSound(loc, Sound.ENTITY_IRON_GOLEM_ATTACK, 1, 1);
         player.getWorld().playSound(loc, Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
         player.getWorld().playSound(loc, Sound.BLOCK_FIRE_EXTINGUISH, 1, 1);
@@ -190,6 +205,53 @@ public class Khaos {
         double rpitch = Math.toRadians(loc.getPitch());
         double ryaw = Math.toRadians(loc.getYaw());
         double rroll = Math.toRadians(Math.random() * 40 - 20);
+
+        targetBuilder tb = targetBuilder.builder(player)
+                .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, finalrate))
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
+                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f))
+                .setRadius(1.5);
+
+        if (RLtII == 2) {
+            tb.addStatus((e) -> {
+                e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
+            });
+        }
+        if(RLtIII == 2) {
+            tb.addStatus((e) -> {
+                EntityManager em = EntityManager.getinstance(e);
+                if(em.dummyCount.stream().filter((a)->a.contains("RLtIII2")).toList().size()<4) {
+                    em.damageTakenRate += 0.05;
+                    em.dummyCount.add("RLtIII2");
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+                            em.damageTakenRate -= 0.05;
+                            em.dummyCount.remove("RLtIII2");
+                    }, 200);
+                }
+
+            });
+        }
+        else if(RLtIII == 3) {
+            if(pm.dummyCount.stream().filter((a)->a.contains("RLtIII3")).toList().size()<8) {
+                pm.addiWalkSpeed += 5;
+                pm.dummyCount.add("RLtIII3");
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+                    pm.addiWalkSpeed -= 5;
+                    pm.dummyCount.remove("RLtIII3");
+                }, 120);
+            }
+        }
+
+        if(RLtIV == 3) {
+            if(pm.dummyCount.stream().filter((a)->a.contains("RLtIV3")).toList().size()<10) {
+                pm.damageTakenRate -= 0.05;
+                pm.dummyCount.add("RLtIV3");
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+                    pm.damageTakenRate += 0.05;
+                    pm.dummyCount.remove("RLtIV3");
+                }, 60);
+            }
+        }
 
         new BukkitRunnable() {
 
@@ -221,32 +283,25 @@ public class Khaos {
                         player.getWorld().spawnParticle(Particle.CRIT, loc, 1, 0, 0, 0, 0);
                         player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
 
-                        for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                            if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                Location eloc = entity.getEyeLocation();
-                                BoundingBox box = entity.getBoundingBox();
-                                if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-                                    int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, rate);
-                                    Damage.getinstance().taken(dmg, entity, player);
-                                    EntityStatusManager.getinstance(entity).KnockBack(player, 0.5);
-                                    Hit.add(entity);
-                                    player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                }
-                            }
-                        }
+                        tb.setLocation(loc).build();
                         loc.subtract(v);
                     }
-
 
                     angle+=4;
                 }
 
-
-                if(time >= 3) cancel();
+                if(time >= 3) {
+                    if(RLtIV == 2) {
+                        double healrate = ((double)tb.getHitEntity().size()) * 3 / 100;
+                        PlayerHealthShield.getinstance(player).HealthAdd((int) (pm.Health * healrate), player);
+                    }
+                    cancel();
+                }
 
                 time++;
             }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+
     }
 
     public void RR() {
@@ -266,8 +321,6 @@ public class Khaos {
 
             @Override
             public void run() {
-
-
 
                 player.setVelocity(dir);
 
@@ -293,19 +346,16 @@ public class Khaos {
                             player.getWorld().spawnParticle(Particle.BLOCK_DUST, loc_, 1, 0.2, 0.2, 0.2, 0
                             ,Material.AMETHYST_BLOCK.createBlockData());
 
-                            for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-                                if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-                                    Location eloc = entity.getEyeLocation();
-                                    BoundingBox box = entity.getBoundingBox();
-                                    if(eloc.distance(loc_) < 2.5 || box.contains(loc_.getX(), loc_.getY(), loc_.getZ())) {
-                                        int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, 3);
-                                        Damage.getinstance().taken(dmg, entity, player);
-                                        EntityStatusManager.getinstance(entity).KnockBack(player, 1.2);
-                                        Hit.add(entity);
-                                        player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-                                    }
-                                }
-                            }
+                            targetBuilder tb = targetBuilder.builder(player)
+                                    .setRadius(2.5)
+                                    .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 3))
+                                    .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 1.2))
+                                    .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f))
+                                    .entityExcept(Hit)
+                                    .setLocation(loc_)
+                                    .build();
+
+                            Hit.addAll(tb.getHitEntity());
 
                             loc_.subtract(v);
                         }

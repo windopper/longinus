@@ -49,6 +49,10 @@ public class PlayerEnergy extends PlayerManager {
 	public void removeEnergy(int energy) {
 		Energy -= energy;
 	}
+	public void useEnergy(int energy) {
+		Energy -= energy;
+		setPreviousManaUsed(energy);
+	}
 	public void setEnergy(int energy) {
 		Energy = energy;
 	}

@@ -1,5 +1,8 @@
 package PlayerManager;
 
+import ClassAbility.entitycheck;
+import org.bukkit.Location;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ShulkerBullet;
 import org.bukkit.event.Listener;
@@ -7,12 +10,13 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
 
 public class PlayerFunction implements Listener {
 	
 	private static final HashMap<Player, PlayerFunction> instance = new HashMap<>();
 	
-	private Player p;
+	private Player player;
 	private int melee = 0;
 	private int meleecombo = 1;
 	private int meleecombodelay = 0;
@@ -37,6 +41,7 @@ public class PlayerFunction implements Listener {
 	Aether Functions
 	 */
 	public double AEImpulse = 0;
+	public boolean AERLtIV2 = false; // 스킬 사용 후 3초간 주변 아군이 받는 피해의 50%를 대신 받습니다
 
 	/*
 	ByV Functions
@@ -49,8 +54,8 @@ public class PlayerFunction implements Listener {
 	 */
 	public int KhaosFR = 0;
 
-	private PlayerFunction(Player p) {
-		this.p = p;
+	private PlayerFunction(Player player) {
+		this.player = player;
 	}
 	
 	public static PlayerFunction getinstance(Player p) {
@@ -59,13 +64,20 @@ public class PlayerFunction implements Listener {
 	}
 
 	public void resetFunctions() {
-		instance.remove(p);
-		instance.put(p, new PlayerFunction(p));
+		instance.remove(player);
+		instance.put(player, new PlayerFunction(player));
 		return;
+	}
+
+	public void addAEImpulse(double var) {
+		if(AEImpulse + var >= 1000) {
+			AEImpulse = 1000;
+		}
+		else AEImpulse += var;
 	}
 	
 	public void removeinstance() {
-		instance.remove(p);
+		instance.remove(player);
 	}
 	
 	public int getMeleeDelay() {
@@ -121,7 +133,27 @@ public class PlayerFunction implements Listener {
 	}
 
 	public void removeAllAbnormalStatus() {
-		Arrays.stream(PotionEffectType.values()).forEach(p::removePotionEffect);
+		Arrays.stream(PotionEffectType.values()).forEach(player::removePotionEffect);
+	}
+
+	public Player getNearbyAERLtIV2Player() {
+		Location ploc = player.getLocation();
+		double dist = 10;
+		Player target = null;
+		for(LivingEntity lE : player.getWorld().getLivingEntities()) {
+			Location lloc = lE.getLocation();
+			if(lE instanceof Player pl && lloc.distance(ploc)<6 && !entitycheck.duelcheck(lE, player) && lE != player) {
+				if(!PlayerFunction.getinstance(pl).AERLtIV2) continue;
+				if(lloc.distance(ploc) < dist) {
+					dist = lloc.distance(ploc);
+					target = pl;
+				}
+			}
+		}
+		if(dist != 10 && target != null) {
+			return target;
+		}
+		return null;
 	}
 
 }

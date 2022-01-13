@@ -131,6 +131,8 @@ public class PlayerDeadBodySetter {
             @Override
             public void run() {
 
+                EntityFunctions.hideFromPlayer(slime);
+
                 if(!playerMarker.containsKey(slime)) {
                     for(Player on : Bukkit.getOnlinePlayers()) {
                         PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
@@ -199,7 +201,6 @@ public class PlayerDeadBodySetter {
             this.setPosition(loc.getX(), loc.getY(), loc.getZ());
             world.addEntity(this);
             EntityFunctions.hideFromPlayer(bodymarker);
-
 
         }
     }

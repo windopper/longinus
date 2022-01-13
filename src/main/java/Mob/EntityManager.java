@@ -5,6 +5,7 @@ import DynamicData.HologramIndicator;
 import EntityPlayerManager.EntityPlayerManager;
 import EntityPlayerManager.EntityPlayerWatcher;
 import net.minecraft.network.protocol.game.PacketPlayOutAnimation;
+import net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.entity.EntityPose;
@@ -47,6 +48,10 @@ public class EntityManager {
 	public int maxDmg = 1;
 	public Entity latestDamager;
 	private boolean canDamagedByPlayer = false;
+	private boolean isUnstoppable = false;
+
+	public double damageTakenRate = 1;
+	public List<String> dummyCount = new ArrayList<>();
 
 	private Object EntityInstance;
 	private Method particleMethod;
@@ -155,7 +160,6 @@ public class EntityManager {
 	}
 	
 	public void removeinstance() {
-
 		instance.remove(e);
 		disguise.remove(e);
 	}
@@ -213,6 +217,9 @@ public class EntityManager {
 	public EntityManager setHeight(double Height) {
 		this.Height = Height;
 		return this;
+	}
+	public boolean isUnstoppable() {
+		return this.isUnstoppable;
 	}
 
 	public EntityManager setAmbientParticle(Method method, Object instance) {
@@ -512,6 +519,15 @@ public class EntityManager {
 				for(char ch : arrlist) {
 					customname += ch;
 				}
+
+				if(damageTakenRate != 1) {
+					int def = (int) (100 - 100 * damageTakenRate);
+					char c = '\uD83D';
+					char c2 = '\uDEE1';
+					String var = " §c"+def+" "+c+c2;
+					customname += var;
+				}
+
 				Healthar.setCustomName(customname);
 
 				Healthar.teleport(e.getLocation().add(0, Height, 0));
@@ -550,40 +566,11 @@ public class EntityManager {
 				}
 			}
 		}
-
-//		// disguise 엔티티 텔레포트
-//		for(Entity entity : disguise.keySet()) {
-//
-//			// 기준 엔티티의 좌표
-//			final Location location = entity.getLocation();
-//
-//			// 엔티티가 변신한 엔티티의 목록과 좌표
-//			HashMap<Entity, Location> disguises = disguise.get(entity);
-//
-//			// 변신할 엔티티를 순환하며 좌표로 이동
-//			for(Entity disentity : disguises.keySet()) {
-//
-//				// set fallingblock's time to 1
-//				if(disentity instanceof FallingBlock) {
-//					((FallingBlock) disentity).setTicksLived(1);
-//					disentity.teleport(location.clone().add(disguises.get(disentity)));
-//				}
-//				if(disentity instanceof Player) {
-//					Location loc = disguises.get(disentity).add(location);
-//					((CraftPlayer) disentity).getHandle().setPositionRotation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-//				}
-//				else {
-//					disentity.teleport(location.clone().add(disguises.get(disentity)));
-//				}
-//			}
-//		}
 		// TeleportTo 엔티티에게 텔레포트
 		if(teleportTo != null) {
 			e.teleport(teleportTo.getLocation().clone().add(teleportToLoc));
 			EntityFunctions.hideFromPlayer(e);
 		}
-
-
 
 		// 피해를 받은후 5초가 지나면
 		if(DamageAfterDelay > 0) DamageAfterDelay--;
@@ -693,17 +680,21 @@ public class EntityManager {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 					if(eloc.getWorld().getName().equals(player.getWorld().getName())) {
 						if(eloc.distance(player.getLocation()) > 20) {
-
 							EntityPlayerManager.getInstance().showTo(EP, player);
 						}
 					}
-
 				}
-
 			}
-
 		}
+	}
 
+	public static void HideAllDisguisedEntity() {
+		for(Entity entity : disguise.keySet()) {
+			for(Player player : Bukkit.getOnlinePlayers()) {
+				PlayerConnection conn = ((CraftPlayer) player).getHandle().b;
+				conn.sendPacket(new PacketPlayOutEntityDestroy(entity.getEntityId()));
+			}
+		}
 	}
 
 	public static void showEntityPlayerNPC(Player player) {

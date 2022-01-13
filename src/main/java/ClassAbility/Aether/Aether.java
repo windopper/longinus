@@ -4,6 +4,7 @@ import ClassAbility.Combination;
 import ClassAbility.SpellManager;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
+import DynamicData.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.PlayParticle;
 import PlayerManager.PlayerEnergy;
@@ -18,9 +19,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
+import spellinteracttest.Main;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static PlayParticle.Rotate.*;
 
@@ -28,12 +32,6 @@ public class Aether {
 	
 	private static Aether Aether;
 	/*아이테르 스킬 */
-	
-	public final static int ImpulseSwitchShieldmana = 6;
-	public final static int ImpulseSwitchWeaponmana = 8;
-	public final static int ShieldSwitchChargemana = 6;
-	public final static int WeaponModeChangemana = 3;
-	public final static int ImpulseSwitchEnergymana = 3;
 
 	public static Aether getinstance()	{
 		if(Aether == null) Aether = new Aether();
@@ -42,6 +40,7 @@ public class Aether {
 
 	private Player player;
 	private PlayerFunction playerFunction;
+	private PlayerManager pm;
 	private int CurrentMana;
 	private int ManaDecrease;
 
@@ -51,6 +50,7 @@ public class Aether {
 		this.playerFunction = PlayerFunction.getinstance(player);
 		this.CurrentMana = PlayerEnergy.getinstance(player).getEnergy();
 		this.ManaDecrease = PlayerManager.getinstance(player).ManaDecrease;
+		this.pm = PlayerManager.getinstance(player);
 	}
 
 	private Aether() {
@@ -58,6 +58,7 @@ public class Aether {
 	}
 
 	private enum ENUM {
+
 		RR(6, "§o§l충격량전환: 돌진§l§o §3§l-⚡§l"),
 		RL(6, "§o§l충격량전환: 보호막§l§o §3§l-⚡§l"),
 		FR(8, "§o§l충격량전환: 블레이드오러§l§o §3§l-⚡§l");
@@ -83,15 +84,25 @@ public class Aether {
 
 		if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
-		int mana = ENUM.valueOf(combo).getMana() - ManaDecrease <= 0 ? 1 : ENUM.valueOf(combo).getMana() - ManaDecrease
+		int RLtII = pm.getTalent("RL", 2);
+		int RLtIII = pm.getTalent("RL", 3);
+		int FRtII = pm.getTalent("FR", 2);
+		int FRtIII = pm.getTalent("FR", 3);
+		int originMana = ENUM.valueOf(combo).getMana();
+
+		if(RLtII == 2 && combo.equals("RL")) originMana += 2;
+		if(RLtIII == 3 && combo.equals("RL")) originMana -= 2;
+		if(FRtII == 3 && combo.equals("FR")) originMana -= 1;
+		if(FRtIII == 3 && combo.equals("FR")) originMana -= 2;
+
+		int mana = originMana - ManaDecrease <= 0 ? 1 : originMana - ManaDecrease
 				+ PlayerEnergy.getinstance(player).getEnergyOverload();
 		String title = ENUM.valueOf(combo).getTitle()+mana;
 
 		if(mana <= CurrentMana) {
-			PlayerEnergy.getinstance(player).removeEnergy(mana);
-			PlayerEnergy.getinstance(player).setPreviousManaUsed(mana);
+			PlayerEnergy.getinstance(player).useEnergy(mana);
 			if(combo.equals("RR")) ShieldSwitchCharge();
-			if(combo.equals("RL")) ImpulseSwitchShield();
+			if(combo.equals("RL")) ImpulseSwitchShield(mana);
 			if(combo.equals("FR")) ImpulseSwitchWeapon();
 
 
@@ -108,33 +119,99 @@ public class Aether {
 		return 0;
 	}
 	
-	public void ImpulseSwitchShield() {
+	public void ImpulseSwitchShield(int usedMana) {
+
+		int tI = pm.getTalent("RL", 1);
+		int tII = pm.getTalent("RL", 2);
+		int tIII = pm.getTalent("RL", 3);
+		int tIV = pm.getTalent("RL", 4);
 
 		PlayerFunction PF = PlayerFunction.getinstance(player);
+		double multiplyshield = 0;
+		double maxShieldPercent = 0.5;
+		int radius = 7;
+		double usingImpulse = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
 
-		int add = (int)((double) PlayerManager.getinstance(player).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (PlayerManager.getinstance(player).Shield + 100) / 100);
+		if(tI == 1) multiplyshield += 0.2;
+		else if(tI == 2) radius = 9;
+		else if(tI == 3) {
+			pm.addiWalkSpeed += 10;
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> pm.addiWalkSpeed -= 10, 40);
+		}
+
+		if(tII == 1) {
+			double tIIMultiply = 0;
+			for(LivingEntity lE : player.getWorld().getLivingEntities()) {
+				Location lloc = lE.getLocation();
+				if(lloc.distance(player.getLocation()) < radius && lE instanceof Player pl && !entitycheck.duelcheck(lE, player)) {
+					tIIMultiply += 0.1;
+				}
+			}
+			multiplyshield += tIIMultiply;
+		}
+		else if(tII == 2) {
+			usingImpulse = Double.parseDouble(String.format("%.2f", usingImpulse/2));
+		}
+		else if(tIII == 2) {
+			maxShieldPercent = 0.8;
+		}
+		else if(tIII == 3) {
+
+		}
+		if(tIV == 1) {
+			PlayerHealthShield.getinstance(player).setImmortality(0.1d, 20);
+		}
+		else if(tIV == 2) {
+			PlayerFunction.getinstance(player).AERLtIV2 = true;
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class),
+					() -> PlayerFunction.getinstance(player).AERLtIV2 = false, 60);
+		}
+		else if(tIV == 3) {
+			final PlayerHealthShield phs = PlayerHealthShield.getinstance(player);
+			final double finalusingImpulse = usingImpulse;
+			new BukkitRunnable() {
+
+				int time = 0;
+
+				@Override
+				public void run() {
+
+					if(phs.getCurrentShield() <= 0) {
+						PlayerFunction.getinstance(player).addAEImpulse(finalusingImpulse);
+						PlayerEnergy.getinstance(player).addEnergy(usedMana);
+						cancel();
+						return;
+					}
+
+					if(time >= 12) cancel();
+					time ++;
+				}
+			}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+		}
+
+
+		final int finalshield = (int)((double)PlayerManager.getinstance(player).Health *
+				( (multiplyshield+1) * (maxShieldPercent * PF.AEImpulse / 1000 + 0.05)));
+		final int finalradius = radius;
+
+		if(tIII == 1) {
+			tIII1(radius);
+		}
 		
 		summonCircle4(player.getLocation(), 1);
 		
-		PlayerHealthShield.getinstance(player).ShieldAdd(add, player);
-		
-		
-		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
-		PF.AEImpulse = i;
-		
-		for(Player player : Bukkit.getOnlinePlayers()) {
-			player.playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1, 1);
-		}
-		
-		for(Entity pl : player.getNearbyEntities(6, 6, 6)) { // 근처 아군
-			if(pl instanceof Player && !entitycheck.duelcheck(pl, player)) {
-				Player pla = (Player) pl;
-				add = (int)((double) PlayerManager.getinstance(pla).Health * 5/100 * ((PF.AEImpulse+100) / 100) * (PlayerManager.getinstance(player).Shield + 100) / 100);
-				
-				PlayerHealthShield.getinstance(pla).ShieldAdd(add, player);
-				
-				summonCircle4(pla.getLocation(), 1);
-				
+		PlayerHealthShield.getinstance(player).ShieldAdd(finalshield, player);
+
+		PF.AEImpulse = Double.parseDouble(String.format("%.2f", PF.AEImpulse-usingImpulse));
+
+		player.getWorld().playSound(player.getLocation(), Sound.BLOCK_RESPAWN_ANCHOR_DEPLETE, 1, 1);
+
+		for(LivingEntity lE : player.getWorld().getLivingEntities()) {
+			Location lloc = lE.getLocation();
+			if(lloc.distance(player.getLocation()) < radius && lE instanceof Player pl && !entitycheck.duelcheck(lE, player)) {
+				if(!pl.isOnline()) continue;
+				PlayerHealthShield.getinstance(pl).ShieldAdd(finalshield, player);
+				summonCircle4(pl.getLocation(), 1);
 			}
 		}
 		Location loc = player.getLocation(); //파티클
@@ -147,36 +224,96 @@ public class Aether {
 			public void run() {
 				
 				summonCircle3(loc, t);
-				if(t>7) cancel();
+				if(t>finalradius) cancel();
 				t+=0.7;
 				
 			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 		
-		summonCircle(loc, 7);
+		summonCircle(loc, finalradius);
 
 	}
+	private void tIII1(double radius) {
+		for(LivingEntity lE : player.getWorld().getLivingEntities()) {
+			Location lloc = lE.getLocation();
+			if(lloc.distance(player.getLocation()) < radius && lE instanceof Player pl && !entitycheck.duelcheck(lE, player)) {
+				if(!pl.isOnline()) continue;
+				new BukkitRunnable() {
+					Set<Entity> Hit = new HashSet<>();
+					int time = 0;
+					@Override
+					public void run() {
+						if(time % 4 == 0) {
+							pl.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, pl.getLocation().add(0, 1, 0)
+									, 5, 0.1, 0.1, 0.1, 0.5f);
+							pl.getWorld().playSound(pl.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_SHOOT, 1, 1);
+						}
+						if(time>20) {
+							Location loc = pl.getLocation().clone().add(0, 1, 0);
+							for(double phi = 0; phi <= Math.PI; phi += Math.PI / 8) {
+								double y = 3 * Math.cos(phi) + 1.5;
+								for(double theta = 0; theta <= 2 * Math.PI; theta += Math.PI / 8) {
+									double x = 3 * Math.cos(theta) * Math.sin(phi);
+									double z = 3 * Math.sin(theta) * Math.sin(phi);
+
+									Vector v = new Vector(x, y, z);
+
+									loc.add(x, y, z);
+									loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, pl.getLocation().add(0, 1, 0), 0, v.getX()
+											, v.getY(), v.getZ(), 0.1, null);
+
+									targetBuilder tb = targetBuilder.builder(pl)
+											.setDamage(() -> PlayerHealthShield.getinstance(pl).getCurrentShield())
+											.setRadius(3.5)
+											.setLocation(loc)
+											.entityExcept(Hit).build();
+
+									Hit.addAll(tb.getHitEntity());
+
+									loc.subtract(x, y, z);
+								}
+							}
+							pl.getWorld().playSound(pl.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_TWINKLE, 1, 1f);
+							pl.getWorld().playSound(pl.getLocation(), Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 1);
+							cancel();
+						}
+						time++;
+					}
+				}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+			}
+		}
+	}
+
 	public void ImpulseSwitchWeapon() {
 
 		PlayParticle playParticle = new PlayParticle(Particle.CRIT);
 		playParticle.CirCleHorizontalSmallImpact(player.getLocation().add(0, 0.3, 0));
 		PlayerFunction PF = PlayerFunction.getinstance(player);
 
-		final double spellrate = 2 * (PF.AEImpulse+100) / 200;
+		double spellrate = (PF.AEImpulse+100) / 200;
 
-		if(PF.AEImpulse<300) {
-			BladeStorm(spellrate);
+		int FRtIII = pm.getTalent("FR", 3);
+		int FRtIV = pm.getTalent("FR", 4);
+
+		if(FRtIII == 1) {
+			pm.damageTakenRate += 0.2;
+			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+				pm.damageTakenRate -= 0.2;
+			}, 30);
+			spellrate = PF.AEImpulse * 3 / 1000 + 2.5;
 		}
-		if(PF.AEImpulse>=300 && PF.AEImpulse<600) {
-			BladeStorm(spellrate);
+		if(FRtIV == 1) {
+			spellrate *= 2;
 		}
-		if(PF.AEImpulse>=600) {
-
-			BladeStorm(spellrate);
-
+		else if(FRtIV == 2) {
+			PF.AEImpulse = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));
 		}
 
-		PF.AEImpulse = 0;
+		if(FRtIV != 2) {
+			PF.AEImpulse = 0;
+		}
+
+		BladeStorm(spellrate);
 	}
 	public void ShieldSwitchCharge() {
 		
@@ -266,7 +403,7 @@ public class Aether {
 
 		double i = Double.parseDouble(String.format("%.2f",PF.AEImpulse-100d));
 		PF.AEImpulse = i;
-		PlayerEnergy.getinstance(p).setEnergy(PlayerEnergy.getinstance(p).getEnergy() + ImpulseSwitchEnergymana);
+		//PlayerEnergy.getinstance(p).setEnergy(PlayerEnergy.getinstance(p).getEnergy() + ImpulseSwitchEnergymana);
 		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			player.playSound(p.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 2);
@@ -301,16 +438,12 @@ public class Aether {
 	        particleLoc.setY(location.getY() - 1);
 	        particleLoc.setZ(location.getZ() + Math.sin(d) * size);
 	        //location.getWorld().spawnParticle(Particle.SMOKE_NORMAL, particleLoc, 200, 0.2, 0,2, 0.2, 0.1);
-	        for(Player p : Bukkit.getOnlinePlayers()) {
-		        p.spawnParticle(Particle.BLOCK_CRACK, particleLoc, 20, 0.2, 0.2, 0.2, 0, Material.SEA_LANTERN.createBlockData());
-	        }
+			player.getWorld().spawnParticle(Particle.BLOCK_CRACK, particleLoc, 20, 0.2, 0.2, 0.2, 0, Material.SEA_LANTERN.createBlockData());
 
 	    }
-	    
-	    for(Player p : Bukkit.getOnlinePlayers()) {
-	    	p.playSound(location, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-	    	p.playSound(location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
-	    }
+
+		player.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
+		player.getWorld().playSound(location, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 	}
 	
 	public void summonCircle3(Location location, double size) {
@@ -531,12 +664,34 @@ public class Aether {
 
 	private void BladeStorm(double spellrate) {
 
+		int FRtI = pm.getTalent("FR", 1);
+		int FRtII = pm.getTalent("FR", 2);
+		int FRtIII = pm.getTalent("FR", 3);
+		int FRtIV = pm.getTalent("FR", 4);
+
+		double dist = 3;
+
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 2);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ELDER_GUARDIAN_HURT, 1, 2);
 
-		new BukkitRunnable() {
+		targetBuilder tb = targetBuilder.builder(player)
+				.setRadius(1.5)
+				.setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, spellrate));
 
+		if(FRtI == 2) tb.addStatus((e)->EntityStatusManager.getinstance(e).KnockBack(player, 1.5));
+		if(FRtII == 2) dist = 4;
+		if(FRtIII == 2) {
+			tb.addPlayParticle((e)->player.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, e.getLocation(), 1, 0, 0, 0, 0))
+					.addPlaySound((e)->player.getWorld().playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1))
+					.setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1));
+		}
+
+
+
+		double finaldist = dist;
+
+		new BukkitRunnable() {
 
 			double pitch = player.getLocation().getPitch();
 			double yaw = player.getLocation().getYaw();
@@ -559,7 +714,7 @@ public class Aether {
 			@Override
 			public void run() {
 
-				for(int i =0; i<5; i++) {
+				for(int i =0; i<finaldist; i++) {
 
 					location.add(vector);
 
@@ -577,38 +732,18 @@ public class Aether {
 						v = transform(v, ryaw, rpitch, rroll);
 
 						location.add(v);
-						//player.getWorld().spawnParticle(Particle.CRIT_MAGIC, location,1, 0, 0, 0, 0);
-						//player.getWorld().spawnParticle(Particle.CLOUD, location, 1, 0, 0, 0, 0);
 						player.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, location,1, 0, 0, 0, 0);
 						player.getWorld().spawnParticle(Particle.REDSTONE, location,1, 0, 0, 0, 0,
 								new Particle.DustOptions(Color.RED, 0.5f));
 
-
-						for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-							if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player) && entity != player && !Hit.contains(entity)) {
-								Location eloc = entity.getEyeLocation();
-								BoundingBox box = entity.getBoundingBox();
-								if(eloc.distance(location) < 1.5 || box.contains(location.getX(), location.getY(), location.getZ())) {
-									int dmg = PlayerManager.getinstance(player).spelldmgcalculate(player, spellrate);
-									Damage.getinstance().taken(dmg, entity, player);
-									EntityStatusManager.getinstance(entity).KnockBack(player, 1.5);
-									Hit.add(entity);
-									player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f);
-									player.getWorld().playSound(eloc, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
-									player.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, eloc, 1, 0, 0, 0, 0);
-								}
-							}
-						}
-
+						tb.setLocation(location);
+						tb.build();
 
 						location.subtract(v);
 
 					}
 				}
-
 				if(t<=5) {
-
-
 
 					for(int l=0; l<8; l++) {
 
@@ -635,22 +770,18 @@ public class Aether {
 							else
 								location.getWorld().spawnParticle(Particle.SMOKE_NORMAL, temploc, 1, 0, 0, 0, 0);
 							temploc.subtract(v);
-
 						}
-
 						a-=3;
 					}
 				}
 
-				if(t>6) cancel();
+				if(t>7) cancel();
 				t++;
 
 			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 
 	}
-
 	public void MeleeMethod(Player player) {
 
 		Location location = player.getEyeLocation();

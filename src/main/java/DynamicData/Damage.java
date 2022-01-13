@@ -11,10 +11,15 @@ import PlayerManager.PlayerEnergy;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import spellinteracttest.Main;
+
+import java.util.HashMap;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class Damage {
 	
@@ -39,8 +44,10 @@ public class Damage {
 			PlayerHealthShield PH = PlayerHealthShield.getinstance(user);
 			PlayerFunction PF = PlayerFunction.getinstance(user);
 			PlayerEnergy PE = PlayerEnergy.getinstance(user);
+			PlayerManager PM = PlayerManager.getinstance(user);
 			// 방어도 계산
 			int dmg = (int)(damage * PlayerManager.getinstance(user).defcalculate(user));
+			dmg *= PM.damageTakenRate;
 			// 카오스 FR 스킬
 			if(PF.KhaosFR > 0 && PE.getEnergy()>1) dmg = (int)((double)dmg / 2);
 
@@ -55,12 +62,12 @@ public class Damage {
 					Bukkit.getPluginManager().callEvent(new PlayerTakeDamageEvent(damager, user, fidmg));
 				}
 			}, 0);
-
-			return;
 		}
-		else if(!(taker instanceof ArmorStand) && (taker instanceof LivingEntity)) {
+		else if(!(taker instanceof ArmorStand) && (taker != null)) {
 
 			EntityManager EH = EntityManager.getinstance(taker);
+
+			damage *= EH.damageTakenRate;
 
 			if(EH.canDamagedByPlayer()) {
 				if(damager instanceof Player) return;

@@ -106,6 +106,12 @@ public class PlayerClass {
                     //Bukkit.broadcastMessage(value.name()+"  "+value.getLevelReq());
                 });
 
+                List<Integer> list = Arrays.asList(0, 0, 0, 0);
+                yaml.set(path+".rrtalent", list);
+                yaml.set(path+".rltalent", list);
+                yaml.set(path+".srtalent", list);
+                yaml.set(path+".frtalent", list);
+
                 String encoded = (new SQL.Converter()).encodeYaml(yaml);
                 sendToSQLServer(encoded);
 

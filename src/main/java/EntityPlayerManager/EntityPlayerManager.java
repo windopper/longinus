@@ -133,8 +133,6 @@ public class EntityPlayerManager {
 //            fixSkinHelmetLayerForPlayer(npc, player);
 //        }, 8);
 
-
-
         ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Bukkit.getScoreboardManager().getMainScoreboard())
                 .getHandle(), player.getName()+"a");
         team.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
@@ -146,8 +144,7 @@ public class EntityPlayerManager {
         byte b = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40;
         watcher.set(DataWatcherRegistry.a.a(17), b);
 
-        for(Player on : Bukkit.getOnlinePlayers()) {
-            PlayerConnection connection = ((CraftPlayer) on).getHandle().b;
+            PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
             connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, npc));
             connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
             connection.sendPacket(score1);
@@ -162,7 +159,6 @@ public class EntityPlayerManager {
                     connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc));
                 }
             }.runTaskAsynchronously(Main.getPlugin(Main.class));
-        }
 
 
     }

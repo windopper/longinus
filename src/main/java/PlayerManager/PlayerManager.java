@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
 	
@@ -38,6 +39,11 @@ public class PlayerManager {
 	public int ManaDecrease = 0;
 
 	public int addiWalkSpeed = 0;
+	public int nextManaDecrease = 0;
+
+	public double damageTakenRate = 1;
+
+	public List<String> dummyCount = new ArrayList<>();
 
 	public int Str = 0;
 	public int Dex = 0;
@@ -205,6 +211,13 @@ public class PlayerManager {
 		else if(skill.equals("SR")) SRTalent[tier-1] = talent;
 	}
 	public void setTalent(List<Integer> list, String skill) {
+		if(list.size() != 4) {
+			list = new ArrayList<>();
+			list.set(0, 0);
+			list.set(1, 0);
+			list.set(2, 0);
+			list.set(3, 0);
+		}
 		if(skill.equals("FR")) FRTalent =  list.stream().mapToInt(i -> i).toArray();
 		else if(skill.equals("RL")) RLTalent = list.stream().mapToInt(i -> i).toArray();
 		else if(skill.equals("RR")) RRTalent = list.stream().mapToInt(i -> i).toArray();
@@ -470,7 +483,6 @@ public class PlayerManager {
 		EnergyPerSecond = energypersecond;
 		ManaDecrease = manadecrease;
 		MaxShield =  (int)((double)shieldraw * ((double)(Shield+100)/100));
-
 
 		SetWalkSpeed();
 		
