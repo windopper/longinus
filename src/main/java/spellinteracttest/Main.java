@@ -7,6 +7,7 @@ import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
+import DynamicData.Damage;
 import GUIManager.GUIManager;
 import Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
@@ -495,7 +496,7 @@ public class Main extends JavaPlugin implements Listener {
 
 			case "damage": {
 				int dmg = Integer.parseInt(args[1]);
-				PlayerHealthShield.getinstance(player).setDamage(dmg);
+				Damage.getinstance().taken(dmg, player, player);
 				break;
 			}
 
@@ -933,7 +934,7 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerCombination.getinstance(p).removeinstance();
 		PlayerFunction.getinstance(p).removeinstance();
 		PartyManager.getinstance().removeinstance(p);
-		DuelManager.getDuelManager(p).setLoser(p);
+//		DuelManager.getDuelManager(p).setLoser(p);
 		
 	}
 	

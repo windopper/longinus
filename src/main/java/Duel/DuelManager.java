@@ -153,6 +153,9 @@ public class DuelManager {
 
             if(duels.duelEnableStatus) {
 
+                if(!player.isOnline()) duels.setLoser(player);
+                if(!target.isOnline()) duels.setLoser(target);
+
                 if(second == 0) {
                     player.sendMessage("§5>> §ePVP가 10초뒤에 시작됩니다");
                 }
@@ -181,11 +184,6 @@ public class DuelManager {
                     }
                     duels.targetRequest.replace(requests, duels.targetRequest.get(requests) + 1);
                 }
-
-//                if(duels.requestTime == 600) {
-//                    duels.removeDuelManager(player);
-//                }
-//                duels.requestTime++;
             }
         }
     }

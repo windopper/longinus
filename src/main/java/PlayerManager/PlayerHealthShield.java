@@ -120,7 +120,6 @@ public class PlayerHealthShield {
 			Damage.getinstance().taken(damage, AEtIV2Player, player);
 		}
 
-
 		if(getShieldRegenerateStop()==0) //피해 받으면 보호막 재생이 멈춤
 			setShieldRegenerateStop();
 

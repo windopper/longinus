@@ -225,4 +225,22 @@ BOW1:
  이동속도: -500%~-200%
  에너지충전:
  custommodeldata: 1
+
+Khaos1:
+ Name: BETTER
+ Type: Material.DIAMOND_SWORD
+ Grade: Legendary
+ 클래스제한: 카오스
+ 무기강화최소: 1
+ 감각강화최소: 1
+ 외피강화최소: 1
+ 기동강화최소: 1
+ 레벨제한: 15
+ 데미지: 2000-4000
+ 생명력: 100~1300
+ 보호막: 19%~40%
+ 스킬데미지: 5%~20%
+ 이동속도: -500%~-200%
+ 에너지충전:
+ custommodeldata: 1
  

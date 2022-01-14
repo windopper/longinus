@@ -48,7 +48,6 @@ public class PlayerWASDListener {
                 double angle = dir.angle(v);
                 if(angle>2.2) {
                     if(move.equals(MOVE.values()[i].name())) break;
-                    //Bukkit.broadcastMessage(MOVE.values()[i].name());
                     move = MOVE.values()[i].name();
                     break;
                 }

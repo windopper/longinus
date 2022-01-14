@@ -7,6 +7,7 @@ import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
+import PlayerManager.PlayerHealthShield;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
@@ -31,10 +32,14 @@ public class KhaosMelee {
 
     private Player player;
     private PlayerFunction playerFunction;
+    private PlayerManager pm;
+    private final targetBuilder tb;
 
     public KhaosMelee(Player player) {
         this.player = player;
         playerFunction = PlayerFunction.getinstance(player);
+        pm = PlayerManager.getinstance(player);
+        tb = targetBuilder.builder(player);
     }
 
     public static ArmorStand getThrown(Player player) {
@@ -43,6 +48,14 @@ public class KhaosMelee {
     }
 
     public void Melee(String combo) {
+
+        if(pm.getTalent("RR", 3) == 3) {
+            if(pm.dummyCount.contains("KHRRtIII3")) {
+                tb.addwhenHit(() -> {
+                    PlayerHealthShield.getinstance(player).HealthAdd((int) ((double)pm.Health / 100), player);
+                });
+            }
+        }
 
         int MeleeCombo = playerFunction.getMeleeCombo();
 
@@ -127,8 +140,7 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(1.5)
+        tb.setRadius(1.5)
                 .setLocation(loc)
                 .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
@@ -212,8 +224,7 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(1.5)
+        tb.setRadius(1.5)
                 .setLocation(loc)
                 .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
@@ -275,8 +286,7 @@ public class KhaosMelee {
         Location location = player.getLocation();
         Vector dir = loc.getDirection().normalize();
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(1.5)
+        tb.setRadius(1.5)
                 .setLocation(loc)
                 .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
@@ -327,8 +337,7 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(2.5)
+        tb.setRadius(2.5)
                 .setLocation(loc)
                 .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
@@ -408,13 +417,11 @@ public class KhaosMelee {
 
         player.getWorld().playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, 1, 1);
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(1.5)
+        tb.setRadius(1.5)
                 .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .addPlaySound((e) -> player.getWorld().playSound(e.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 1))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
                 .setHitOnlyOne(true);
-
 
             final Set<Entity> Hit = new HashSet<>();
 
@@ -560,8 +567,7 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_CRIT, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_EVOKER_CAST_SPELL, 1, 1);
 
-        targetBuilder tb = targetBuilder.builder(player)
-                .setRadius(2.5)
+        tb.setRadius(2.5)
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 2))
                 .entityExcept(Hit)
                 .setLocation(loc);
@@ -635,7 +641,6 @@ public class KhaosMelee {
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
 
     }
-
     private void KhaosOneofTripleHit(Double roll, Location loc) {
 
         final Set<Entity> Hit = new HashSet<>();
@@ -643,13 +648,18 @@ public class KhaosMelee {
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_KNOCKBACK, 1, 2);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1, 1);
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_PLAYER_ATTACK_STRONG, 1, 1);
-
-        final targetBuilder tb = targetBuilder.builder(player)
+        targetBuilder tb = targetBuilder.builder(player)
                 .setRadius(1.5)
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
-                .setLocation(loc);
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5));
 
+        if(pm.getTalent("RR", 3) == 3) {
+            if(pm.dummyCount.contains("KHRRtIII3")) {
+                tb.addwhenHit(() -> {
+                    PlayerHealthShield.getinstance(player).HealthAdd((int) ((double)pm.Health / 100), player);
+                });
+            }
+        }
 
         new BukkitRunnable() {
 

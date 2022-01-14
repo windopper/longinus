@@ -1,8 +1,6 @@
 package ClassAbility.Khaos;
 
 import ClassAbility.Combination;
-import ClassAbility.entitycheck;
-import DynamicData.Damage;
 import DynamicData.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
@@ -11,17 +9,18 @@ import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
 import PlayerManager.PlayerHealthShield;
 import Mob.EntityManager;
+import TabListSetter.TabList;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import spellinteracttest.Main;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class Khaos {
 
@@ -33,6 +32,7 @@ public class Khaos {
     private PlayerManager pm;
     private int CurrentMana;
     private int ManaDecrease;
+    private targetBuilder tb;
 
     public Khaos(Player player) {
         this.player = player;
@@ -40,6 +40,7 @@ public class Khaos {
         this.CurrentMana = PlayerEnergy.getinstance(player).getEnergy();
         this.ManaDecrease = PlayerManager.getinstance(player).ManaDecrease;
         this.pm = PlayerManager.getinstance(player);
+        this.tb = targetBuilder.builder(player);
     }
 
     private Khaos() {
@@ -80,9 +81,13 @@ public class Khaos {
         if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
         int RLtII = pm.getTalent("RL", 2);
+        int FRtI = pm.getTalent("FR", 1);
+        int FRtIII = pm.getTalent("FR", 3);
         int originmana = ENUM.valueOf(combo).getMana();
 
         if(RLtII == 1 && combo.equals("RL")) originmana -= 1;
+        if(FRtI == 2 && combo.equals("FR")) originmana -= 1;
+        if(FRtIII == 2 && combo.equals("FR")) originmana -= 2;
 
         int mana = originmana - ManaDecrease <= 0 ? 1 : originmana - ManaDecrease
                 + PlayerEnergy.getinstance(player).getEnergyOverload();
@@ -93,7 +98,7 @@ public class Khaos {
             if(combo.equals("SHIFTR")) SHIFTR(player);
             if(combo.equals("RL")) HalfMoon();
             if(combo.equals("FR")) FR();
-            if(combo.equals("RR")) RR();
+            if(combo.equals("RR")) RR(mana);
 
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
@@ -304,11 +309,69 @@ public class Khaos {
 
     }
 
-    public void RR() {
+    public void RR(int usedMana) {
+
+        int RRtI = pm.getTalent("RR", 1);
+        int RRtII = pm.getTalent("RR", 2);
+        int RRtIII = pm.getTalent("RR", 3);
+        int RRtIV = pm.getTalent("RR", 4);
+
         Location loc = player.getEyeLocation();
         Vector dir = loc.getDirection().normalize().multiply(4);
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GHAST_SHOOT, 1, 1);
+
+        double spellrate = 1;
+        if(RRtI == 1) spellrate = 1.1;
+        else if(RRtI == 2) {
+            if(pm.dummyCount.stream().filter((a)->a.contains("KHRRtI2")).toList().size() == 0) {
+                pm.addiWalkSpeed += 10;
+                pm.dummyCount.add("KHRRtI2");
+                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+                        pm.dummyCount.remove("KHRRtI2");
+                        pm.addiWalkSpeed -= 10;
+                }, 100);
+            }
+        }
+        if(RRtIV == 1)
+            spellrate *= 1 + 2 *
+                    ( 1 - (double)PlayerHealthShield.getinstance(player).getCurrentHealth() / (double)pm.Health);
+
+        if(RRtII == 1) {
+            spellrate *= 3;
+            tb.setHitOnlyOne(true);
+        }
+
+        final double finalspellrate = spellrate;
+
+        tb.setRadius(2.5)
+                .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, finalspellrate))
+                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 1.2))
+                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f));
+
+        if(RRtIII == 1) {
+            tb.addTargetAfterDamage((e, d) -> {
+                if(EntityManager.getinstance(e).getCurrentHealth()-d<0)
+                    PlayerEnergy.getinstance(player).addEnergy(usedMana);
+            });
+        }
+        else if(RRtIII == 3) {
+            pm.dummyCount.add("KHRRtIII3");
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+                    pm.dummyCount.remove("KHRRtIII3"), 30);
+        }
+
+        if(RRtIV == 2) {
+            tb.addRunOnlyOnce(() -> {
+                if(pm.evasion.stream().filter((a)->a.contains("KHRRtIV2")).toList().size()<4){
+                    pm.evasion.add("KHRRtIV2");
+                }
+                if(pm.evasion.stream().filter((a)->a.contains("KHRRtIV2")).toList().size()<4){
+                    pm.evasion.add("KHRRtIV2");
+                }
+            });
+        }
+
 
         new BukkitRunnable() {
 
@@ -316,8 +379,6 @@ public class Khaos {
             double yB = 45;
 
             int time = 0;
-
-            final Set<Entity> Hit = new HashSet<>();
 
             @Override
             public void run() {
@@ -346,21 +407,11 @@ public class Khaos {
                             player.getWorld().spawnParticle(Particle.BLOCK_DUST, loc_, 1, 0.2, 0.2, 0.2, 0
                             ,Material.AMETHYST_BLOCK.createBlockData());
 
-                            targetBuilder tb = targetBuilder.builder(player)
-                                    .setRadius(2.5)
-                                    .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 3))
-                                    .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 1.2))
-                                    .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f))
-                                    .entityExcept(Hit)
-                                    .setLocation(loc_)
-                                    .build();
-
-                            Hit.addAll(tb.getHitEntity());
+                            tb.setLocation(loc_).build();
 
                             loc_.subtract(v);
                         }
                     }
-
 
                     for(double j = -60; j<60; j+=2) {
                         double radian = Math.toRadians(j);
@@ -389,8 +440,6 @@ public class Khaos {
                         player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
                         loc_.subtract(v);
                     }
-
-
                     cancel();
                 }
                 time++;
@@ -399,20 +448,109 @@ public class Khaos {
     }
 
     public void FR() {
-        playerFunction.KhaosFR = 60;
-        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1.5f);
-        FREffect(60);
 
-//        ArmorStand a = (ArmorStand) player.getWorld().spawnEntity(player.getEyeLocation().add(0, 0.5, 0), EntityType.ARMOR_STAND);
-//        FRA = a;
-//        a.setSmall(true);
-//        a.setInvisible(true);
-//        a.setInvulnerable(true);
-//        a.setMarker(true);
-//        a.setCollidable(false);
-//        char c = '\ue238';
-//        a.setCustomName(""+c);
-//        a.setCustomNameVisible(true);
+        playerFunction.KhaosFR = 60;
+
+        int FRtI = pm.getTalent("FR", 1);
+        int FRtII = pm.getTalent("FR", 2);
+        int FRtIII = pm.getTalent("FR", 3);
+        int FRtIV = pm.getTalent("FR", 4);
+
+        double def = 0.6;
+        double nomanadef = 0.9;
+        int lastsec = 30;
+        int manaLost = 3;
+        int manaTake = 1;
+        if(FRtI == 1) def = 0.5;
+        if(FRtII == 1) lastsec = 40;
+        else if(FRtII == 2) nomanadef = 0.7;
+        if(FRtIII == 3) manaLost = 2;
+
+        if(FRtIV == 1) manaTake = 2;
+
+        final int finallastsec = lastsec;
+        final double finaldef = def;
+        final double finalnomanadef = nomanadef;
+        final int finalmanaLost = manaLost;
+        final int finalmanaTake = manaTake;
+
+        if(FRtIV == 3) {
+            Function<Integer, Integer> giveDamageFunction = (dmg) -> (int)((double)dmg*1.5);
+            pm.giveDamageModifier.add(giveDamageFunction);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+                    pm.giveDamageModifier.remove(giveDamageFunction), finallastsec);
+        }
+        else if(FRtIV == 2) {
+
+            new BukkitRunnable() {
+                int time = 0;
+                @Override
+                public void run() {
+                    if(time%8 == 0) {
+                        Location loc = player.getLocation();
+                        targetBuilder.builder(player)
+                                .setRadius(3)
+                                .setDamage(() -> pm.spelldmgcalculate(player, 0.1))
+                                .setLocation(loc).build();
+
+                        for(double i = 0; i<Math.PI * 2; i+= Math.PI/32) {
+                            double x = Math.cos(i);
+                            double y = 0.2;
+                            double z = Math.sin(i);
+                            Vector v = new Vector(x, y, z);
+                            loc.add(v);
+                            player.getWorld().spawnParticle(Particle.SNOWFLAKE, loc, 0, v.getX(), v.getY(),
+                                    v.getZ(), 0.1);
+                            loc.subtract(v);
+                        }
+                    }
+                    if(time > finallastsec) cancel();
+                    time++;
+                }
+            }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+        }
+
+        Function<Integer, Integer> modf = (dmg) -> {
+            if(PlayerEnergy.getinstance(player).getEnergy()>1) {
+                dmg = (int)((double)dmg*finaldef);
+            }
+            else {
+                dmg = (int)((double)dmg*finalnomanadef);
+            }
+
+            return dmg;
+        };
+
+        // 피해를 줄때마다 마나 1
+        Runnable runnable = () -> {
+            if(PlayerEnergy.getinstance(player).getEnergy()<20) {
+                DynamicData.HologramIndicator.getinstance().ManaIndicator(finalmanaTake, player.getLocation());
+                PlayerEnergy.getinstance(player).addEnergy(finalmanaTake);
+            }
+        };
+
+        // 피해를 받을 때마다 마나를 잃음
+        Runnable manaLostRunnable = () -> {
+            if(PlayerEnergy.getinstance(player).getEnergy()>1) {
+                DynamicData.HologramIndicator.getinstance().ManaIndicator(-finalmanaLost, player.getLocation());
+                PlayerEnergy.getinstance(player).setEnergy(PlayerEnergy.getinstance(player).getEnergy() - finalmanaLost);
+            }
+        };
+
+        pm.takeDamageModifier.add(modf);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+                pm.takeDamageModifier.remove(modf), finallastsec);
+
+        pm.runWhenAttack.add(runnable);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+                pm.runWhenAttack.remove(runnable), finallastsec);
+
+        pm.runWhenDamaged.add(manaLostRunnable);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+                pm.runWhenDamaged.remove(manaLostRunnable), finallastsec);
+
+        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 1, 1.5f);
+        FREffect(finallastsec);
     }
 
     private void FREffect(int tick) {
@@ -438,6 +576,4 @@ public class Khaos {
             }
         }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
     }
-
-
 }

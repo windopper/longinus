@@ -13,6 +13,8 @@ public class CustomMobDeathEvent extends Event implements Cancellable {
 
     private Entity e;
     private MobListManager.MobList mobList;
+    private Entity damager;
+    private customDamageCause DamageCause;
 
     public CustomMobDeathEvent(Entity entity, MobListManager.MobList mobList) {
         this.e = entity;

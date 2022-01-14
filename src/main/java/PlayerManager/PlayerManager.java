@@ -10,11 +10,9 @@ import org.bukkit.inventory.ItemStack;
 import spellinteracttest.RandomRange;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 public class PlayerManager {
 	
@@ -43,7 +41,12 @@ public class PlayerManager {
 
 	public double damageTakenRate = 1;
 
+	public CopyOnWriteArrayList<String> evasion = new CopyOnWriteArrayList<>();
 	public List<String> dummyCount = new ArrayList<>();
+	public Set<Runnable> runWhenDamaged = Collections.synchronizedSet(new HashSet<>());
+	public Set<Runnable> runWhenAttack = Collections.synchronizedSet(new HashSet<>());
+	public Set<Function<Integer, Integer>> takeDamageModifier = Collections.synchronizedSet(new HashSet<>());
+	public Set<Function<Integer, Integer>> giveDamageModifier = Collections.synchronizedSet(new HashSet<>());
 
 	public int Str = 0;
 	public int Dex = 0;

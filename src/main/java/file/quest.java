@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 
 public class quest {
-	//TODO 지우기
+	//TODO 퀘스트 리메이크 할 때 지우기
 	private static quest q;
 	
 	
@@ -20,11 +20,7 @@ public class quest {
 		if(q == null) q = new quest();
 		return q;
 	}
-	
-	
-	
-	
-	
+
 	public void set(Player p, String category, String write) {
 		
 		File questfile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), "userquest.yml");

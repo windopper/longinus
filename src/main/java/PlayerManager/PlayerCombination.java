@@ -12,8 +12,7 @@ public class PlayerCombination {
 	private static PlayerCombination Combination;
 	
 	private static final HashMap<Player, PlayerCombination> instance = new HashMap<>();
-	
-	
+
 	private Player p;
 	private String keybind = "none";
 	private String key1 = "none";
@@ -23,6 +22,7 @@ public class PlayerCombination {
 	private ItemStack previousweapon;
 	private Boolean sneakingleft = false;
 	private String DelaySave = "none";
+	private String previousSkill = "none";
 	
 	//public final static List<Player> sneakingleft = new ArrayList<>();
 	
@@ -55,6 +55,7 @@ public class PlayerCombination {
 	public String getKeymessage() {
 		return keymessage;
 	}
+	public String getPreviousSkill() { return previousSkill; }
 	
 	public void setKey1(String key1) {
 		this.key1 = key1;
@@ -71,6 +72,7 @@ public class PlayerCombination {
 	public void setKeymessage(String keymessage) {
 		this.keymessage = keymessage;
 	}
+	public void setPreviousSkill(String var) { this.previousSkill = var; }
 	
 	
 	public void KeyBind() {
@@ -137,9 +139,6 @@ public class PlayerCombination {
 				keycooldown = 0;
 			}
 			keybind = "none";
-
-
-
 
 			return;
 		}

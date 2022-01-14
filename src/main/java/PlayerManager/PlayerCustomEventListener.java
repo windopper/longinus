@@ -72,6 +72,7 @@ public class PlayerCustomEventListener implements Listener {
 
         PlayerFunction PF = PlayerFunction.getinstance(target);
         PlayerEnergy PE = PlayerEnergy.getinstance(target);
+        PlayerManager PM = PlayerManager.getinstance(target);
 
         if(PlayerManager.getinstance(target).CurrentClass.equals("아이테르")) {
             Aether.getinstance().DmgtoImpulse(damage, target, target); // 아이테르 패시브 활성화를 위해 받은 피해를 저장
@@ -89,12 +90,6 @@ public class PlayerCustomEventListener implements Listener {
         if(PlayerFunction.getinstance(target).ACPassiveCoolDown > 0 && PlayerManager.getinstance(target).CurrentClass.equals("엑셀러레이터")) {
             // 엑셀러레이터가 맞으면 패시브 쿨다운 초기화
             PlayerFunction.getinstance(target).ACPassiveCoolDown = 0;
-        }
-
-        // 카오스 FR 스킬
-        if(PF.KhaosFR > 0 && PE.getEnergy()>1) {
-            DynamicData.HologramIndicator.getinstance().ManaIndicator(-2, target.getLocation());
-            PE.setEnergy(PE.getEnergy() - 2);
         }
 
         ReturnToBase.ReturnMech.getinstance().ReturnCancel(target); // 귀환을 하고 있다면 귀환을 취소해 버리기
@@ -119,28 +114,12 @@ public class PlayerCustomEventListener implements Listener {
                 double r = Math.random() * 0.05 + 0.05;
                 PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
             }
-//            else if(cause == EntityDamageEvent.DamageCause.FIRE) {
-//                double r = Math.random() * 0.05 + 0.02;
-//                PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
-//            }
             else if(cause == EntityDamageEvent.DamageCause.FIRE_TICK) {
                 double r = Math.random() * 0.03 + 0.02;
                 PlayerHealthShield.getinstance(player).setDamage((int)(r * PlayerManager.getinstance(player).Health));
             }
         }
     }
-
-//    @EventHandler
-//    public void PlayerEnvironmentsBlockDamageEvent(EntityDamageByBlockEvent event) {
-//        if(event.getEntity() instanceof Player) {
-//            Player player = (Player) event.getEntity();
-//            EntityDamageEvent.DamageCause cause = event.getCause();
-//
-//            double r = Math.random() * 0.03 + 0.02;
-//            PlayerHealthShield.getinstance(player).setDamage((int) (r * PlayerManager.getinstance(player).Health));
-//        }
-//    }
-
 
     // 듀얼시 화살 통과 못하게 일반 상태에서는 화살 통과 가능
     @EventHandler
@@ -159,6 +138,16 @@ public class PlayerCustomEventListener implements Listener {
                     //((Player) entity).setCollidable(false);
                     event.setCancelled(true);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public void PlayerDodge(EntityDamageByEntityEvent event) {
+        if(event.getEntity() instanceof Player player) {
+            PlayerManager PM = PlayerManager.getinstance(player);
+            if(PM.evasion.size()>=1) {
+                event.setCancelled(true);
             }
         }
     }

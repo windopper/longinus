@@ -9,6 +9,7 @@ import ClassAbility.Khaos.KhaosMelee;
 import ClassAbility.Phlox.Phlox;
 import ClassAbility.Shield.Shield;
 import ClassAbility.Shield.ShieldMelee;
+import PlayerManager.PlayerCombination;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
@@ -48,8 +49,7 @@ public class Combination {
 		카오스,
 		없음;
 	}
-	
-	
+
 	public void removemaps(Player p) {
 		//trainermelee.remove(p);
 	}
@@ -61,6 +61,8 @@ public class Combination {
 			PacketRecord.Record.getInstance().recordCombo(p, PlayerFunction.getinstance(p).getMeleeCombo());
 		}
 
+		PlayerCombination.getinstance(p).setPreviousSkill(combo);
+
 		if(name.equals("아이테르")) Aether(p, combo);
 		else if(name.equals("엑셀러레이터")) Accelerator(p, combo);
 		else if(name.equals("블래스터")) Blaster(p, combo);
@@ -70,8 +72,6 @@ public class Combination {
 		else if(name.equals("없음")) Trainer(p, combo);
 		else if(name.equals("케이론")) Cheiron(p, combo);
 		else if(name.equals("쉴드")) Shield(p, combo);
-
-		//p.sendTitle(" ", PlayerFunction.getinstance(p).getMeleecommand()+blank2,0, 20, 10);
 	}
 
 	public void Sound(Player p) {

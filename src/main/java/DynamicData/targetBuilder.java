@@ -10,6 +10,7 @@ import org.bukkit.util.BoundingBox;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -19,6 +20,9 @@ public class targetBuilder {
     private boolean hitOnlyOne = false;
     private Set<Supplier<Integer>> damage = new HashSet<>();
     private Set<Consumer<LivingEntity>> status = new HashSet<>();
+    private Set<BiConsumer<LivingEntity, Integer>> targetAfterDamage = new HashSet<>();
+    private Set<Runnable> whenHit = new HashSet<>();
+    private Set<Runnable> runOnlyOnce = new HashSet<>();
     private Set<Consumer<Entity>> playParticle = new HashSet<>();
     private Set<Runnable> playSound = new HashSet<>();
     private Set<Consumer<Entity>> playSoundAtEntityLoc = new HashSet<>();
@@ -87,11 +91,28 @@ public class targetBuilder {
         return this;
     }
 
+    public targetBuilder addwhenHit(Runnable whenHit) {
+        this.whenHit.add(whenHit);
+        return this;
+    }
+
+    public targetBuilder addRunOnlyOnce(Runnable runOnlyOnce) {
+        this.runOnlyOnce.add(runOnlyOnce);
+        return this;
+    }
+
+    public targetBuilder addTargetAfterDamage(BiConsumer<LivingEntity, Integer> targetAfterDamage) {
+        this.targetAfterDamage.add(targetAfterDamage);
+        return this;
+    }
+
     public Set<Entity> getHitEntity() {
         return entityHit;
     }
 
     public targetBuilder build() {
+
+        if(hitOnlyOne && entityHit.size()>=1) return this;
 
         for(LivingEntity entity : player.getWorld().getLivingEntities()) {
             if(entityExcept.contains(entity)) continue;
@@ -99,9 +120,13 @@ public class targetBuilder {
                 Location eloc = entity.getEyeLocation();
                 BoundingBox box = entity.getBoundingBox();
                 if(eloc.distance(loc) < radius || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
+                    targetAfterDamage.forEach((a)->damage.forEach((damage)->a.accept(entity, damage.get())));
                     damage.forEach((a)->Damage.getinstance().taken(a.get(), entity, player));
                     entityHit.add(entity);
                     playSound.forEach(Runnable::run);
+                    whenHit.forEach(Runnable::run);
+                    runOnlyOnce.forEach(Runnable::run);
+                    runOnlyOnce.clear();
                     playSoundAtEntityLoc.forEach((a) -> a.accept(entity));
                     playParticle.forEach((a)->a.accept(entity));
                     status.forEach((a) -> a.accept(entity));

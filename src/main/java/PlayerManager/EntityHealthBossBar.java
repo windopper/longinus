@@ -62,7 +62,6 @@ public class EntityHealthBossBar {
 
 		if(BossBarCurrentShow == null || BossBarShowTime == 0 || BossBarCurrentEntity == null) { // 현재 보여주는게 없으면
 
-
 			if(entity.getCustomName() != null) { //엔티티 이름이 있으면
 
 				BossBarCurrentShow = bar;  // 보스바 추가
@@ -73,11 +72,10 @@ public class EntityHealthBossBar {
 				BossBarShowTime = 1; // 시간 설정
 				return;
 			}
-
 		}
 		else { // 보여주는 게 있으면
 			
-			if(EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth() < MaxHealth) { // 지금 들어온 엔티티가 최대체력이 더 많다면
+			if(EntityManager.getinstance(BossBarCurrentEntity).getMaxHealth() <= MaxHealth) { // 지금 들어온 엔티티가 최대체력이 더 많다면
 				
 				BossBarCurrentShow.removePlayer(p);
 				BossBarCurrentShow = bar;
@@ -85,14 +83,12 @@ public class EntityHealthBossBar {
 				BossBarShowTime = 1; // 시간 초기화
 				bar.addPlayer(p);
 				return;
-				
 			}
 			else {
 				BossBarShowTime = 1; // 시간 초기화
 				return;
-				
 			}
-				
+
 		}
 		bar.removeAll();
 		return;
@@ -123,8 +119,7 @@ public class EntityHealthBossBar {
 				BossBarShowTime = 0;
 				return;
 			}
-			
-			
+
 			BossBarCurrentShow.setTitle(EntityManager.getinstance(BossBarCurrentEntity).getCustomName()
 					+" §c♥ "+CurrentHealth+"/"+MaxHealth);
 			
@@ -146,7 +141,6 @@ public class EntityHealthBossBar {
 			}
 			// 보스바 타이틀 재 설정
 			BossBarShowTime++;
-			
 		}
 	}
 }

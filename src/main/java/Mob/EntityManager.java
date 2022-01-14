@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 
 public class EntityManager {
@@ -27,13 +28,13 @@ public class EntityManager {
 	private static HashMap<Entity, HashMap<Entity, Location>> disguise = new HashMap<>();
 
 	private final HashMap<Player, Integer> contribute = new HashMap<>(); // 플레이어 기여도
-	private LivingEntity teleportTo;  //텔레포트 하고자 하는 엔티티
-	private Location teleportToLoc; // 상대적인 좌표
+	private LivingEntity controller;  //텔레포트 하고자 하는 엔티티
+	private Location controllerLoc; // 상대적인 좌표
 	private Entity e; // 마스터 엔티티
 	private ArmorStand Namear; // 이름 아머스탠드
 	private ArmorStand Healthar; // 체력 아머스탠드
 	public String CustomName = ""; // 마스터 엔티티 이름
-	private int CurrentHealth; // 현재 체력
+	private int CurrentHealth = 100;// 현재 체력
 	private int PreviousHealth; // 이전 체력
 	private int MaxHealth; // 최대 체력
 	public int Level = 1;
@@ -149,7 +150,6 @@ public class EntityManager {
 
 	// 변신하고 등록된 몹
 	public static EntityManager getinstance(Entity e, MobListManager.MobList mobList, HashMap<Entity, Location> disguises) {
-
 		if(!instance.containsKey(e)) instance.put(e, new EntityManager(e, mobList.getHealth(), mobList, disguises));
 		return instance.get(e);
 	}
@@ -186,17 +186,6 @@ public class EntityManager {
 		return null;
 	}
 
-	public static Entity getDisguiseEntity(Entity e) {
-		for(Entity entity : disguise.keySet()) {
-			for(Entity disguise : disguise.get(entity).keySet()) {
-				if(disguise == e) {
-					return entity;
-				}
-			}
-		}
-		return null;
-	}
-
 	public static List<EntityPlayer> getDisguiseEntitiesPlayer() {
 
 		List<EntityPlayer> eP = new ArrayList<>();
@@ -207,6 +196,17 @@ public class EntityManager {
 			}
 		}
 		return eP;
+	}
+
+	public static Entity getDisguiseEntity(Entity e) {
+		for(Entity entity : disguise.keySet()) {
+			for(Entity disguise : disguise.get(entity).keySet()) {
+				if(disguise == e) {
+					return entity;
+				}
+			}
+		}
+		return null;
 	}
 
 	public EntityManager setShowNameTag(boolean value) {
@@ -256,15 +256,14 @@ public class EntityManager {
 	}
 
 	public EntityManager setTeleportToEntity(LivingEntity teleportTo) {
-		this.teleportTo = teleportTo;
+		this.controller = teleportTo;
 		return this;
 	}
 
 	public EntityManager setTeleportToEntityLoc(Location location) {
-		this.teleportToLoc = location;
+		this.controllerLoc = location;
 		return this;
 	}
-
 
 	public int getPatterntime() {
 		return patterntime;
@@ -439,8 +438,8 @@ public class EntityManager {
 					eP.setPose(EntityPose.h);
 				}
 
-				if(teleportTo != null) {
-					teleportTo.setHealth(0);
+				if(controller != null) {
+					controller.setHealth(0);
 				}
 
 				DeathAbility();
@@ -452,19 +451,24 @@ public class EntityManager {
 				return;
 			}
 
+			Function<ArmorStand, ArmorStand> ASFunction = (ar) -> {
+				ar.setCustomNameVisible(true);
+				ar.setInvisible(true);
+				ar.setSmall(true);
+				ar.setMarker(true);
+				ar.setInvulnerable(true);
+				ar.setBasePlate(false);
+				ar.setGravity(false);
+				ar.setSilent(true);
+				return ar;
+			};
+
 			if(Namear == null && showNameTag && !CustomName.equals("")) {
 
 				Namear = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height+HeightTempAdd, 0), EntityType.ARMOR_STAND);
-
 				Namear.setCustomName(CustomName);
-				Namear.setCustomNameVisible(true);
-				Namear.setInvisible(true);
-				Namear.setSmall(true);
-				Namear.setMarker(true);
-				Namear.setInvulnerable(true);
-				Namear.setBasePlate(false);
-				Namear.setGravity(false);
-				Namear.setSilent(true);
+
+				Namear = ASFunction.apply(Namear);
 			}
 
 			// 피해를 받았을때
@@ -474,31 +478,16 @@ public class EntityManager {
 
 				// 아머스탠드 소환
 				Namear = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height+0.25, 0), EntityType.ARMOR_STAND);
-
 				Namear.setCustomName(CustomName);
-				Namear.setCustomNameVisible(true);
-				Namear.setInvisible(true);
-				Namear.setSmall(true);
-				Namear.setMarker(true);
-				Namear.setInvulnerable(true);
-				Namear.setBasePlate(false);
-				Namear.setGravity(false);
-				Namear.setSilent(true);
 
+				Namear = ASFunction.apply(Namear);
 			}
 			if((Healthar == null && CurrentHealth < MaxHealth) && DamageAfterDelay == 100 && CustomName != "") {
 
 				Healthar = (ArmorStand) e.getWorld().spawnEntity(e.getLocation().add(0, Height, 0), EntityType.ARMOR_STAND);
-				Healthar.setCustomNameVisible(true);
-				Healthar.setInvisible(true);
-				Healthar.setSmall(true);
-				Healthar.setMarker(true);
-				Healthar.setInvulnerable(true);
-				Healthar.setBasePlate(false);
-				Healthar.setGravity(false);
-				Healthar.setSilent(true);
 				Healthar.setCustomName("§b[||||"+CurrentHealth+"||||]");
-				Healthar.setCustomNameVisible(true);
+
+				Healthar = ASFunction.apply(Healthar);
 			}
 
 			// teleporting armorstand and set Healthar's name
@@ -509,7 +498,6 @@ public class EntityManager {
 				for(int i=0; i<arr.length; i++) {
 					arrlist.add(arr[i]);
 				}
-
 				double rate = (double) CurrentHealth / (double) MaxHealth;
 				int index = (int)(arr.length * rate);
 				arrlist.add(index, '3');
@@ -567,8 +555,8 @@ public class EntityManager {
 			}
 		}
 		// TeleportTo 엔티티에게 텔레포트
-		if(teleportTo != null) {
-			e.teleport(teleportTo.getLocation().clone().add(teleportToLoc));
+		if(controller != null) {
+			e.teleport(controller.getLocation().clone().add(controllerLoc));
 			EntityFunctions.hideFromPlayer(e);
 		}
 
@@ -655,37 +643,65 @@ public class EntityManager {
 	}
 
 	public void invokeDropTable() {
-		for(Player player : getDropItemContribute()) {
-			for(ItemStack item : dropTable.keySet()) {
-				if(Math.random() <= dropTable.get(item)) {
-					Item it = (Item) e.getWorld().spawnEntity(e.getLocation(), EntityType.DROPPED_ITEM);
-					it.setItemStack(item);
-					it.setOwner(player.getUniqueId());
-				}
-			}
-		}
+
+		getDropItemContribute()
+				.forEach((player)->{
+					dropTable.keySet()
+							.stream()
+							.filter((item)->Math.random()<=dropTable.get(item))
+							.forEach((item)-> {
+								Item it = (Item) e.getWorld().spawnEntity(e.getLocation(), EntityType.DROPPED_ITEM);
+								it.setItemStack(item);
+								it.setOwner(player.getUniqueId());
+							});
+				});
+
+//		for(Player player : getDropItemContribute()) {
+//			for(ItemStack item : dropTable.keySet()) {
+//				if(Math.random() <= dropTable.get(item)) {
+//					Item it = (Item) e.getWorld().spawnEntity(e.getLocation(), EntityType.DROPPED_ITEM);
+//					it.setItemStack(item);
+//					it.setOwner(player.getUniqueId());
+//				}
+//			}
+//		}
 	}
 
 	public static void CraftNPCRefresh() {
 
-		for(EntityManager entityManager : instance.values()) {
-
-			Location eloc = entityManager.e.getLocation();
-
-			if(entityManager.isDisguiseEntityPlayer()) {
-
-				Player eP = entityManager.getDisguiseEntityPlayer();
+		instance.values()
+				.forEach((em)-> {
+			Location eloc = em.e.getLocation();
+			if(em.isDisguiseEntityPlayer()) {
+				Player eP = em.getDisguiseEntityPlayer();
 				EntityPlayer EP = ((CraftPlayer) eP).getHandle();
 
-				for(Player player : Bukkit.getOnlinePlayers()) {
-					if(eloc.getWorld().getName().equals(player.getWorld().getName())) {
-						if(eloc.distance(player.getLocation()) > 20) {
-							EntityPlayerManager.getInstance().showTo(EP, player);
-						}
-					}
-				}
+				Bukkit.getOnlinePlayers()
+						.stream()
+						.filter((p)->eloc.getWorld().getName().equals(p.getWorld().getName()))
+						.filter((p)->eloc.distance(p.getLocation())>20)
+						.forEach((p)->EntityPlayerManager.getInstance().showTo(EP, p));
 			}
-		}
+		});
+
+//		for(EntityManager entityManager : instance.values()) {
+//
+//			Location eloc = entityManager.e.getLocation();
+//
+//			if(entityManager.isDisguiseEntityPlayer()) {
+//
+//				Player eP = entityManager.getDisguiseEntityPlayer();
+//				EntityPlayer EP = ((CraftPlayer) eP).getHandle();
+//
+//				for(Player player : Bukkit.getOnlinePlayers()) {
+//					if(eloc.getWorld().getName().equals(player.getWorld().getName())) {
+//						if(eloc.distance(player.getLocation()) > 20) {
+//							EntityPlayerManager.getInstance().showTo(EP, player);
+//						}
+//					}
+//				}
+//			}
+//		}
 	}
 
 	public static void HideAllDisguisedEntity() {
@@ -698,19 +714,32 @@ public class EntityManager {
 	}
 
 	public static void showEntityPlayerNPC(Player player) {
-		for(Entity lE : instance.keySet()) {
-			if(getinstance(lE).isDisguiseEntityPlayer()) {
-				Player dP = getinstance(lE).getDisguiseEntityPlayer();
-				EntityPlayer eP = ((CraftPlayer) dP).getHandle();
-				EntityPlayerManager.getInstance().showTo(eP, player);
-			}
-		}
+
+		instance.keySet()
+				.stream()
+				.filter((lE)->getinstance(lE).isDisguiseEntityPlayer())
+				.forEach((lE)-> {
+					Player dP = getinstance(lE).getDisguiseEntityPlayer();
+					EntityPlayer eP = ((CraftPlayer) dP).getHandle();
+					EntityPlayerManager.getInstance().showTo(eP, player);
+				});
+
+//		for(Entity lE : instance.keySet()) {
+//			if(getinstance(lE).isDisguiseEntityPlayer()) {
+//				Player dP = getinstance(lE).getDisguiseEntityPlayer();
+//				EntityPlayer eP = ((CraftPlayer) dP).getHandle();
+//				EntityPlayerManager.getInstance().showTo(eP, player);
+//			}
+//		}
 	}
 
 	public static void DeleteAllEntity() {
-		for(Entity lE : instance.keySet()) {
-			instance.get(lE).setCurrentHealth(0);
-		}
+
+		instance.keySet().forEach((lE)->instance.get(lE).setCurrentHealth(0));
+
+//		for(Entity lE : instance.keySet()) {
+//			instance.get(lE).setCurrentHealth(0);
+//		}
 	}
 
 

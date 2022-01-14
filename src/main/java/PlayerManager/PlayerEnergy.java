@@ -58,6 +58,7 @@ public class PlayerEnergy extends PlayerManager {
 	}
 	public void addEnergy(int energy) {
 		if(this.Energy + energy <= 20) this.Energy += energy;
+		else this.Energy = 20;
 	}
 
 	public void setEnergyOverload(int energyOverload) {

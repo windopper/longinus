@@ -687,8 +687,6 @@ public class Aether {
 					.setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1));
 		}
 
-
-
 		double finaldist = dist;
 
 		new BukkitRunnable() {
