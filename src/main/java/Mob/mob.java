@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffectType;
 
 public class mob {
 	
-	public void mobdelete() {
+	public void mobDelete() {
 		for(LivingEntity e : Bukkit.getWorld("world").getLivingEntities()) {
 			int i=0;
 			for(Player p : Bukkit.getOnlinePlayers()) {
@@ -30,7 +30,6 @@ public class mob {
 						break;
 					}
 				}
-
 			}
 			if(i==0) { // 아무도 없으면
 				e.remove();
@@ -57,14 +56,6 @@ public class mob {
 		//Tutorial.exambot();
 				
 	}
-	
-	public static void fastmobloop() {
-		
-				
-		
-				
-	}
-	
 	@SuppressWarnings("deprecation")
 	public void trainerbot() {
 		
@@ -113,7 +104,7 @@ public class mob {
 		
 		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatusManager.getinstance(skeleton).setCanKnockback(false);
+		EntityStatusManager.getinstance(skeleton).setStatusTag(EntityStatusManager.statusTag.knockbackImmune);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}
@@ -165,8 +156,8 @@ public class mob {
 		item.setItemMeta(meta);
 		
 		skeleton.getEquipment().setItemInMainHand(item);
-		
-		EntityStatusManager.getinstance(skeleton).setCanKnockback(false);
+
+		EntityStatusManager.getinstance(skeleton).setStatusTag(EntityStatusManager.statusTag.knockbackImmune);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}

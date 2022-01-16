@@ -91,7 +91,7 @@ public class Cheiron implements Listener {
 
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
-            Combination.getinstance().energyoverload(player, combo);
+            PlayerEnergy.getinstance(player).energyOverload(combo);
             return mana;
         }
         else {

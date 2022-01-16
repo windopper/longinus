@@ -13,10 +13,4 @@ public class EventProcess implements Listener {
         Player player = event.getPlayer();
         PartyManager.getinstance().QuitParty(player);
     }
-//
-//    @EventHandler
-//    public void serverJoin(PlayerJoinEvent event) {
-//        Player player = event.getPlayer();
-//        PartyManager.getinstance().setMemberOnline(player);
-//    }
 }

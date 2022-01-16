@@ -1,6 +1,6 @@
 package Mob;
 
-import Gliese581cMobs.Parasite;
+import Mob.Gliese581cMobs.Parasite;
 import org.bukkit.Material;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;

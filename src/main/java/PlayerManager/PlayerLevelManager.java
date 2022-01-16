@@ -158,8 +158,6 @@ public class PlayerLevelManager {
                 PartyManager.getParty(member).addPartyXP(BonusExp);
             }
         }
-
-
     }
 
     public void expWatcher() {

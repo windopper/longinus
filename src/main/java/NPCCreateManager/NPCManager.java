@@ -37,15 +37,6 @@ public class NPCManager {
         return NPCManager;
     }
 
-//    public static EntityPlayer getNPCID(int EntityID) {
-//        for(EntityPlayer NPCs : NPC) {
-//            if(NPCs.getId() == EntityID) {
-//                return NPCs;
-//            }
-//        }
-//        return null;
-//    }
-
     public EntityPlayer createNPC(Location location, String npcName, String texture, String signature) {
 
         MinecraftServer nmsServer = ((CraftServer) Bukkit.getServer()).getServer();

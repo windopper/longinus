@@ -1,6 +1,6 @@
 package Mob;
 
-import Gliese581cMobs.BloodRoot;
+import Mob.Gliese581cMobs.BloodRoot;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;

@@ -30,6 +30,7 @@ public class targetBuilder {
     private Set<Entity> entityHit = new HashSet<>();
     private Player player;
     private Location loc;
+    private boolean isBuilt = false;
 
     private targetBuilder(Player player) {
         this.player = player;
@@ -106,6 +107,10 @@ public class targetBuilder {
         return this;
     }
 
+    public boolean isBuilt() {
+        return this.isBuilt;
+    }
+
     public Set<Entity> getHitEntity() {
         return entityHit;
     }
@@ -131,6 +136,7 @@ public class targetBuilder {
                     playParticle.forEach((a)->a.accept(entity));
                     status.forEach((a) -> a.accept(entity));
                     if(hitOnlyOne) return this;
+                    isBuilt = true;
                 }
             }
         }

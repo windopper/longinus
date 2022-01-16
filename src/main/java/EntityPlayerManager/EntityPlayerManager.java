@@ -86,53 +86,6 @@ public class EntityPlayerManager {
 
     public void showTo(EntityPlayer npc, Player player) {
 
-//        PacketPlayOutPlayerInfo packetPlayOutPlayerInfo = new PacketPlayOutPlayerInfo(
-//                PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a,
-//                npc
-//        );
-//
-//        PacketPlayOutNamedEntitySpawn packetPlayOutNamedEntitySpawn = new PacketPlayOutNamedEntitySpawn(
-//                npc
-//        );
-//
-//        sendpacket(player, packetPlayOutPlayerInfo);
-//        sendpacket(player, packetPlayOutNamedEntitySpawn);
-//
-//        CraftScoreboardManager scoreboardManager = ((CraftServer) Bukkit.getServer()).getScoreboardManager();
-//        assert scoreboardManager != null;
-//
-//        CraftScoreboard mainScoreboard = scoreboardManager.getNewScoreboard();
-//        Scoreboard scoreboard = mainScoreboard.getHandle();
-//
-//        ScoreboardTeam scoreboardTeam = scoreboard.getPlayerTeam(npc.getName());
-//
-//
-//        if (scoreboardTeam == null) {
-//            scoreboardTeam = scoreboard.createTeam("NPC");
-//            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
-//        }
-//        else {
-//            scoreboard.addPlayerToTeam(npc.getName(), scoreboardTeam);
-//        }
-//
-//        scoreboardTeam.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
-//
-//        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-//            try {
-//                PacketPlayOutPlayerInfo removeFromTabPacket = new PacketPlayOutPlayerInfo(
-//                        PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e,
-//                        npc
-//                );
-//                sendpacket(player, removeFromTabPacket);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//        }, 10);
-//
-//        Bukkit.getServer().getScheduler().runTaskLater(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
-//            fixSkinHelmetLayerForPlayer(npc, player);
-//        }, 8);
-
         ScoreboardTeam team = new ScoreboardTeam(((CraftScoreboard) Bukkit.getScoreboardManager().getMainScoreboard())
                 .getHandle(), player.getName()+"a");
         team.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.b);
@@ -159,8 +112,6 @@ public class EntityPlayerManager {
                     connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc));
                 }
             }.runTaskAsynchronously(Main.getPlugin(Main.class));
-
-
     }
 
 

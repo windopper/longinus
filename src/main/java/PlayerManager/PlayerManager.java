@@ -1,12 +1,14 @@
 package PlayerManager;
 
 import net.minecraft.nbt.NBTTagCompound;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import spellinteracttest.Main;
 import spellinteracttest.RandomRange;
 
 import javax.annotation.Nonnull;
@@ -160,6 +162,22 @@ public class PlayerManager {
 	}
 	public void setexp(int exp) {
 		this.exp = exp;
+	}
+	public void addRunWhenAttack(Runnable runnable, int tick) {
+		runWhenAttack.add(runnable);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> runWhenAttack.remove(runnable), tick);
+	}
+	public void addRunWhenDamaged(Runnable runnable, int tick) {
+		runWhenDamaged.add(runnable);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> runWhenDamaged.remove(runnable), tick);
+	}
+	public void addTakeDamageModifier(Function<Integer, Integer> function, int tick) {
+		takeDamageModifier.add(function);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> takeDamageModifier.remove(function), tick);
+	}
+	public void addGiveDamageModifier(Function<Integer, Integer> function, int tick) {
+		giveDamageModifier.add(function);
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> giveDamageModifier.remove(function), tick);
 	}
 	public int getTalentPoint() {
 		updateTalentPoint();

@@ -24,10 +24,6 @@ public class PlayerAlarmManager {
 		if(Alarmfile == null) Alarmfile = new PlayerAlarmManager();
 		return Alarmfile;
 	}
-	
-	
-	
-	
 	public void register(Player p) {
 		
 		String uuid = p.getUniqueId().toString();
@@ -43,7 +39,6 @@ public class PlayerAlarmManager {
 			config.set("alarm."+i+".date", "");
 			
 		}
-		
 		try {
 			config.save(file);
 		}
@@ -66,11 +61,8 @@ public class PlayerAlarmManager {
 		if(!config.contains("alarm")) {
 			register(p);
 		}
-		
-		
 		for(int i=49; i>=0; i-- ) {
-			
-			
+
 			int j = i+1;
 			
 			config.set("alarm."+j+".content", config.getString("alarm."+i+".content"));
@@ -90,10 +82,7 @@ public class PlayerAlarmManager {
 		catch(Exception e) {
 			p.sendMessage("오류 발생");
 		}
-		
-		
 	}
-	
 	public void removeoldonealarm(Player p) {
 		
 		String uuid = p.getUniqueId().toString();
@@ -117,10 +106,7 @@ public class PlayerAlarmManager {
 		catch(Exception e) {
 			p.sendMessage("오류 발생");
 		}
-		
-		
 	}
-	
 	public void removeallalarms(Player p) {
 		
 		String uuid = p.getUniqueId().toString();
@@ -129,7 +115,6 @@ public class PlayerAlarmManager {
 		FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
 		for(int i=49; i>=0; i-- ) {
-			
 			config.set("alarm."+i+".content", "");
 			config.set("alarm."+i+".type", "");
 			config.set("alarm."+i+".date", "");
@@ -141,12 +126,8 @@ public class PlayerAlarmManager {
 		catch(Exception e) {
 			p.sendMessage("오류 발생");
 		}
-		
-		
 	}
-	
-	
-	
+
 	public void addalarmtoallplayers(String contents, String type) {
 		
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(),"joinedplayer.yml");
@@ -183,14 +164,7 @@ public class PlayerAlarmManager {
 			}
 			
 		}
-		
-
-		
-
-		
-		
 	}
-	
 	public int getalarmamount(Player p) {
 		
 		String uuid = p.getUniqueId().toString();
@@ -205,13 +179,9 @@ public class PlayerAlarmManager {
 		}
 		
 		return amount;
-		
-
 	}
-	
 	public ArrayList<String> getalarmlist(Player p, int location){
-		
-		
+
 		String uuid = p.getUniqueId().toString();
 		
 		File file = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder(), uuid+".yml");
@@ -238,7 +208,6 @@ public class PlayerAlarmManager {
 	}
 	
 	public String getalarmtype(Player p, int location) {
-		
 
 		String uuid = p.getUniqueId().toString();
 		

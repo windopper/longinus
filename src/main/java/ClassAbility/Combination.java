@@ -81,37 +81,7 @@ public class Combination {
 		p.playSound(p.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1f);
 	}
 
-	public void energyoverload(Player p, String combo) {
-		
-		PlayerEnergy PE = PlayerEnergy.getinstance(p);
-		
-		if(PE.getPreviousSkill().equals("none")) { // 이전에 쓴 스킬이 없으면
-			PE.setPreviousSkill(combo);
-			PE.setEnergyOverload(0);
-			PE.setEnergyOverloadCooldown(1);
-		}
-		
-		else {
-			if(PE.getPreviousSkill().equals(combo)) { // 이전에 쓴 스킬이 지금 스킬이랑 같으면
-				if(PE.getEnergyOverload()==0) { // 에너지 과부하가 없으면
-					
-					PE.setEnergyOverload(PE.getEnergyOverload()+1);
-					PE.setEnergyOverloadCooldown(1);
-				}
-				else {
-					 // 에너지 과부하가 있으면 과부하 1더 추가
-					PE.setEnergyOverload(PE.getEnergyOverload()+1);
-					// 에너지 과부하 쿨다운 시작
-					PE.setEnergyOverloadCooldown(1);
-				}
-			}
-			else { // 이전에 쓴 스킬이 지금 스킬이랑 다르면
-				PE.setPreviousSkill(combo);
-				PE.setEnergyOverload(0);
-				PE.setEnergyOverloadCooldown(1);
-			}
-		}
-	}
+
 	
 	@SuppressWarnings("deprecation")
 	public void Trainer(final Player p, String combo) {
@@ -419,7 +389,7 @@ public class Combination {
 			if(CurrentMana >= RLmana ) {
 				Sound(p);
 				p.sendTitle(" ",blank+RL, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Accelerator.getinstance().movehit(p, RLmana);
 			}
 			else {
@@ -439,7 +409,7 @@ public class Combination {
 			if(CurrentMana >= RRmana ) {
 				Sound(p);
 				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Accelerator.getinstance().adrenaline(p, RRmana);
 			}
 			else {
@@ -460,7 +430,7 @@ public class Combination {
 			if(CurrentMana >= FRmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+FR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Accelerator.getinstance().randomfire(p, FRmana);
 			}
 			else {
@@ -480,7 +450,7 @@ public class Combination {
 			if(CurrentMana >= RFmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+RF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Accelerator.getinstance().bombthrow(p, RFmana);
 			}
 			else {
@@ -500,7 +470,7 @@ public class Combination {
 			if(CurrentMana >= FFmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Accelerator.getinstance().particleacceleration(p, FFmana);
 			}
 			else {
@@ -546,7 +516,7 @@ public class Combination {
 			if(CurrentMana >= RLmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle(" ",blank+RL, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				ByV.getinstance().recover(p, RLmana);
 			}
 			else {
@@ -573,7 +543,7 @@ public class Combination {
 			if(CurrentMana >= RRmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				ByV.getinstance().takedown(p, RRmana);
 			}
 			else {
@@ -600,7 +570,7 @@ public class Combination {
 			if(CurrentMana >= FRmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+FR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				ByV.getinstance().chain(p, FRmana);
 			}
 			else {
@@ -620,7 +590,7 @@ public class Combination {
 			if(CurrentMana >= RFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle(" ",blank+RF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				ByV.getinstance().punch(p, RFmana);
 			}
 			else {
@@ -646,7 +616,7 @@ public class Combination {
 			if(CurrentMana >= FFmana && PlayerFunction.getinstance(p).essence >= 1) {
 				Sound(p);
 				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				ByV.getinstance().shockwave(p, FFmana);
 			}
 			else {
@@ -712,7 +682,7 @@ public class Combination {
 //			if(CurrentMana >= RLmana && CurrentRobot >= RLrobot) {
 //				Sound(p);
 //				p.sendTitle(" ",blank+RL, 5, 20, 10);
-//				energyoverload(p, combo);
+//				PlayerEnergy.getinstance(p).energyoverload(combo);
 //				Phlox.getinstance().heal(p, RLmana);
 //			}
 //			else {
@@ -738,7 +708,7 @@ public class Combination {
 //			if(CurrentMana >= RRmana && CurrentRobot >= RRrobot) {
 //				Sound(p);
 //				p.sendTitle(" ",blank+RR, 5, 20, 10);
-//				energyoverload(p, combo);
+//				PlayerEnergy.getinstance(p).energyoverload(combo);
 //				Phlox.getinstance().escape(p, RRmana);
 //			}
 //			else {
@@ -764,7 +734,7 @@ public class Combination {
 //			if(CurrentMana >= FRmana && CurrentRobot >= FRrobot) {
 //				Sound(p);
 //				p.sendTitle(" ",blank+FR, 5, 20, 10);
-//				energyoverload(p, combo);
+//				PlayerEnergy.getinstance(p).energyoverload(combo);
 //				Phlox.getinstance().interrupt(p, FRmana);
 //			}
 //			else {
@@ -789,7 +759,7 @@ public class Combination {
 //			if(CurrentMana >= RFmana && CurrentRobot >= RFrobot) {
 //				Sound(p);
 //				p.sendTitle(" ",blank+RF, 5, 20, 10);
-//				energyoverload(p, combo);
+//				PlayerEnergy.getinstance(p).energyoverload(combo);
 //				Phlox.getinstance().annihilation(p, RFmana);
 //			}
 //			else {
@@ -814,7 +784,7 @@ public class Combination {
 //			if(CurrentMana >= FFmana) {
 //				Sound(p);
 //				p.sendTitle(" ",blank+FF, 5, 20, 10);
-//				energyoverload(p, combo);
+//				PlayerEnergy.getinstance(p).energyoverload(combo);
 //				Phlox.getinstance().robot(p, FFmana);
 //			}
 //			else {
@@ -864,7 +834,7 @@ public class Combination {
 //				}
 				Sound(p);
 				p.sendTitle(" ",blank+RL, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Blaster.getinstance().TurretDrop(p, RLmana);
 			}
 			else {
@@ -892,7 +862,7 @@ public class Combination {
 				}	
 				Sound(p);
 				p.sendTitle(" ",blank+RR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Blaster.getinstance().grenadelauncher(p, RRmana);
 			}
 			else {
@@ -920,7 +890,7 @@ public class Combination {
 				}	
 				Sound(p);
 				p.sendTitle(" ",blank+RF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Blaster.getinstance().rifle(p, RFmana);
 			}
 			else {
@@ -942,7 +912,7 @@ public class Combination {
 			if(CurrentMana >= FRmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+FR, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Blaster.getinstance().energytrans(p, CurrentMana);
 			}
 			else {
@@ -964,7 +934,7 @@ public class Combination {
 			if(CurrentMana >= FFmana) {
 				Sound(p);
 				p.sendTitle(" ",blank+FF, 5, 20, 10);
-				energyoverload(p, combo);
+				PlayerEnergy.getinstance(p).energyOverload(combo);
 				Blaster.getinstance().magneticfield(p, FFmana);
 			}
 			else {

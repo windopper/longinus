@@ -86,7 +86,7 @@ public class Shield {
 
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
-            Combination.getinstance().energyoverload(player, combo);
+            PlayerEnergy.getinstance(player).energyOverload(combo);
         }
         else {
             player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_LAND, 0.5f, 1f);

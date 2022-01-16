@@ -56,6 +56,7 @@ public class Damage {
 			int dmg = (int)(damage * PlayerManager.getinstance(user).defcalculate(user));
 			dmg *= PM.damageTakenRate;
 
+			// 피해를 받았을 때 작동
 			PM.runWhenDamaged.forEach((a)->a.run());
 			// 피해를 주는 이가 플레이어일 경우
 			if(damager instanceof Player player) {

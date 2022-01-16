@@ -8,14 +8,14 @@ import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
 import DynamicData.Damage;
-import GUIManager.GUIManager;
-import Gliese581cMobs.Gliese581cEntitySummon;
+import GUIs.GUIManager.GUIManager;
+import Mob.Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
 import Items.ModuleChips;
 import Items.WeaponManager;
-import Map.Map;
+import itemtools.Map.Map;
 import Mob.EntityManager;
-import Mob.MobEventManager;
+import Mob.EventListener;
 import Mob.MobMechManager;
 import Mob.mob;
 import PacketListener.PacketReader;
@@ -31,6 +31,7 @@ import PlayerChip.GuiEvent;
 import PlayerChip.SkillTalent.TalentUI;
 import PlayerChip.UserChipEvent;
 import PlayerManager.*;
+import PlayerManager.EventListener.*;
 import QuestFunctions.LeavingWhileQuestAndJoinAgain;
 import QuestFunctions.QuestNPCManager;
 import QuestFunctions.UserQuestManager;
@@ -41,6 +42,8 @@ import Shop.ShopNPCManager;
 import SpyGlass.SpyGlassEvent;
 import SpyGlass.SpyGlassItemManager;
 import UserStorage.Event;
+import Watchers.ArrowWatcher.ArrowWatcher;
+import itemtools.FlashLight.FlashLightListener;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.syncher.DataWatcher;
@@ -62,7 +65,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.SlimeSplitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -77,7 +79,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -95,8 +99,14 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new GuiEvent(), this);
 		getServer().getPluginManager().registerEvents(UserChipEvent.getinstance(), this);
 		getServer().getPluginManager().registerEvents(new Event(), this);
+
 		getServer().getPluginManager().registerEvents(new PlayerActionListener(), this);
-		getServer().getPluginManager().registerEvents(new PlayerCustomEventListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerArrowPassable(), this);
+		getServer().getPluginManager().registerEvents(new PlayerClassChange(), this);
+		getServer().getPluginManager().registerEvents(new PlayerDeathAndRespawn(), this);
+		getServer().getPluginManager().registerEvents(new PlayerDodge(), this);
+		getServer().getPluginManager().registerEvents(new PlayerTakeDamage(), this);
+
 		getServer().getPluginManager().registerEvents(ReturnMech.getinstance(), this);
 		getServer().getPluginManager().registerEvents(UserQuestManager.Singleton(), this);
 		getServer().getPluginManager().registerEvents(new ItemManager(), this);
@@ -104,7 +114,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new EventProcess(), this);
 		getServer().getPluginManager().registerEvents(new SpyGlassEvent(), this);
 		getServer().getPluginManager().registerEvents(new Gliese581cEntitySummon(), this);
-		getServer().getPluginManager().registerEvents(new MobEventManager(), this);
+		getServer().getPluginManager().registerEvents(new EventListener(), this);
 		//getServer().getPluginManager().registerEvents(new PacketListener(), this);
 		getServer().getPluginManager().registerEvents(new EditEventListener(), this);
 		getServer().getPluginManager().registerEvents(PacketRecord.Record.getInstance(), this);
@@ -114,6 +124,8 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new ModuleChips(), this);
 		getServer().getPluginManager().registerEvents(new GUIManager(), this);
 		getServer().getPluginManager().registerEvents(new TalentUI(), this);
+
+		getServer().getPluginManager().registerEvents(new FlashLightListener(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -139,11 +151,11 @@ public class Main extends JavaPlugin implements Listener {
 			if(!Bukkit.getOnlinePlayers().isEmpty()) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 
-					ServerJoinToDo(player);
+					registerInstance(player);
 				}
 			}
 
-			loop();
+			mainLoop();
 
 			QuestNPCManager.getinstance().addnpctolist();
 			ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
@@ -192,7 +204,7 @@ public class Main extends JavaPlugin implements Listener {
 	public void serverjoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 
-		ServerJoinToDo(p);
+		registerInstance(p);
 
 	}
 	
@@ -255,112 +267,12 @@ public class Main extends JavaPlugin implements Listener {
 			event.setCancelled(true);
 		}
 	}
-	
-	
+
+
 	@EventHandler
 	public void onClick(RightClickNPC event) {
 		Player player = event.getPlayer();
 	}
-
-//	@EventHandler
-//	public void hitentity(EntityDamageByEntityEvent e) { // 좌
-//
-//		if(e.getDamager() instanceof Arrow && e.getEntity() instanceof LivingEntity) {
-//			if(e.getDamager().getCustomName() != null) {
-//				String split[] = e.getDamager().getCustomName().split(":");
-//
-//				String skillname = split[0];
-//				String name = split[1];
-//
-//				if(split[1] != null) {
-//
-//
-//					if(e.getEntity().getCustomName() != null) {
-//
-//						if(e.getEntity().getCustomName().equals("샌드백")) {  // 화살로 친에가 샌드백이면
-//							for(Player p : Bukkit.getOnlinePlayers()) {
-//								if(p.getName().equals(name)) {
-//									if(PlayerHealthShield.getinstance(p).getCurrentShield()>0) {  // 플레이어가 1이상의 보호막을 가지고 있으면
-//										Damage.getinstance().taken(2000, (LivingEntity) p, (LivingEntity) e.getEntity());
-//										p.sendMessage("§e시험 진행 A.I:§e §f시간이 지나면 보호막은 자동으로 채워지니 염려하지 않으셔도 됩니다.");
-//										p.playSound(p.getLocation(), "meme.tut6", 5, 1);
-//										Tutorial.trainerbothit.put(p, 1);
-//									}
-//								}
-//							}
-//						}
-//						else if(e.getEntity().getCustomName().equals("과녁")) {  // 화살로 친에가 과녁이면
-//							for(Player p : Bukkit.getOnlinePlayers()) {
-//								if(p.getName().equals(name)) {
-//									Tutorial.trainerbothit.put(p, 1);
-//								}
-//							}
-//						}
-//					}
-//
-//					for(Player p : Bukkit.getOnlinePlayers()) {
-//						if(p.getName().equals(name)) {
-//
-//							if(!Tutorial.examset.containsKey(p)) {
-//
-//								if(Tutorial.exambothit.containsKey(p)) {// 튜토리얼 활성화?
-//
-//									if(e.getEntity().getCustomName() != null && e.getEntity() instanceof Slime) {  // 슬라임 봇 때릴 때
-//										String splitslime[] = e.getEntity().getCustomName().split("m");
-//										if(splitslime[1] != null) {
-//
-//												int number = Integer.parseInt(splitslime[1]);
-//
-//												if(Tutorial.exambothit.get(p)[number-1] == 0) { // 때린 봇의 번혿가 0번이면
-//
-//													Tutorial.exambothit.get(p)[number-1] = number; // 때린 봇 번호 추가
-//													Tutorial.exambothitcount.replace(p, Tutorial.exambothitcount.get(p)+1); // 횟수 추가
-//													break; // 번호 넣으면 탈출
-//												}
-//											}
-//
-//										}
-//
-//								}
-//							}
-//
-//							if(skillname.equals("dart")) {
-//								int dmg = PlayerManager.getinstance(p).spelldmgcalculate(p, 1);
-//								Damage.getinstance().taken(dmg, (LivingEntity) e.getEntity(), p);
-//							}
-//							else if(skillname.equals("bomb")) {
-//
-//								Blaster.getinstance().grenadelauncherbomb(e.getEntity().getLocation(), p);
-//
-//							}
-//
-//
-//
-//							break;
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-	
-	@EventHandler
-	public void respawn(PlayerRespawnEvent e) {
-		Player player = (Player) e.getPlayer();
-		PlayerHealthShield.getinstance(player).setCurrentHealth(PlayerManager.getinstance(player).Health);
-
-	}
-	
-	@EventHandler
-	public void Interact(PlayerInteractEvent e) {
-		
-		Action action = e.getAction();
-		Player player = e.getPlayer();
-		
-	}
-
-	
-	
     public static Main getInstance() {
         return instance;
     }
@@ -381,9 +293,6 @@ public class Main extends JavaPlugin implements Listener {
 				}
 
 			}
-//			if(args[0].equals("accept")) {
-//				DuelManager.getDuelManager();
-//			}
 		}
 
 
@@ -806,11 +715,21 @@ public class Main extends JavaPlugin implements Listener {
 				(new Map()).getMap(player, MapView.Scale.CLOSEST);
 				break;
 			}
+			case "dungeon": {
+				Set<Player> set = new HashSet<>();
+				set.add(player);
+				Dungeon.Dungeon.init(set, player.getWorld());
+				break;
+			}
+			case "flashlight": {
+				player.getInventory().addItem((new FlashLightListener()).getFlashLight());
+				break;
+			}
 		}
 		return true;
 	}
 	
-	public void loop() {
+	public void mainLoop() {
 
 		
 		new BukkitRunnable() {
@@ -854,7 +773,7 @@ public class Main extends JavaPlugin implements Listener {
 				
 				Packets.loop.packetloop();
 				
-				ArrowCheck.ArrowWatcher();
+				ArrowWatcher.ArrowWatcher();
 
 				MobMechManager.getInstance().RunGliese581cMobMech();
 				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
@@ -906,7 +825,7 @@ public class Main extends JavaPlugin implements Listener {
 
 
 				mob.loop();
-				mob.mobdelete();
+				mob.mobDelete();
 				loop.loop();
 
 			}
@@ -938,7 +857,7 @@ public class Main extends JavaPlugin implements Listener {
 		
 	}
 	
-	public void ServerJoinToDo(Player p) {
+	public void registerInstance(Player p) {
 
 		(new SQL.SQLManager(p)).updateData();
 		(new SQL.SQLManager(p)).initData();

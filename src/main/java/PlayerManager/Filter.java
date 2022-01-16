@@ -5,66 +5,51 @@ import org.bukkit.entity.Player;
 import net.md_5.bungee.api.ChatColor;
 
 public class Filter {
+
+	public enum FilterType {
+		generalItem,
+		sameWpClassAndCurrentClass,
+		hasWpClassButDiffCurrentClass,
+		filteredWithUserEquipmentChecker,
+	}
 	
-	public static int Require(Player p) { // 무기 안
+	public static Filter.FilterType Require(Player p) { // 무기 안
 		
 		/*
 		 0 무기클래스가 할당되지 않은 일반적인 아이템
 		 1 무기클래스와 현재 클래스가 같음
 		 2 무기클래스가 있으나 현재클래스가 다름
 		 3 userrequipmentchecker에 걸림
-		 
-		 
-		 
 		 */
 		
 		String CurrentClass = PlayerManager.getinstance(p).CurrentClass;
 		String WeaponClass = PlayerManager.getinstance(p).WeaponClass;
 
-		
 		if(WeaponClass.equals("없음")) {
-			if(p.getInventory().getItemInMainHand() != null) {
 				if(p.getInventory().getItemInMainHand().getItemMeta() != null) {
 					if(ChatColor.stripColor(p.getInventory().getItemInMainHand().getItemMeta().getDisplayName()).equals("훈련용 검")) {
-						return 1;
+						return Filter.FilterType.sameWpClassAndCurrentClass;
 					}
 				}
-			}
 		}
-		
 		if(CurrentClass.equals(WeaponClass)) { // 이름이 같으면
 			if(WeaponClass.equals("없음")) { // 근데 무기클래스가 nothing1 이라면
-				
-				return 0; // 0이면 무기클래스가 할당되지 않은 일반적인 아이템을 듬
+				return Filter.FilterType.generalItem; // 0이면 무기클래스가 할당되지 않은 일반적인 아이템을 듬
 			}
 			else { // 이름이 같고, 무기 클래스가 nothing1가 아니면
-				
-				
-				if(!UserRequirementChecker(p)) {
-					
-					//p.sendMessage("§c안됨");
-					
-					return 3;
-				}
-				
-				return 1; // 1이면 무기클래스가 할당된 아이템을 듬
-			}
 
+				if(!UserRequirementChecker(p)) {
+					return Filter.FilterType.filteredWithUserEquipmentChecker;
+				}
+				return Filter.FilterType.sameWpClassAndCurrentClass; // 1이면 무기클래스가 할당된 아이템을 듬
+			}
 		}
 		else { // 이름이 다르면
-			
-			if(WeaponClass.equals("없음")) { // 이름이 다르고 무기클래스가 할당 되지 않은 아이템을 들었을때
-				return 0;
+			if (WeaponClass.equals("없음")) { // 이름이 다르고 무기클래스가 할당 되지 않은 아이템을 들었을때
+				return Filter.FilterType.generalItem;
 			}
-			else { 
-				
-			}
-			
-			return 2; // 2이면 무기클래스가 할당된 아이템을 들었으나 클래스가 다름
+			return Filter.FilterType.hasWpClassButDiffCurrentClass; // 2이면 무기클래스가 할당된 아이템을 들었으나 클래스가 다름
 		}
-		
-		
-
 	}
 	
 	public static void UserRequirementChecker(int req, Player p) {
@@ -73,8 +58,6 @@ public class Filter {
 			p.sendMessage("§c아직 필요레벨을 충족하지 못하였습니다");
 		}
 	}
-	
-	
 	private static boolean UserRequirementChecker(Player p) {
 
 		int lvl = PlayerManager.getinstance(p).getlvl();
@@ -137,8 +120,6 @@ public class Filter {
 			
 			return false;
 		}
-		
-		
 		return true;
 	}
 	

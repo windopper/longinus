@@ -108,7 +108,7 @@ public class Aether {
 
 			Combination.getinstance().Sound(player);
 			player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
-			Combination.getinstance().energyoverload(player, combo);
+			PlayerEnergy.getinstance(player).energyOverload(combo);
 			return mana;
 		}
 		else {
@@ -290,7 +290,7 @@ public class Aether {
 		playParticle.CirCleHorizontalSmallImpact(player.getLocation().add(0, 0.3, 0));
 		PlayerFunction PF = PlayerFunction.getinstance(player);
 
-		double spellrate = (PF.AEImpulse+100) / 200;
+		double spellrate = PF.AEImpulse / 1000 * 4 + 1;
 
 		int FRtIII = pm.getTalent("FR", 3);
 		int FRtIV = pm.getTalent("FR", 4);
@@ -303,7 +303,12 @@ public class Aether {
 			spellrate = PF.AEImpulse * 3 / 1000 + 2.5;
 		}
 		if(FRtIV == 1) {
-			spellrate *= 2;
+			if(FRtIII == 1) {
+				spellrate = PF.AEImpulse * 8.5 / 1000 + 2.5;
+			}
+			else {
+				spellrate = PF.AEImpulse * 11 / 1000;
+			}
 		}
 		else if(FRtIV == 2) {
 			PF.AEImpulse = Double.parseDouble(String.format("%.2f", PF.AEImpulse/2));

@@ -311,14 +311,14 @@ public class SpellManager {
                             RunParticles(ParticleType.DestinationParticle);
                             RunSounds(SoundType.DestinationSound);
                         }
-                        if(StunTick != 0)
-                            EntityStatusManager.getinstance(e).Stun(player, StunTick);
+//                        if(StunTick != 0)
+//                            EntityStatusManager.getinstance(e).Stun(player, StunTick);
+//
+//                        if(BurnTick != 0)
+//                            EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
-                        if(BurnTick != 0)
-                            EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
-
-                        if(KnockBackStandard != null)
-                            EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
+//                        if(KnockBackStandard != null)
+//                            EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
                         HitEntityList.add(e);
                         Damage.getinstance().taken(dmg, e, player);
@@ -366,8 +366,8 @@ public class SpellManager {
                     if(KnockBackStandard != null)
                         EntityStatusManager.getinstance(e).KnockBack(KnockBackStandard, KnockBackRate);
 
-                    if(BurnTick != 0)
-                        EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
+//                    if(BurnTick != 0)
+//                        EntityStatusManager.getinstance(e).burns(player, BurnTick, BurnDamage + (int)(dmg * BurnDamageRate));
 
                     HitEntityList.add(e);
                     Damage.getinstance().taken(dmg, e, player);

@@ -11,12 +11,9 @@ public class PlayerInfoActionBar {
 	static int i=0;
 
 	public static void actionbar() {
-		
-		
+
 		if(i>20) i=0;
 		i++;
-
-		
 		for(Player player : Bukkit.getOnlinePlayers()) {
 
 			PlayerFunction PF = PlayerFunction.getinstance(player);
@@ -67,7 +64,5 @@ public class PlayerInfoActionBar {
 				player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(n));
 			}
 		}
-				
 	}
-
 }

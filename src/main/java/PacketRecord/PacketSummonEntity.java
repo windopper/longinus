@@ -16,7 +16,7 @@ public class PacketSummonEntity {
     private final UUID uuid;
     private final World world;
 
-    public final static List<String> Type = Arrays.asList("Gliese581cMobs.FoxRat");
+    public final static List<String> Type = Arrays.asList("Mob.Gliese581cMobs.FoxRat");
 
     public PacketSummonEntity(String entitytype, UUID uuid, World world) {
         this.entitytype = entitytype;
@@ -26,7 +26,7 @@ public class PacketSummonEntity {
 
     public Entity getEntity() {
 
-        if(entitytype.equals("Gliese581cMobs.FoxRat")) {
+        if(entitytype.equals("Mob.Gliese581cMobs.FoxRat")) {
             EntityFox entityFox = new EntityFox(EntityTypes.E, world);
             entityFox.setSilent(true);
             entityFox.setCustomNameVisible(false);

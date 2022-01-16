@@ -1,6 +1,6 @@
 package PlayerChip.SkillTalent;
 
-import GUIManager.GUIManager;
+import GUIs.GUIManager.GUIManager;
 import PlayerChip.Maingui;
 import PlayerManager.PlayerManager;
 import net.minecraft.nbt.NBTTagCompound;

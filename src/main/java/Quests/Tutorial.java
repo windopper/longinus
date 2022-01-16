@@ -434,7 +434,7 @@ public class Tutorial {
 //		
 //		skeleton.getEquipment().setItemInMainHand(item);
 		
-		EntityStatusManager.getinstance(slime).setCanKnockback(false);
+		EntityStatusManager.getinstance(slime).setStatusTag(EntityStatusManager.statusTag.knockbackImmune);
 		
 		//Bukkit.broadcastMessage("hi2");
 	}

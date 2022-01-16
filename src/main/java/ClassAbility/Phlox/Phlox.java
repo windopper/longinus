@@ -4,6 +4,7 @@ import ClassAbility.Combination;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
 import DynamicData.targetBuilder;
+import PlayParticle.Rotate;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerHealthShield;
@@ -12,32 +13,25 @@ import Mob.*;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
 import spellinteracttest.Main;
+import utils.SkullHandler;
+import utils.StandHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 public class Phlox {
 
 	private static Phlox Phlox;
-	
-//	public static final int healmana = 5;
-//	public static final int annihilationmana = 3;
-//	public static final int escapemana = 3;
-//	public static final int interruptmana = 4;
-//	public static final int robotmana = 3;
-//
-//	public static final int healrobot = 20;
-//	public static final int annihilationrobot = 20;
-//	public static final int escaperobot = 10;
-//	public static final int interruptrobot = 20;
 
 	private Player player;
 	private PlayerFunction playerFunction;
@@ -45,6 +39,7 @@ public class Phlox {
 	private int CurrentMana;
 	private int ManaDecrease;
 	private int CurrentRobot;
+	private targetBuilder tb;
 
 
 	public Phlox(Player player) {
@@ -54,6 +49,7 @@ public class Phlox {
 		this.ManaDecrease = PlayerManager.getinstance(player).ManaDecrease;
 		this.CurrentRobot = PlayerFunction.getinstance(player).PHNanoRobot;
 		this.pm = PlayerManager.getinstance(player);
+		this.tb = targetBuilder.builder(player);
 	}
 
 	private Phlox() {
@@ -63,7 +59,7 @@ public class Phlox {
 	private enum ENUM {
 		RR(3, 10,"§o§l긴급탈출§l§o §3§l-⚡§l"),
 		RL(5, 20,"§o§l정밀치료§l§o §3§l-⚡§l"),
-		FR(8, 20,"§o§l충격량전환: 블레이드오러§l§o §3§l-⚡§l"),
+		FR(2, 20,"§o§lFR§l§o §3§l-⚡§l"),
 		SHIFTR(5, 20,"§o§l섬멸개시§l§o §3§l-⚡§l");
 
 		private int mana;
@@ -90,15 +86,25 @@ public class Phlox {
 
 		if(!Enums.getIfPresent(ENUM.class, combo).isPresent()) return 0;
 
+		int originMana = ENUM.valueOf(combo).getMana();
+		int originRobot = ENUM.valueOf(combo).getRobot();
 
-		int mana = ENUM.valueOf(combo).getMana() - ManaDecrease <= 0 ? 1 : ENUM.valueOf(combo).getMana() - ManaDecrease
+		int RRtIII = pm.getTalent("RR", 3);
+		int RRtIV = pm.getTalent("RR", 4);
+		if(RRtIII == 1 && combo.equals("RR"))
+			originMana -= 2;
+		if(RRtIV == 2 && combo.equals("RR"))
+			originRobot = 0;
+
+		int mana = originMana - ManaDecrease <= 0 ? 1 : originMana - ManaDecrease
 				+ PlayerEnergy.getinstance(player).getEnergyOverload();
 
-		int robot = ENUM.valueOf(combo).getRobot();
+		int robot = originRobot;
 
 		int RLtIV = pm.getTalent("RL", 4);
 		int SRtIII = pm.getTalent("SR", 3);
 		int SRtIV = pm.getTalent("SR", 4);
+
 		if(RLtIV == 2 && combo.equals("RL")) {
 			mana = 1 + PlayerEnergy.getinstance(player).getEnergyOverload();
 			robot /= 2;
@@ -113,6 +119,7 @@ public class Phlox {
 			mana = Math.max(mana - pm.nextManaDecrease, 1);
 		}
 
+
 		String title = ENUM.valueOf(combo).getTitle()+mana;
 
 		if(robot > CurrentRobot) {
@@ -122,15 +129,15 @@ public class Phlox {
 		}
 		if(mana <= CurrentMana) {
 			PlayerEnergy.getinstance(player).useEnergy(mana);
-			if(combo.equals("RR")) escape();
+			if(combo.equals("RR")) RR();
 			if(combo.equals("RL")) heal();
-			if(combo.equals("FR")) {};
+			if(combo.equals("FR")) FR();
 			if(combo.equals("SHIFTR")) annihilation();
 
 
 			Combination.getinstance().Sound(player);
 			player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
-			Combination.getinstance().energyoverload(player, combo);
+			PlayerEnergy.getinstance(player).energyOverload(combo);
 			nanorobotoverload(robot, 80);
 			return mana;
 		}
@@ -440,32 +447,79 @@ public class Phlox {
 		annihilationlaser();
 	}
 
-	public void escape() {
+	public void RR() {
+
+		int RRtI = pm.getTalent("RR", 1);
+		int RRtII = pm.getTalent("RR", 2);
+		int RRtIII = pm.getTalent("RR", 3);
+		int RRtIV = pm.getTalent("RR", 4);
+
 		Location ploc = player.getLocation();
 		for(Player pl : Bukkit.getOnlinePlayers()) {
 			pl.playSound(ploc, Sound.ENTITY_GHAST_SHOOT, 2, 1);
 		}
-		Vector pvec = ploc.toVector();
-		
-		player.setVelocity(new Vector(0, 1.5, 0));
-		
-		for(Entity e : player.getWorld().getNearbyEntities(ploc, 3, 3, 3)) {
 
-			if(e instanceof LivingEntity) {
-				if(EntityStatusManager.getinstance((LivingEntity)e).canKnockback() == false) continue;
+		if(RRtIV != 1)
+			player.setVelocity(new Vector(0, 1.5, 0));
+		else
+			player.setVelocity(new Vector(0, 0.7, 0));
+
+		Runnable knockBack = () -> {
+			for(LivingEntity e : player.getWorld().getLivingEntities()) {
+				if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, player) && e!=player) {
+					if(e.getLocation().distance(player.getLocation())<3) {
+						EntityStatusManager.getinstance(e).KnockBackVectorPSubE(player, 1.5);
+					}
+				}
 			}
+		};
 
-			if(entitycheck.entitycheck(e) && entitycheck.duelcheck(e, player) && e != player) {
-				
-				Location eloc = e.getLocation();	
-				
-				Vector evec = eloc.toVector();
-				Vector ptoe = evec.subtract(pvec);
-				ptoe.normalize();
-				e.setVelocity(ptoe.multiply(1.5));	
-				
+		Function<Integer, Integer> damageModf = (d) -> (int)((double)d * 1.2);
+
+		if(RRtI == 1) knockBack.run();
+		else if(RRtI == 2) {
+			tb.setRadius(3)
+					.setDamage(()->pm.spelldmgcalculate(player, 0.3))
+					.build();
+		}
+
+		if(RRtII == 1) {
+			if(!pm.dummyCount.contains("PHRRtII1")) {
+				pm.giveDamageModifier.add(damageModf);
+				pm.dummyCount.add("PHRRtII1");
 			}
 		}
+		else if(RRtII == 2) {
+			if(!player.isOnGround() && !player.getLocation().add(0, -2, 0).getBlock().getType().isSolid()) {
+				final ArmorStand ar = (new StandHandler()).getArmorStand(player.getLocation());
+				ItemStack itemStack = (new SkullHandler())
+						.getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2FmNTk3NzZmMmYwMzQxMmM3YjU5NDdhNjNhMGNmMjgzZDUxZmU2NWFjNmRmN2YyZjg4MmUwODM0NDU2NWU5In19fQ==");
+				ar.getEquipment().setItem(EquipmentSlot.HEAD, itemStack);
+				ar.setGravity(true);
+				Vector v = new Vector(0, -1, 0);
+				new BukkitRunnable() {
+					@Override
+					public void run() {
+						ar.getWorld().spawnParticle(Particle.SMOKE_NORMAL, ar.getEyeLocation(), 1, 0, 0, 0, 0);
+						ar.setVelocity(v);
+						if(ar.isOnGround()) {
+							ar.getWorld().playSound(ar.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2, 1);
+							ar.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, ar.getLocation(), 5, 0.5, 0.5, 0.5, 0);
+							targetBuilder.builder(player)
+									.setRadius(4)
+									.setDamage(() -> pm.spelldmgcalculate(player, 1))
+									.setLocation(ar.getLocation())
+									.build();
+							ar.remove();
+							cancel();
+						}
+					}
+				}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+			}
+		}
+
+		player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 1, 1));
+
 		new BukkitRunnable() {
 			
 			double i=0;
@@ -475,7 +529,19 @@ public class Phlox {
 			public void run() {
 				player.setFallDistance(0);
 
+				if(RRtIV == 1)
+					player.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_FALLING, 10, 1));
+
 				if(player.isOnGround() && i>3) {
+					if(pm.dummyCount.contains("PHRRtII1")) {
+						pm.giveDamageModifier.remove(damageModf);
+						pm.dummyCount.remove("PHRRtII1");
+					}
+					if(RRtII == 3) {
+						pm.damageTakenRate -= 0.15;
+						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () ->
+								pm.damageTakenRate += 0.15, 50);
+					}
 					cancel();
 				}
 				
@@ -489,10 +555,7 @@ public class Phlox {
 				i++;
 				
 			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
-
-		
-		
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 	}
 	public void interrupt() {
 		nanorobotoverload(ENUM.FR.robot, 80);
@@ -952,41 +1015,109 @@ public class Phlox {
 	    }
 	}
 
-	private void FRSkill(Player player) {
-
-		Location targetloc = null;
-
+	private void FR() {
 		Location loc = player.getEyeLocation();
-		Vector dir = loc.getDirection().normalize().multiply(0.4);
-
-
-		// location settings
-		for(int i=0; i<40; i++) {
-			for(LivingEntity entity : player.getWorld().getLivingEntities()) {
-				if(entitycheck.entitycheck(entity) && entitycheck.duelcheck(entity, player)) {
-					Location eloc = entity.getLocation();
-					BoundingBox box = entity.getBoundingBox();
-					if(eloc.distance(loc) < 1.5 || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
-						targetloc = entity.getLocation();
-						break;
+		tb.setLocation(loc)
+				.setDamage(() -> pm.spelldmgcalculate(player, 1.5))
+				.setRadius(1.5)
+				.addStatus((e)-> {
+					EntityManager em = EntityManager.getinstance(e);
+					if(em.dummyCount.stream().filter((a)->a.contains("PHFR")).toList().size()<2) {
+						em.dummyCount.add("PHFR");
+						em.damageTakenRate += 0.05;
+						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
+							em.dummyCount.remove("PHFR");
+							em.damageTakenRate -= 0.05;
+						}, 60);
 					}
+				});
+
+		new BukkitRunnable() {
+			int time =0;
+			int roll = 0;
+			double dist = 0;
+			double pitch = loc.getPitch();
+			double yaw = loc.getYaw();
+			double rpitch = Math.toRadians(pitch);
+			double ryaw = Math.toRadians(yaw);
+			double r = 0.5;
+			@Override
+			public void run() {
+
+				for(int i=0; i<5; i++) {
+					double x = 0;
+					double y = r;
+					double z = dist;
+
+					double x_ = Math.sqrt(r*3)/3;
+					double y_ = -r/2;
+					double z_ = dist;
+
+					double x__ = -Math.sqrt(r*3)/3;
+					double y__ = -r/2;
+					double z__ = dist;
+
+					double x___ = 0;
+					double y___ = 0;
+					double z___ = dist;
+
+					Vector v = new Vector(x, y, z);
+					Vector v_ = new Vector(x_, y_, z_);
+					Vector v__ = new Vector(x__, y__, z__);
+					Vector v___ = new Vector(x___, y___, z___);
+
+					double rroll = Math.toRadians(roll);
+					v = Rotate.transform(v, ryaw, rpitch, rroll);
+					v_ = Rotate.transform(v_, ryaw, rpitch, rroll);
+					v__ = Rotate.transform(v__, ryaw, rpitch, rroll);
+					v___ = Rotate.transform(v___, ryaw, rpitch, rroll);
+
+					loc.add(v);
+					FRParticle(loc);
+					loc.subtract(v);
+
+					loc.add(v_);
+					FRParticle(loc);
+					loc.subtract(v_);
+
+					loc.add(v__);
+					FRParticle(loc);
+					loc.subtract(v__);
+
+					loc.add(v___);
+					loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0
+					,new Particle.DustOptions(Color.RED, 1));
+					tb.build();
+
+					if(tb.isBuilt()) {
+						for(double k =0; k<Math.PI*2; k+=Math.PI/16) {
+							x = Math.cos(k);
+							y = 0;
+							z = Math.sin(k);
+							Vector va = new Vector(x, y, z);
+							loc.getWorld().spawnParticle(Particle.CLOUD, loc, 0, va.getX()
+									,va.getY(), va.getZ(), 0.15);
+						}
+					}
+
+					loc.subtract(v___);
+
+					roll+=5;
+					dist+=0.2;
 				}
+				if(time>40 || tb.isBuilt()) {
+					cancel();
+				}
+				time++;
 			}
-			if(targetloc != null) break;
-			if(loc.getBlock().getType().isSolid()) {
-				targetloc = loc;
-				break;
-			}
-			if(i==39) targetloc = loc;
-			loc.add(dir);
-		}
-
-
-
-
-
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 	}
 
+	private void FRParticle(Location loc) {
+		loc.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+		loc.getWorld().spawnParticle(Particle.REDSTONE, loc, 1, 0, 0, 0, 0
+		,new Particle.DustOptions(Color.YELLOW, 0.5f));
+	}
 }	
 
 

@@ -60,7 +60,6 @@ public class EntityManager {
 	private Method deathMethod;
 	private Method attackMethod;
 	private Method attackedByMethod;
-	//private Method dropTable;
 	private final HashMap<ItemStack, Double> dropTable = new HashMap<>();
 	
 	private EntityManager(@Nonnull Entity e) {
@@ -445,8 +444,8 @@ public class EntityManager {
 				DeathAbility();
 				invokeDropTable();
 
-				if(e instanceof LivingEntity)
-					EntityStatusManager.getinstance((LivingEntity) e).removeinstance();
+//				if(e instanceof LivingEntity)
+//					EntityStatusManager.getinstance((LivingEntity) e).removeinstance();
 				removeinstance();
 				return;
 			}
@@ -578,14 +577,11 @@ public class EntityManager {
 				Namear = null;
 			}
 
-
 			HeightTempAdd = 0.25;
 
 			if(Healthar != null) Healthar.remove();
 			Healthar = null;
-
 		}
-
 
 		AmbientParticleCycle();
 		AmbientAbilityCycle();

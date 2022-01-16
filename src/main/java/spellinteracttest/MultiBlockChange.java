@@ -24,7 +24,6 @@ public class MultiBlockChange {
 
         HashMap<Location, Material> blocks = new HashMap<>();
         HashMap<Location, BlockData> bdata = new HashMap<>();
-        
 
         double x1 = -244;
         double y1 = 125;

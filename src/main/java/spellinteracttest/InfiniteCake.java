@@ -34,7 +34,7 @@ public class InfiniteCake {
                 location.getBlock().setType(Material.CAKE);
                 if(!turnon) cancel();
             }
-        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 
     }
 

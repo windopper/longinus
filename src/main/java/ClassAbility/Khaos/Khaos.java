@@ -9,7 +9,6 @@ import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerManager;
 import PlayerManager.PlayerHealthShield;
 import Mob.EntityManager;
-import TabListSetter.TabList;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.*;
@@ -102,7 +101,7 @@ public class Khaos {
 
             Combination.getinstance().Sound(player);
             player.sendTitle(" ", Combination.blank+title, 5, 20, 10);
-            Combination.getinstance().energyoverload(player, combo);
+            PlayerEnergy.getinstance(player).energyOverload(combo);
             return mana;
         }
         else {
@@ -225,35 +224,35 @@ public class Khaos {
         if(RLtIII == 2) {
             tb.addStatus((e) -> {
                 EntityManager em = EntityManager.getinstance(e);
-                if(em.dummyCount.stream().filter((a)->a.contains("RLtIII2")).toList().size()<4) {
+                if(em.dummyCount.stream().filter((a)->a.contains("KHRLtIII2")).toList().size()<4) {
                     em.damageTakenRate += 0.05;
-                    em.dummyCount.add("RLtIII2");
+                    em.dummyCount.add("KHRLtIII2");
                     Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
                             em.damageTakenRate -= 0.05;
-                            em.dummyCount.remove("RLtIII2");
+                            em.dummyCount.remove("KHRLtIII2");
                     }, 200);
                 }
 
             });
         }
         else if(RLtIII == 3) {
-            if(pm.dummyCount.stream().filter((a)->a.contains("RLtIII3")).toList().size()<8) {
+            if(pm.dummyCount.stream().filter((a)->a.contains("KHRRLtIII3")).toList().size()<8) {
                 pm.addiWalkSpeed += 5;
-                pm.dummyCount.add("RLtIII3");
+                pm.dummyCount.add("KHRRLtIII3");
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
                     pm.addiWalkSpeed -= 5;
-                    pm.dummyCount.remove("RLtIII3");
+                    pm.dummyCount.remove("KHRRLtIII3");
                 }, 120);
             }
         }
 
         if(RLtIV == 3) {
-            if(pm.dummyCount.stream().filter((a)->a.contains("RLtIV3")).toList().size()<10) {
+            if(pm.dummyCount.stream().filter((a)->a.contains("KHRRLtIV3")).toList().size()<10) {
                 pm.damageTakenRate -= 0.05;
-                pm.dummyCount.add("RLtIV3");
+                pm.dummyCount.add("KHRRLtIV3");
                 Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
                     pm.damageTakenRate += 0.05;
-                    pm.dummyCount.remove("RLtIV3");
+                    pm.dummyCount.remove("KHRRLtIV3");
                 }, 60);
             }
         }
@@ -388,7 +387,10 @@ public class Khaos {
                 if(time>=1) player.setVelocity(new Vector(0, 0, 0));
                 if(time>1) {
 
-                    player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1, 0);
+                    //player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 1, 0);
+                    for(int i=0; i<5; i++) {
+                        player.getWorld().playSound(player.getLocation(), Sound.BLOCK_GLASS_BREAK, 1, ((float)i/2));
+                    }
                     player.getWorld().playSound(player.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1.5f);
 
                     Location loc_ = player.getEyeLocation().add(0, -0.3, 0);
@@ -413,33 +415,51 @@ public class Khaos {
                         }
                     }
 
-                    for(double j = -60; j<60; j+=2) {
-                        double radian = Math.toRadians(j);
-                        double x = 0;
-                        double y = 0;
-                        double z = 2;
+                    for(double j=0; j<Math.PI*2; j+=Math.PI/32) {
+                        double x = Math.cos(j);
+                        double y = Math.sin(j);
+                        double z = 1;
                         Vector v = new Vector(x, y, z);
-                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
-                        v = Rotate.transform(v, rY, rP , Math.toRadians(45));
+                        v = Rotate.transform(v, rY, rP, 0);
                         loc_.add(v);
-                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
-                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
+                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 0, v.getX(), v.getY(), v.getZ(), 0.25);
+                        Vector v_ = new Vector(x, y, 0);
+                        v_ = Rotate.transform(v_, rY, 0,0);
+                        player.getWorld().spawnParticle(Particle.SOUL_FIRE_FLAME,
+                                player.getLocation().add(0, 1, 0), 0, v_.getX(), v_.getY(), v_.getZ(), 0.2);
+                        Vector v__ = new Vector(x, z, y);
+                        player.getWorld().spawnParticle(Particle.SNOWFLAKE,
+                                player.getLocation().add(0, 1, 0), 0, v__.getX(), v__.getY(), v__.getZ(), 0.2);
                         loc_.subtract(v);
                     }
 
-                    for(double j = 60; j>-60; j-=2) {
-                        double radian = Math.toRadians(j);
-                        double x = 0;
-                        double y = 0;
-                        double z = 2;
-                        Vector v = new Vector(x, y, z);
-                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
-                        v = Rotate.transform(v, rY, rP , Math.toRadians(-45));
-                        loc_.add(v);
-                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
-                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
-                        loc_.subtract(v);
-                    }
+//                    for(double j = -60; j<60; j+=2) {
+//                        double radian = Math.toRadians(j);
+//                        double x = 0;
+//                        double y = 0;
+//                        double z = 2;
+//                        Vector v = new Vector(x, y, z);
+//                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
+//                        v = Rotate.transform(v, rY, rP , Math.toRadians(45));
+//                        loc_.add(v);
+//                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
+//                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
+//                        loc_.subtract(v);
+//                    }
+//
+//                    for(double j = 60; j>-60; j-=2) {
+//                        double radian = Math.toRadians(j);
+//                        double x = 0;
+//                        double y = 0;
+//                        double z = 2;
+//                        Vector v = new Vector(x, y, z);
+//                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
+//                        v = Rotate.transform(v, rY, rP , Math.toRadians(-45));
+//                        loc_.add(v);
+//                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
+//                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
+//                        loc_.subtract(v);
+//                    }
                     cancel();
                 }
                 time++;

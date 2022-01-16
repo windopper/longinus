@@ -42,15 +42,9 @@ public class Centermsg {
                 sb.append(" ");
                 compensated += spaceLength;
         }
-        
-        
-        return sb.toString() + message + sb.toString();
-        //p.sendMessage(sb.toString() + message);
-		
 
+        return sb.toString() + message + sb.toString();
 	}
-	
-	
 	public static void CenteredMessage(Player p, String message){
 		
         message = ChatColor.translateAlternateColorCodes('&', message);

@@ -3,7 +3,6 @@ package PlayerManager;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerEnergy extends PlayerManager {
@@ -107,5 +106,35 @@ public class PlayerEnergy extends PlayerManager {
 		}
 		getUsedManaFromPlayer.clear();
 		PreviousManaUsed = 0;
+	}
+
+	public void energyOverload(String combo) {
+
+		if(getPreviousSkill().equals("none")) { // 이전에 쓴 스킬이 없으면
+			setPreviousSkill(combo);
+			setEnergyOverload(0);
+			setEnergyOverloadCooldown(1);
+		}
+
+		else {
+			if(getPreviousSkill().equals(combo)) { // 이전에 쓴 스킬이 지금 스킬이랑 같으면
+				if(getEnergyOverload()==0) { // 에너지 과부하가 없으면
+
+					setEnergyOverload(getEnergyOverload()+1);
+					setEnergyOverloadCooldown(1);
+				}
+				else {
+					// 에너지 과부하가 있으면 과부하 1더 추가
+					setEnergyOverload(getEnergyOverload()+1);
+					// 에너지 과부하 쿨다운 시작
+					setEnergyOverloadCooldown(1);
+				}
+			}
+			else { // 이전에 쓴 스킬이 지금 스킬이랑 다르면
+				setPreviousSkill(combo);
+				setEnergyOverload(0);
+				setEnergyOverloadCooldown(1);
+			}
+		}
 	}
 }
