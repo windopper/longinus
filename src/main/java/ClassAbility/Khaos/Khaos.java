@@ -1,7 +1,8 @@
 package ClassAbility.Khaos;
 
 import ClassAbility.Combination;
-import DynamicData.targetBuilder;
+import utils.DuraAbilityHandler;
+import utils.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerEnergy;
@@ -236,17 +237,26 @@ public class Khaos {
             });
         }
         else if(RLtIII == 3) {
-            if(pm.dummyCount.stream().filter((a)->a.contains("KHRRLtIII3")).toList().size()<8) {
-                pm.addiWalkSpeed += 5;
-                pm.dummyCount.add("KHRRLtIII3");
-                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
-                    pm.addiWalkSpeed -= 5;
-                    pm.dummyCount.remove("KHRRLtIII3");
-                }, 120);
-            }
+
+            DuraAbilityHandler.getHandler(player, "KHRLtIII3")
+                    .setMaximumStack(8)
+                    .setTick(120)
+                    .setRunnable(()->pm.addiWalkSpeed += 5, ()->pm.addiWalkSpeed -= 5)
+                    .isPersistent(true)
+                    .setStopCondition(() -> !PlayerEnergy.getinstance(player).getPreviousSkill().equals("RL"))
+                    .run();
         }
 
         if(RLtIV == 3) {
+
+            DuraAbilityHandler.getHandler(player, "KHRLtIV3")
+                    .setMaximumStack(10)
+                    .setTick(60)
+                    .setRunnable(()->pm.damageTakenRate-=0.05, ()->pm.damageTakenRate+=0.05)
+                    .isPersistent(true)
+                    .run();
+
+
             if(pm.dummyCount.stream().filter((a)->a.contains("KHRRLtIV3")).toList().size()<10) {
                 pm.damageTakenRate -= 0.05;
                 pm.dummyCount.add("KHRRLtIV3");
@@ -323,14 +333,12 @@ public class Khaos {
         double spellrate = 1;
         if(RRtI == 1) spellrate = 1.1;
         else if(RRtI == 2) {
-            if(pm.dummyCount.stream().filter((a)->a.contains("KHRRtI2")).toList().size() == 0) {
-                pm.addiWalkSpeed += 10;
-                pm.dummyCount.add("KHRRtI2");
-                Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
-                        pm.dummyCount.remove("KHRRtI2");
-                        pm.addiWalkSpeed -= 10;
-                }, 100);
-            }
+            DuraAbilityHandler.getHandler(player, "KHRRtI2")
+                    .isPersistent(true)
+                    .setTick(100)
+                    .setMaximumStack(1)
+                    .setRunnable(()->pm.addiWalkSpeed+=10, ()->pm.addiWalkSpeed-=10)
+                    .run();
         }
         if(RRtIV == 1)
             spellrate *= 1 + 2 *
@@ -432,34 +440,6 @@ public class Khaos {
                                 player.getLocation().add(0, 1, 0), 0, v__.getX(), v__.getY(), v__.getZ(), 0.2);
                         loc_.subtract(v);
                     }
-
-//                    for(double j = -60; j<60; j+=2) {
-//                        double radian = Math.toRadians(j);
-//                        double x = 0;
-//                        double y = 0;
-//                        double z = 2;
-//                        Vector v = new Vector(x, y, z);
-//                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
-//                        v = Rotate.transform(v, rY, rP , Math.toRadians(45));
-//                        loc_.add(v);
-//                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
-//                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
-//                        loc_.subtract(v);
-//                    }
-//
-//                    for(double j = 60; j>-60; j-=2) {
-//                        double radian = Math.toRadians(j);
-//                        double x = 0;
-//                        double y = 0;
-//                        double z = 2;
-//                        Vector v = new Vector(x, y, z);
-//                        v = Rotate.rotateAroundAxisY(v, Math.cos(radian), Math.sin(radian));
-//                        v = Rotate.transform(v, rY, rP , Math.toRadians(-45));
-//                        loc_.add(v);
-//                        player.getWorld().spawnParticle(Particle.LAVA, loc_, 1, 0.2, 0.2, 0.2, 0);
-//                        player.getWorld().spawnParticle(Particle.CLOUD, loc_, 1, 0.2, 0.2, 0.2, 0);
-//                        loc_.subtract(v);
-//                    }
                     cancel();
                 }
                 time++;

@@ -3,7 +3,7 @@ package ClassAbility.Phlox;
 import ClassAbility.Combination;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
-import DynamicData.targetBuilder;
+import utils.targetBuilder;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
@@ -91,6 +91,14 @@ public class Phlox {
 
 		int RRtIII = pm.getTalent("RR", 3);
 		int RRtIV = pm.getTalent("RR", 4);
+		int FRtI = pm.getTalent("FR", 1);
+		int FRtIV = pm.getTalent("FR", 4);
+		if(FRtI == 1 && combo.equals("SHIFTR"))
+			originMana -= 1;
+		if(FRtIV == 1 && combo.equals("SHIFTR")) {
+			originMana += 2;
+			originRobot += 10;
+		}
 		if(RRtIII == 1 && combo.equals("RR"))
 			originMana -= 2;
 		if(RRtIV == 2 && combo.equals("RR"))
@@ -1016,21 +1024,111 @@ public class Phlox {
 	}
 
 	private void FR() {
+
+		int FRtI = pm.getTalent("FR", 1);
+		int FRtII = pm.getTalent("FR", 2);
+		int FRtIII = pm.getTalent("FR", 3);
+		int FRtIV = pm.getTalent("FR", 4);
+
+		int dura = 60;
+		double takenRateInc = 0.05;
+		int maxtakenStack = 2;
+		double spellrate = 1.5;
+
+		if(FRtI == 2) dura = 80;
+		else if(FRtI == 3) {
+			takenRateInc = 0.1;
+		}
+
+		if(FRtII == 1)
+			tb.addStatus((e) -> {
+				if(EntityStatusManager.getinstance(e).canKnockback()) {
+					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
+				}
+			});
+		else if(FRtII == 3)
+			spellrate = 1.75;
+
+		if(FRtIII == 1) {
+			maxtakenStack = 6;
+		}
+		if(FRtIV == 1) {
+			tb.addrunOnlyOnceWhenEntityExist((e) -> {
+				ArmorStand ar = (ArmorStand) player.getWorld().spawnEntity(e.getLocation(), EntityType.ARMOR_STAND);
+				if(pm.dummyCount.contains("PHFRtIV1")) {
+
+				}
+				else {
+					pm.dummyCount.add("PHFRtIV1");
+					Runnable runnable = () -> {
+
+					};
+					//TODO PHFRtIV1 특성만들기
+					new BukkitRunnable() {
+						int time=0;
+						@Override
+						public void run() {
+
+						}
+					}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+				}
+			});
+
+		}
+
+
+		final double finaltakenRateInc = takenRateInc;
+		final int finaldura = dura;
+		final double finalspellrate = spellrate;
+		final int finalmaxtakenStack = maxtakenStack;
+
 		Location loc = player.getEyeLocation();
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2, 1f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 2, 1.5f);
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 1, 1.5f);
 		tb.setLocation(loc)
-				.setDamage(() -> pm.spelldmgcalculate(player, 1.5))
+				.setDamage(() -> pm.spelldmgcalculate(player, finalspellrate))
 				.setRadius(1.5)
+				.addPlaySound((e) -> {
+					player.getWorld().playSound(e.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 1.5f);
+					player.getWorld().playSound(e.getLocation(), Sound.ENTITY_GHAST_SHOOT, 2, 2f);
+				})
+				.addPlayParticle((e)-> {
+					player.getWorld().spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 20, 0.1, 0.1, 0.1, 0.1);
+				})
 				.addStatus((e)-> {
 					EntityManager em = EntityManager.getinstance(e);
-					if(em.dummyCount.stream().filter((a)->a.contains("PHFR")).toList().size()<2) {
-						em.dummyCount.add("PHFR");
-						em.damageTakenRate += 0.05;
+					if(em.dummyCount.stream().filter((a)->a.contains("PHFR")).toList().size()<finalmaxtakenStack) {
+						for(double i=0; i<finaltakenRateInc; i+=0.05)
+							em.dummyCount.add("PHFR");
+						em.damageTakenRate += finaltakenRateInc;
 						Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
 							em.dummyCount.remove("PHFR");
-							em.damageTakenRate -= 0.05;
-						}, 60);
+							em.damageTakenRate -= finaltakenRateInc;
+						}, finaldura);
 					}
 				});
+
+		double rY = Math.toRadians(loc.getYaw());
+		double rP = Math.toRadians(loc.getPitch());
+
+		for(double j=0; j<Math.PI*2; j+=Math.PI/32) {
+			double x = Math.cos(j);
+			double y = Math.sin(j);
+			double z = 1;
+			Vector v = new Vector(x, y, z);
+			v = Rotate.transform(v, rY, rP, 0);
+			loc.add(v);
+			player.getWorld().spawnParticle(Particle.CLOUD, loc, 0, v.getX(), v.getY(), v.getZ(), 0.25);
+			Vector v_ = new Vector(x, y, 0);
+			v_ = Rotate.transform(v_, rY, 0,0);
+			player.getWorld().spawnParticle(Particle.SMALL_FLAME,
+					player.getLocation().add(0, 1, 0), 0, v_.getX(), v_.getY(), v_.getZ(), 0.2);
+			Vector v__ = new Vector(x, z, y);
+			player.getWorld().spawnParticle(Particle.SNOWFLAKE,
+					player.getLocation().add(0, 1, 0), 0, v__.getX(), v__.getY(), v__.getZ(), 0.2);
+			loc.subtract(v);
+		}
 
 		new BukkitRunnable() {
 			int time =0;

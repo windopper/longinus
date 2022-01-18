@@ -8,10 +8,10 @@ import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
 import DynamicData.Damage;
-import GUIs.GUIManager.GUIManager;
+import utils.GUICancelHandler;
 import Mob.Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
-import Items.ModuleChips;
+import Items.ModuleChip.ModuleChips;
 import Items.WeaponManager;
 import itemtools.Map.Map;
 import Mob.EntityManager;
@@ -45,6 +45,7 @@ import UserStorage.Event;
 import Watchers.ArrowWatcher.ArrowWatcher;
 import itemtools.FlashLight.FlashLightListener;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.chat.ChatComponentText;
 import net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcherObject;
@@ -58,8 +59,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -78,10 +81,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 	
@@ -122,7 +122,7 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(CheironArrowEvent.getInstance(), this);
 		getServer().getPluginManager().registerEvents(new Auction(), this);
 		getServer().getPluginManager().registerEvents(new ModuleChips(), this);
-		getServer().getPluginManager().registerEvents(new GUIManager(), this);
+		getServer().getPluginManager().registerEvents(new GUICancelHandler(), this);
 		getServer().getPluginManager().registerEvents(new TalentUI(), this);
 
 		getServer().getPluginManager().registerEvents(new FlashLightListener(), this);
@@ -403,6 +403,12 @@ public class Main extends JavaPlugin implements Listener {
 		
 		switch (args[0]) {
 
+			case "font": {
+				String c = "\ue238\ue239";
+				player.sendMessage(""+c+"\ue238");
+				break;
+			}
+
 			case "damage": {
 				int dmg = Integer.parseInt(args[1]);
 				Damage.getinstance().taken(dmg, player, player);
@@ -644,7 +650,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 
 			case "hand":{
-				PlayerManager.getinstance(player).equipmentsetting();
+				PlayerManager.getinstance(player).updatePlayerInfo();
 				break;
 			}
 
@@ -723,6 +729,21 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			case "flashlight": {
 				player.getInventory().addItem((new FlashLightListener()).getFlashLight());
+				break;
+			}
+			case "optChat" : {
+
+				ArmorStand as = (ArmorStand) player.getWorld().spawnEntity(player.getLocation(), EntityType.ARMOR_STAND);
+				as.setCustomNameVisible(true);
+				as.setCustomName("nknknk");
+
+
+				for(Player p : Bukkit.getOnlinePlayers()) {
+					PlayerConnection conn = ((CraftPlayer) p).getHandle().b;
+					DataWatcher dataWatcher = ((CraftEntity) as).getHandle().getDataWatcher();
+					dataWatcher.set(new DataWatcherObject<>(2, DataWatcherRegistry.f), Optional.of(new ChatComponentText("hi! "+p.getName())));
+					conn.sendPacket(new PacketPlayOutEntityMetadata(as.getEntityId(), dataWatcher, true));
+				}
 				break;
 			}
 		}

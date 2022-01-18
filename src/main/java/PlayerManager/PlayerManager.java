@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import Exceptions.UndefinedFunctionError;
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -8,11 +9,13 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import spellinteracttest.Main;
 import spellinteracttest.RandomRange;
 
 import javax.annotation.Nonnull;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
@@ -45,10 +48,14 @@ public class PlayerManager {
 
 	public CopyOnWriteArrayList<String> evasion = new CopyOnWriteArrayList<>();
 	public List<String> dummyCount = new ArrayList<>();
+	public ConcurrentHashMap<String, Integer> dummyValue = new ConcurrentHashMap<>();
+	public ConcurrentHashMap<String, Integer> dummyIncrease = new ConcurrentHashMap<>();
 	public Set<Runnable> runWhenDamaged = Collections.synchronizedSet(new HashSet<>());
 	public Set<Runnable> runWhenAttack = Collections.synchronizedSet(new HashSet<>());
 	public Set<Function<Integer, Integer>> takeDamageModifier = Collections.synchronizedSet(new HashSet<>());
 	public Set<Function<Integer, Integer>> giveDamageModifier = Collections.synchronizedSet(new HashSet<>());
+
+	public List<String> tabContents = new ArrayList<>();
 
 	public int Str = 0;
 	public int Dex = 0;
@@ -120,7 +127,7 @@ public class PlayerManager {
 	public static void updateloop() {
 		
 		for(Player p : instance.keySet()) {
-			getinstance(p).equipmentsetting();
+			getinstance(p).updatePlayerInfo();
 		}
 	}
 
@@ -162,6 +169,12 @@ public class PlayerManager {
 	}
 	public void setexp(int exp) {
 		this.exp = exp;
+	}
+	public enum RunType {
+		whenAttack,
+		whenDamaged,
+		takeDamageModf,
+		giveDamageModf;
 	}
 	public void addRunWhenAttack(Runnable runnable, int tick) {
 		runWhenAttack.add(runnable);
@@ -353,7 +366,9 @@ public class PlayerManager {
 		Agi = 0;
 	}
 
-	public void equipmentsetting() {
+	public void updatePlayerInfo() {
+
+		dummyIncrease.keySet().forEach((a)->dummyIncrease.replace(a, dummyIncrease.get(a)+1));
 		
 		WeaponClass = "없음";
 		int mindamage = 0;
@@ -512,10 +527,7 @@ public class PlayerManager {
 	private void SetWalkSpeed() {
 
 		if(WalkSpeed > 0) {
-			if(((float)WalkSpeed + 100) / 100 * 0.2f > 1) {
-				p.setWalkSpeed(1);
-			}
-			else p.setWalkSpeed(((float)WalkSpeed + 100) / 100 * 0.2f);
+			p.setWalkSpeed(((float)WalkSpeed) / 100 / 2 + 0.2f);
 		}
 		else {
 			float ws = ((float)WalkSpeed + 100) / 100 * 0.2f < 0 ? 0 : ((float)WalkSpeed + 100) / 100 * 0.2f;

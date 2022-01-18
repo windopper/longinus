@@ -1,4 +1,4 @@
-package Items;
+package Items.ModuleChip;
 
 import net.minecraft.nbt.NBTTagCompound;
 import org.bukkit.Bukkit;
@@ -49,8 +49,6 @@ public class ModuleChips implements Listener {
             catch(Exception e) {
                 return;
             }
-
-
 
             if(slot >= 27) {
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 1, 1);
@@ -217,24 +215,6 @@ public class ModuleChips implements Listener {
 
     public enum ChipList {
 
-        NULL("NULL", Arrays.asList("NULL"), 0),
-        테스트_칩("테스트 칩", Arrays.asList("§7프로토타입"), 1),
-        프로토타입("프로토타입V2", Arrays.asList("§7YEEEEEEEE"), 2);
-
-
-        String name;
-        List<String> lore;
-        int code;
-
-        ChipList(String name, List<String> lore, int code) {
-            this.name = name;
-            this.lore = lore;
-            this.code = code;
-        }
-
-        public String getName() { return name; }
-        public List<String> getLore() { return lore; }
-        public int getCode() { return code; }
 
     }
 
@@ -303,7 +283,7 @@ public class ModuleChips implements Listener {
             }
 
             if(!modulelore) {
-                lore.add(loc,"§6- §5"+ Arrays.stream(ChipList.values())
+                lore.add(loc,"§6- §5"+ Arrays.stream(ModuleChipList.values())
                         .filter((a) -> a.getCode() == code)
                         .toList()
                         .get(0).getName());
@@ -311,7 +291,7 @@ public class ModuleChips implements Listener {
                 lore.add(loc, "");
             }
             else {
-                lore.add(loc+1,"§6- §5"+ Arrays.stream(ChipList.values())
+                lore.add(loc+1,"§6- §5"+ Arrays.stream(ModuleChipList.values())
                         .filter((a) -> a.getCode() == code)
                         .toList()
                         .get(0).getName());
@@ -350,11 +330,7 @@ public class ModuleChips implements Listener {
                         installing.remove(player);
                         for(int i=11; i<=15; i++) inv.setItem(i, BLACK_STAINED_GLASS_PANE());
                         player.playSound(player.getLocation(), Sound.BLOCK_PISTON_EXTEND, 1, 1);
-//                        Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
-//                            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1, 2);
-//                        }, 20);
                         cancel();
-
                     }
                     time++;
                     if(time%4==0)
@@ -416,7 +392,7 @@ public class ModuleChips implements Listener {
 
     public ItemStack getChip(String name) {
 
-        ChipList chip = Arrays.stream(ChipList.values()).filter((a) -> a.name().equals(name)).toList().get(0);
+        ModuleChipList chip = Arrays.stream(ModuleChipList.values()).filter((a) -> a.name().equals(name)).toList().get(0);
         ItemStack itemStack = new ItemStack(Material.COMPARATOR, 1);
 
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -431,44 +407,5 @@ public class ModuleChips implements Listener {
         itemStack = CraftItemStack.asBukkitCopy(nmsStack);
 
         return itemStack;
-    }
-
-    public class functions {
-
-        Player player;
-
-        public functions(Player player) {
-            this.player = player;
-        }
-
-        public void invokeChipAbility() {
-            ItemStack itemStack = player.getInventory().getItemInMainHand();
-            net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
-            NBTTagCompound tag = nmsStack.getTag();
-            try {
-                int[] chips = tag.getIntArray("chips");
-                List<ChipList> list = Arrays.stream(ChipList.values())
-                        .filter((a) -> Arrays.stream(chips).anyMatch((b) -> b == a.getCode())).toList();
-                for(ChipList chip : list) {
-                    try {
-                        Class c = this.getClass();
-                        Method method = c.getMethod(chip.name());
-                        method.invoke(this);
-                    }
-                    catch(Exception e) {}
-                }
-            }
-            catch(Exception e) {
-
-            }
-
-        }
-
-        public void 테스트_칩() {
-
-        }
-        public void 프로토타입() {
-            Bukkit.broadcastMessage("hi");
-        }
     }
 }

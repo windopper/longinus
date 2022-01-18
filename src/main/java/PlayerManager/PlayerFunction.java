@@ -41,7 +41,9 @@ public class PlayerFunction implements Listener {
 	Aether Functions
 	 */
 	public double AEImpulse = 0;
+	public double AEImpulseRate = 1;
 	public boolean AERLtIV2 = false; // 스킬 사용 후 3초간 주변 아군이 받는 피해의 50%를 대신 받습니다
+
 
 	/*
 	ByV Functions

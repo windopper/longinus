@@ -13,7 +13,6 @@ import java.util.UUID;
 public class SkullHandler {
     public ItemStack getSkull(String skinURL) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD, 1);
-        //if(skinURL.isEmpty())return head;
         ItemMeta headMeta = head.getItemMeta();
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
         byte[] encodedData = Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", skinURL).getBytes());

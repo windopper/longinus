@@ -1,8 +1,6 @@
 package ClassAbility.Khaos;
 
-import ClassAbility.entitycheck;
-import DynamicData.Damage;
-import DynamicData.targetBuilder;
+import utils.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.Rotate;
 import PlayerManager.PlayerFunction;
@@ -13,13 +11,10 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BoundingBox;
 import org.bukkit.util.EulerAngle;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 

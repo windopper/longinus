@@ -53,6 +53,7 @@ public class EntityManager {
 
 	public double damageTakenRate = 1;
 	public List<String> dummyCount = new ArrayList<>();
+	public ConcurrentHashMap<String, Double> dummyValue = new ConcurrentHashMap<>();
 
 	private Object EntityInstance;
 	private Method particleMethod;
@@ -130,7 +131,6 @@ public class EntityManager {
 
 	// 일반적인 몹
 	public static EntityManager getinstance(Entity e) {
-		
 		if(!instance.containsKey(e)) instance.put(e, new EntityManager(e));
 		return instance.get(e);
 	}
@@ -369,6 +369,8 @@ public class EntityManager {
 	
 	@SuppressWarnings("deprecation")
 	public synchronized void EntityWatcher() {
+
+		if(e instanceof Player) removeinstance();
 		
 		if(!(e instanceof Player) && (e instanceof LivingEntity) && !(e instanceof ArmorStand)) {
 

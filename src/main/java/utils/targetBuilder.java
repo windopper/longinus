@@ -1,6 +1,7 @@
-package DynamicData;
+package utils;
 
 import ClassAbility.entitycheck;
+import DynamicData.Damage;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -23,6 +24,7 @@ public class targetBuilder {
     private Set<BiConsumer<LivingEntity, Integer>> targetAfterDamage = new HashSet<>();
     private Set<Runnable> whenHit = new HashSet<>();
     private Set<Runnable> runOnlyOnce = new HashSet<>();
+    private Set<Consumer<LivingEntity>> runOnlyOnceWhenEntityExist = new HashSet<>();
     private Set<Consumer<Entity>> playParticle = new HashSet<>();
     private Set<Runnable> playSound = new HashSet<>();
     private Set<Consumer<Entity>> playSoundAtEntityLoc = new HashSet<>();
@@ -107,6 +109,11 @@ public class targetBuilder {
         return this;
     }
 
+    public targetBuilder addrunOnlyOnceWhenEntityExist(Consumer<LivingEntity> consumer) {
+        this.runOnlyOnceWhenEntityExist.add(consumer);
+        return this;
+    }
+
     public boolean isBuilt() {
         return this.isBuilt;
     }
@@ -126,7 +133,9 @@ public class targetBuilder {
                 BoundingBox box = entity.getBoundingBox();
                 if(eloc.distance(loc) < radius || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                     targetAfterDamage.forEach((a)->damage.forEach((damage)->a.accept(entity, damage.get())));
-                    damage.forEach((a)->Damage.getinstance().taken(a.get(), entity, player));
+                    damage.forEach((a)-> Damage.getinstance().taken(a.get(), entity, player));
+                    if(entityHit.size()==0)
+                        runOnlyOnceWhenEntityExist.forEach((a)->a.accept(entity));
                     entityHit.add(entity);
                     playSound.forEach(Runnable::run);
                     whenHit.forEach(Runnable::run);

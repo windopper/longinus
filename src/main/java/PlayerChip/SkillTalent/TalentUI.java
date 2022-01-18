@@ -1,6 +1,6 @@
 package PlayerChip.SkillTalent;
 
-import GUIs.GUIManager.GUIManager;
+import utils.GUICancelHandler;
 import PlayerChip.Maingui;
 import PlayerManager.PlayerManager;
 import net.minecraft.nbt.NBTTagCompound;
@@ -110,7 +110,7 @@ public class TalentUI implements Listener {
     }
 
     public void openGUI() {
-        GUIManager.setClickCanceller("특성을 선택할 스킬을 선택해주세요");
+        GUICancelHandler.setClickCanceller("특성을 선택할 스킬을 선택해주세요");
         Inventory inv = Bukkit.createInventory(null, 27, "특성을 선택할 스킬을 선택해주세요");
         inv.setItem(10, selectSkill("RL"));
         inv.setItem(12, selectSkill("RR"));
@@ -123,7 +123,7 @@ public class TalentUI implements Listener {
     }
 
     public void openTalentGUI(String skill) {
-        GUIManager.setClickCanceller("특성을 선택해주세요");
+        GUICancelHandler.setClickCanceller("특성을 선택해주세요");
         Inventory inv = Bukkit.createInventory(null, 45, "특성을 선택해주세요 [남은 포인트: §c"+pm.getTalentPoint()+"§r]");
 
         inv.setItem(10, selectTalent(skill, 1, 1));

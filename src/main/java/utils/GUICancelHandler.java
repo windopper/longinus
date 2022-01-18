@@ -1,4 +1,4 @@
-package GUIs.GUIManager;
+package utils;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-public class GUIManager implements Listener {
+public class GUICancelHandler implements Listener {
 
     private static final Set<String> clickCanceller = new HashSet<>();
 

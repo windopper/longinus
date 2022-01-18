@@ -4,13 +4,15 @@ import ClassAbility.Combination;
 import ClassAbility.SpellManager;
 import ClassAbility.entitycheck;
 import DynamicData.Damage;
-import DynamicData.targetBuilder;
+import utils.DuraAbilityHandler;
+import utils.targetBuilder;
 import Mob.EntityStatusManager;
 import PlayParticle.PlayParticle;
 import PlayerManager.PlayerEnergy;
 import PlayerManager.PlayerFunction;
 import PlayerManager.PlayerHealthShield;
 import PlayerManager.PlayerManager;
+import PlayParticle.Rotate;
 import com.google.common.base.Enums;
 import org.bukkit.*;
 import org.bukkit.entity.Entity;
@@ -61,7 +63,8 @@ public class Aether {
 
 		RR(6, "§o§l충격량전환: 돌진§l§o §3§l-⚡§l"),
 		RL(6, "§o§l충격량전환: 보호막§l§o §3§l-⚡§l"),
-		FR(8, "§o§l충격량전환: 블레이드오러§l§o §3§l-⚡§l");
+		FR(8, "§o§l충격량전환: 블레이드오러§l§o §3§l-⚡§l"),
+		SHIFTR(8, "§o§l칼날 와류§l§o §3§l-⚡§l");
 
 		private int mana;
 		private String title;
@@ -102,8 +105,9 @@ public class Aether {
 		if(mana <= CurrentMana) {
 			PlayerEnergy.getinstance(player).useEnergy(mana);
 			if(combo.equals("RR")) ShieldSwitchCharge();
-			if(combo.equals("RL")) ImpulseSwitchShield(mana);
-			if(combo.equals("FR")) ImpulseSwitchWeapon();
+			else if(combo.equals("RL")) ImpulseSwitchShield(mana);
+			else if(combo.equals("FR")) ImpulseSwitchWeapon();
+			else if(combo.equals("SHIFTR")) SR();
 
 
 			Combination.getinstance().Sound(player);
@@ -419,7 +423,7 @@ public class Aether {
 
 		PlayerFunction PF = PlayerFunction.getinstance(p);
 
-		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse + (double) takendmg / (double) PlayerManager.getinstance(p).Health * 400));
+		double i = Double.parseDouble(String.format("%.2f", PF.AEImpulse + PF.AEImpulseRate * (double) takendmg / (double) PlayerManager.getinstance(p).Health * 400));
 		PF.AEImpulse = i;
 
 		if (PF.AEImpulse > 1000) {
@@ -909,9 +913,58 @@ public class Aether {
 
 				angle += 3;
 			}
-		}.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 
 
+	}
+
+	public void SR() {
+		Location loc = player.getLocation();
+
+		targetBuilder tb = targetBuilder.builder(player);
+
+		DuraAbilityHandler dah = DuraAbilityHandler.getHandler(player, "AESR");
+		PlayerFunction pf = PlayerFunction.getinstance(player);
+		dah.setRunnable(()->pf.AEImpulseRate+=0.5, ()->pf.AEImpulseRate-=0.5)
+				.setMaximumStack(1)
+				.setTick(30).run();
+
+		tb.setRadius(8)
+				.setLocation(loc)
+				.setDamage(()->pm.spelldmgcalculate(player, 1.5))
+				.addStatus((e)->EntityStatusManager.getinstance(e).KnockBackVectorPSubE(player, -1)).build();
+
+		new BukkitRunnable() {
+			int time = 0;
+			@Override
+			public void run() {
+
+				for(int k=0; k<360; k+=60) {
+					for(double z =6; z>6-time*2; z-=0.2) {
+						Vector v = new Vector(0, 0, z);
+						v = Rotate.transform(v, Math.toRadians(k+z*30), 0, 0);
+						loc.add(v);
+						loc.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
+						if(time==3)
+							loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc,
+									0, -v.getX(), -v.getY(), -v.getZ(), 0.2f);
+						loc.subtract(v);
+					}
+				}
+				if(time>2) cancel();
+				time++;
+			}
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+
+		new BukkitRunnable() {
+			int time =0;
+			@Override
+			public void run() {
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1, 1f);
+				if(time>2) cancel();
+				time++;
+			}
+		}.runTaskTimer(Main.getPlugin(Main.class), 0, 3);
 	}
 
 }

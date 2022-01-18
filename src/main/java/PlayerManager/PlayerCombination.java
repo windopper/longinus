@@ -1,6 +1,7 @@
 package PlayerManager;
 
-import Items.ModuleChips;
+import Items.ModuleChip.ModuleChipAbilities;
+import Items.ModuleChip.ModuleChips;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -78,8 +79,7 @@ public class PlayerCombination {
 	public void KeyBind() {
 
 		if(p.isSneaking() && keybind.equals("F")) {
-			ModuleChips moduleChips = new ModuleChips();
-			(moduleChips.new functions(p)).invokeChipAbility();
+			(new ModuleChipAbilities(p)).invokeChipAbility();
 		}
 
 		if(PlayerManager.getinstance(p).CurrentClass.equals("케이론")) {
