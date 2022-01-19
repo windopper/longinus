@@ -1052,30 +1052,6 @@ public class Phlox {
 		if(FRtIII == 1) {
 			maxtakenStack = 6;
 		}
-		if(FRtIV == 1) {
-			tb.addrunOnlyOnceWhenEntityExist((e) -> {
-				ArmorStand ar = (ArmorStand) player.getWorld().spawnEntity(e.getLocation(), EntityType.ARMOR_STAND);
-				if(pm.dummyCount.contains("PHFRtIV1")) {
-
-				}
-				else {
-					pm.dummyCount.add("PHFRtIV1");
-					Runnable runnable = () -> {
-
-					};
-					//TODO PHFRtIV1 특성만들기
-					new BukkitRunnable() {
-						int time=0;
-						@Override
-						public void run() {
-
-						}
-					}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
-				}
-			});
-
-		}
-
 
 		final double finaltakenRateInc = takenRateInc;
 		final int finaldura = dura;
@@ -1086,6 +1062,7 @@ public class Phlox {
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 2, 1f);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR, 2, 1.5f);
 		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 1, 1.5f);
+
 		tb.setLocation(loc)
 				.setDamage(() -> pm.spelldmgcalculate(player, finalspellrate))
 				.setRadius(1.5)
@@ -1108,6 +1085,72 @@ public class Phlox {
 						}, finaldura);
 					}
 				});
+
+
+		targetBuilder tb_ = tb.clone();
+
+		if(FRtIV == 1) {
+			tb.addrunOnlyOnceWhenEntityExist((e) -> {
+
+				ArmorStand ar = (new StandHandler()).getArmorStand(e.getLocation().add(0, 2.5, 0));
+				ar.getEquipment().setItem(EquipmentSlot.HEAD, (new SkullHandler()).getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0MDBlYTE5ZGJkODRmNzVjMzlhZDY4MjNhYzRlZjc4NmYzOWY0OGZjNmY4NDYwMjM2NmFjMjliODM3NDIyIn19fQ=="));
+				ar.setGravity(false);
+				pm.dummyCount.add("PHFRtIV1");
+				Location loc_ = ar.getLocation().add(0, 0.6, 0);
+
+				new BukkitRunnable() {
+					int time=0;
+					double i = 0;
+					double r = 3;
+					@Override
+					public void run() {
+						Location test = ar.getLocation();
+						test.setYaw(ar.getLocation().getYaw()+5.625f);
+						ar.teleport(test);
+
+						for(double y=0; y>=-2.5; y-=0.2) {
+							r = y / -2.5 * 3;
+							double x = r*Math.cos(i);
+							double z = r*Math.sin(i);
+
+							double x_ = r*Math.cos(i+Math.PI);
+							double z_ = r*Math.sin(i+Math.PI);
+
+							Vector v = new Vector(x, y, z);
+							Vector v_ = new Vector(x_, y, z_);
+
+							loc_.add(v);
+							loc_.getWorld().spawnParticle(Particle.REDSTONE, loc_, 1, 0, 0, 0, 0
+									,new Particle.DustOptions(Color.RED, 1));
+							if(y==-2.4)
+								loc_.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc_, 1, 0, 0, 0, 0);
+							loc_.subtract(v);
+							loc_.add(v_);
+							loc_.getWorld().spawnParticle(Particle.REDSTONE, loc_, 1, 0, 0, 0, 0
+									,new Particle.DustOptions(Color.RED, 1));
+							if(y==-2.4)
+								loc_.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc_, 1, 0, 0, 0, 0);
+							loc_.subtract(v_);
+						}
+
+						if(time%10 ==0) {
+							loc_.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc_, 1, 0, 0, 0, 0);
+							tb_.deleteHitSet();
+							tb_.clone().setRadius(3).setLocation(ar.getLocation().add(0, -2.5, 0)).setDamage(() ->
+									pm.spelldmgcalculate(player, 0.5)).build();
+						}
+
+						if(time>100 || pm.dummyCount.stream().filter((a)->a.contains("PHFRtIV1")).toList().size()>1){
+							pm.dummyCount.remove("PHFRtIV1");
+							ar.remove();
+							cancel();
+						}
+						time++;
+						i+=Math.PI/32;
+					}
+				}.runTaskTimer(Main.getPlugin(Main.class), 1, 1);
+			});
+		}
 
 		double rY = Math.toRadians(loc.getYaw());
 		double rP = Math.toRadians(loc.getPitch());

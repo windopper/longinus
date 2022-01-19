@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class targetBuilder {
+public class targetBuilder implements Cloneable {
 
     private double radius = 0;
     private boolean hitOnlyOne = false;
@@ -112,6 +112,19 @@ public class targetBuilder {
     public targetBuilder addrunOnlyOnceWhenEntityExist(Consumer<LivingEntity> consumer) {
         this.runOnlyOnceWhenEntityExist.add(consumer);
         return this;
+    }
+
+    public targetBuilder clone() {
+        try {
+            return (targetBuilder) super.clone();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    public void deleteHitSet() {
+        entityHit.clear();
     }
 
     public boolean isBuilt() {

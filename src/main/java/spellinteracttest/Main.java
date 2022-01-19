@@ -8,6 +8,7 @@ import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
 import DynamicData.Damage;
+import PacketRecord.PacketRecordCommands;
 import utils.GUICancelHandler;
 import Mob.Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
@@ -268,11 +269,11 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 
-
 	@EventHandler
 	public void onClick(RightClickNPC event) {
 		Player player = event.getPlayer();
 	}
+
     public static Main getInstance() {
         return instance;
     }
@@ -282,6 +283,8 @@ public class Main extends JavaPlugin implements Listener {
 		Player player = (Player) sender;
 
 		String cmdName = command.getName().toLowerCase();
+
+		(new PacketRecordCommands(player)).commandListener(cmdName, args);
 
 		if(cmdName.equals("duel")) {
 
@@ -294,7 +297,6 @@ public class Main extends JavaPlugin implements Listener {
 
 			}
 		}
-
 
 		if(cmdName.equals("party")) {
 			if(args.length == 0) {

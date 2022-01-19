@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BoundingBox;
+import spellinteracttest.Main;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -175,7 +176,7 @@ public class Record implements Listener {
 
         RecordOn = true;
 
-        File recordfile = new File(Bukkit.getPluginManager().getPlugin("spellinteract").getDataFolder().getAbsolutePath()+"\\Records", filename+".yml");
+        File recordfile = new File(Main.getPlugin(Main.class).getDataFolder().getAbsolutePath()+"\\Records", filename+".yml");
         if(!recordfile.exists()) {
             try {
                 recordfile.createNewFile();
@@ -198,8 +199,6 @@ public class Record implements Listener {
             if(Center.distance(player.getLocation())>50) continue;
             if(player.getGameMode() == GameMode.SPECTATOR) continue;
         }
-//
-//        }
 
         new BukkitRunnable() {
 
@@ -208,8 +207,8 @@ public class Record implements Listener {
             @Override
             public void run() {
 
-                config.set(filename+"."+Integer.toString(time)+".players", "");
-                config.set(filename+"."+Integer.toString(time)+".entities", "");
+                config.set(filename+"."+time+".players", "");
+                config.set(filename+"."+time+".entities", "");
 
                 for(Player actor : Bukkit.getOnlinePlayers()) {
 
@@ -276,7 +275,6 @@ public class Record implements Listener {
                 }
                 for(LivingEntity actor : Center.getWorld().getLivingEntities()) {
 
-
                     if(actor instanceof Player) continue;
                     if(!Center.getWorld().getName().equals(actor.getWorld().getName())) continue;
                     if(!box.contains(actor.getLocation().getX(), actor.getLocation().getY(), actor.getLocation().getZ())) continue;
@@ -284,7 +282,6 @@ public class Record implements Listener {
 
                     String entity = ((CraftEntity) actor).getHandle().getClass().getName();
                     if(!PacketSummonEntity.Type.contains(entity)) continue;
-
 
                     // 등장엔티티 초기설정
                     if(!IDPlayer.containsKey(actor)) {
@@ -350,8 +347,6 @@ public class Record implements Listener {
                 Skill.clear();
             }
         }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"),0, 1);
-
-
     }
 
     public void RecordStop() {
@@ -372,8 +367,6 @@ public class Record implements Listener {
                 loc1.getWorld().spawnParticle(Particle.FLAME, loc1.clone().add(x1 * i, 0, 0), 1, 0, 0, 0, 0);
             }
             for(double i=0; i<50; i++) {
-
-
                 loc1.getWorld().spawnParticle(Particle.FLAME, loc1.clone().add(0, y1 * i, 0), 1, 0, 0, 0, 0);
             }
             for(double i=0; i<50; i++) {
