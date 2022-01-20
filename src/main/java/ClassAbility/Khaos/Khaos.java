@@ -138,9 +138,9 @@ public class Khaos {
                         targetBuilder tb = targetBuilder.builder(player)
                                 .setRadius(4)
                                 .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5))
-                                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f ))
-                                .addPlaySound(() -> player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f))
-                                .addStatus((aE) -> EntityStatusManager.getinstance(aE).KnockBack(player, 0.5))
+                                .addRunWhenEntityExist(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f ))
+                                .addRunWhenEntityExist(() -> player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f))
+                                .addRunWhenEntityExist((aE) -> EntityStatusManager.getinstance(aE).KnockBack(player, 0.5))
                                 .entityExcept(Hit)
                                 .setLocation(loc)
                                 .build();
@@ -213,17 +213,17 @@ public class Khaos {
 
         targetBuilder tb = targetBuilder.builder(player)
                 .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, finalrate))
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
-                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
+                .addRunWhenEntityExist(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f))
                 .setRadius(1.5);
 
         if (RLtII == 2) {
-            tb.addStatus((e) -> {
+            tb.addRunWhenEntityExist((e) -> {
                 e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
             });
         }
         if(RLtIII == 2) {
-            tb.addStatus((e) -> {
+            tb.addRunWhenEntityExist((e) -> {
                 EntityManager em = EntityManager.getinstance(e);
                 if(em.dummyCount.stream().filter((a)->a.contains("KHRLtIII2")).toList().size()<4) {
                     em.damageTakenRate += 0.05;
@@ -353,8 +353,8 @@ public class Khaos {
 
         tb.setRadius(2.5)
                 .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, finalspellrate))
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 1.2))
-                .addPlaySound(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f));
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 1.2))
+                .addRunWhenEntityExist(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f));
 
         if(RRtIII == 1) {
             tb.addTargetAfterDamage((e, d) -> {
@@ -369,7 +369,7 @@ public class Khaos {
         }
 
         if(RRtIV == 2) {
-            tb.addRunOnlyOnce(() -> {
+            tb.addRunOnlyOnceWhenEntityExist(() -> {
                 if(pm.evasion.stream().filter((a)->a.contains("KHRRtIV2")).toList().size()<4){
                     pm.evasion.add("KHRRtIV2");
                 }

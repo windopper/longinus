@@ -95,7 +95,7 @@ public class Phlox {
 		int FRtIV = pm.getTalent("FR", 4);
 		if(FRtI == 1 && combo.equals("SHIFTR"))
 			originMana -= 1;
-		if(FRtIV == 1 && combo.equals("SHIFTR")) {
+		if(FRtIV == 1 && combo.equals("FR")) {
 			originMana += 2;
 			originRobot += 10;
 		}
@@ -823,13 +823,13 @@ public class Phlox {
 				.setDamage(() -> PlayerManager.getinstance(this.player).spelldmgcalculate(this.player, finalspellrate2));
 
 		if(SRtI == 3) {
-			tb.addStatus((e) -> {
+			tb.addRunWhenEntityExist((e) -> {
 				if(!EntityManager.getinstance(e).isUnstoppable())
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 5));
 			});
 		}
 		if(SRtII == 2) {
-			tb.addStatus((e) -> {
+			tb.addRunWhenEntityExist((e) -> {
 				new BukkitRunnable() {
 					int time = 0;
 					@Override
@@ -1041,7 +1041,7 @@ public class Phlox {
 		}
 
 		if(FRtII == 1)
-			tb.addStatus((e) -> {
+			tb.addRunWhenEntityExist((e) -> {
 				if(EntityStatusManager.getinstance(e).canKnockback()) {
 					e.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 20, 0));
 				}
@@ -1066,14 +1066,14 @@ public class Phlox {
 		tb.setLocation(loc)
 				.setDamage(() -> pm.spelldmgcalculate(player, finalspellrate))
 				.setRadius(1.5)
-				.addPlaySound((e) -> {
+				.addRunWhenEntityExist((e) -> {
 					player.getWorld().playSound(e.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 2, 1.5f);
 					player.getWorld().playSound(e.getLocation(), Sound.ENTITY_GHAST_SHOOT, 2, 2f);
 				})
-				.addPlayParticle((e)-> {
+				.addRunWhenEntityExist((e)-> {
 					player.getWorld().spawnParticle(Particle.SPELL_INSTANT, e.getLocation(), 20, 0.1, 0.1, 0.1, 0.1);
 				})
-				.addStatus((e)-> {
+				.addRunWhenEntityExist((e)-> {
 					EntityManager em = EntityManager.getinstance(e);
 					if(em.dummyCount.stream().filter((a)->a.contains("PHFR")).toList().size()<finalmaxtakenStack) {
 						for(double i=0; i<finaltakenRateInc; i+=0.05)
@@ -1090,7 +1090,7 @@ public class Phlox {
 		targetBuilder tb_ = tb.clone();
 
 		if(FRtIV == 1) {
-			tb.addrunOnlyOnceWhenEntityExist((e) -> {
+			tb.addRunOnlyOnceWhenEntityExist((e) -> {
 
 				ArmorStand ar = (new StandHandler()).getArmorStand(e.getLocation().add(0, 2.5, 0));
 				ar.getEquipment().setItem(EquipmentSlot.HEAD, (new SkullHandler()).getSkull("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzc0MDBlYTE5ZGJkODRmNzVjMzlhZDY4MjNhYzRlZjc4NmYzOWY0OGZjNmY4NDYwMjM2NmFjMjliODM3NDIyIn19fQ=="));
@@ -1135,8 +1135,7 @@ public class Phlox {
 
 						if(time%10 ==0) {
 							loc_.getWorld().spawnParticle(Particle.VILLAGER_ANGRY, loc_, 1, 0, 0, 0, 0);
-							tb_.deleteHitSet();
-							tb_.clone().setRadius(3).setLocation(ar.getLocation().add(0, -2.5, 0)).setDamage(() ->
+							targetBuilder.builder(player).setRadius(3).setLocation(ar.getLocation().add(0, -2.5, 0)).setDamage(() ->
 									pm.spelldmgcalculate(player, 0.5)).build();
 						}
 
@@ -1149,6 +1148,21 @@ public class Phlox {
 						i+=Math.PI/32;
 					}
 				}.runTaskTimer(Main.getPlugin(Main.class), 1, 1);
+			});
+		}
+		else if(FRtIV == 2) {
+			tb.setDamage((e)-> {
+				EntityManager em = EntityManager.getinstance(e);
+				if(em.dummyCount.contains("PHFRtIV2")) {
+					em.dummyCount.remove("PHFRtIV2");
+					e.getWorld().spawnParticle(Particle.SPELL_WITCH, e.getLocation().add(0, 0.5, 0), 25, 0.2, 0.2, 0.2, 0.2);
+					e.getWorld().playSound(e.getLocation(),Sound.ENTITY_GUARDIAN_HURT,  1, 1);
+					return pm.spelldmgcalculate(player, 2);
+				}
+				else {
+					em.dummyCount.add("PHFRtIV2");
+					return 0;
+				}
 			});
 		}
 
@@ -1231,7 +1245,7 @@ public class Phlox {
 					tb.build();
 
 					if(tb.isBuilt()) {
-						for(double k =0; k<Math.PI*2; k+=Math.PI/16) {
+						for(double k =0; k<Math.PI*2; k+=Math.PI/4) {
 							x = Math.cos(k);
 							y = 0;
 							z = Math.sin(k);

@@ -9,25 +9,26 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BoundingBox;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class targetBuilder implements Cloneable {
+public class targetBuilder {
 
     private double radius = 0;
     private boolean hitOnlyOne = false;
     private Set<Supplier<Integer>> damage = new HashSet<>();
-    private Set<Consumer<LivingEntity>> status = new HashSet<>();
+    private Set<Function<Entity, Integer>> damageFunction = new HashSet<>();
     private Set<BiConsumer<LivingEntity, Integer>> targetAfterDamage = new HashSet<>();
-    private Set<Runnable> whenHit = new HashSet<>();
     private Set<Runnable> runOnlyOnce = new HashSet<>();
     private Set<Consumer<LivingEntity>> runOnlyOnceWhenEntityExist = new HashSet<>();
-    private Set<Consumer<Entity>> playParticle = new HashSet<>();
-    private Set<Runnable> playSound = new HashSet<>();
-    private Set<Consumer<Entity>> playSoundAtEntityLoc = new HashSet<>();
+    private Set<Runnable> runWhenEntityHit = new HashSet<>();
+    private Set<Consumer<LivingEntity>> runWhenEntityExist = new HashSet<>();
     private Set<Entity> entityExcept = new HashSet<>();
     private Set<Entity> entityHit = new HashSet<>();
     private Player player;
@@ -37,7 +38,7 @@ public class targetBuilder implements Cloneable {
     private targetBuilder(Player player) {
         this.player = player;
         this.loc = player.getLocation();
-        this.playSound.add(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f));
+        this.runWhenEntityHit.add(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f));
     }
 
     public static targetBuilder builder(Player player) {
@@ -74,33 +75,28 @@ public class targetBuilder implements Cloneable {
         return this;
     }
 
-    public targetBuilder addPlaySound(Runnable playSound) {
-        this.playSound.add(playSound);
+    public targetBuilder setDamage(Function<Entity, Integer> damage) {
+        this.damageFunction.add(damage);
         return this;
     }
 
-    public targetBuilder addPlaySound(Consumer<Entity> playSound) {
-        this.playSoundAtEntityLoc.add(playSound);
+    public targetBuilder addRunWhenEntityExist(Runnable playSound) {
+        this.runWhenEntityHit.add(playSound);
         return this;
     }
 
-    public targetBuilder addPlayParticle(Consumer<Entity> playParticle) {
-        this.playParticle.add(playParticle);
+    public targetBuilder addRunWhenEntityExist(Consumer<LivingEntity> playSound) {
+        this.runWhenEntityExist.add(playSound);
         return this;
     }
 
-    public targetBuilder addStatus(Consumer<LivingEntity> status) {
-        this.status.add(status);
-        return this;
-    }
-
-    public targetBuilder addwhenHit(Runnable whenHit) {
-        this.whenHit.add(whenHit);
-        return this;
-    }
-
-    public targetBuilder addRunOnlyOnce(Runnable runOnlyOnce) {
+    public targetBuilder addRunOnlyOnceWhenEntityExist(Runnable runOnlyOnce) {
         this.runOnlyOnce.add(runOnlyOnce);
+        return this;
+    }
+
+    public targetBuilder addRunOnlyOnceWhenEntityExist(Consumer<LivingEntity> consumer) {
+        this.runOnlyOnceWhenEntityExist.add(consumer);
         return this;
     }
 
@@ -109,14 +105,32 @@ public class targetBuilder implements Cloneable {
         return this;
     }
 
-    public targetBuilder addrunOnlyOnceWhenEntityExist(Consumer<LivingEntity> consumer) {
-        this.runOnlyOnceWhenEntityExist.add(consumer);
-        return this;
-    }
-
     public targetBuilder clone() {
         try {
-            return (targetBuilder) super.clone();
+            targetBuilder clonetb = targetBuilder.builder(player);
+
+            Class fromClass = this.getClass();
+            Class toClass = clonetb.getClass();
+            Field[] fromField = fromClass.getDeclaredFields();
+            Field[] toField = toClass.getDeclaredFields();
+            Arrays.stream(fromField).forEach((fromfield)-> {
+                fromfield.setAccessible(true);
+                for(Field tofield : toField) {
+                    tofield.setAccessible(true);
+                    if(tofield.getName().equals(fromfield.getName())) {
+                        try {
+                            tofield.set(clonetb, fromfield.get(this));
+                            tofield.setAccessible(false);
+                            break;
+                        }
+                        catch(IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                fromfield.setAccessible(false);
+            });
+            return clonetb;
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -147,16 +161,16 @@ public class targetBuilder implements Cloneable {
                 if(eloc.distance(loc) < radius || box.contains(loc.getX(), loc.getY(), loc.getZ())) {
                     targetAfterDamage.forEach((a)->damage.forEach((damage)->a.accept(entity, damage.get())));
                     damage.forEach((a)-> Damage.getinstance().taken(a.get(), entity, player));
-                    if(entityHit.size()==0)
+                    damageFunction.forEach((a)->Damage.getinstance().taken(a.apply(entity), entity, player));
+
+                    if(entityHit.size()==0) {
                         runOnlyOnceWhenEntityExist.forEach((a)->a.accept(entity));
+                        runOnlyOnce.forEach(Runnable::run);
+                    }
                     entityHit.add(entity);
-                    playSound.forEach(Runnable::run);
-                    whenHit.forEach(Runnable::run);
-                    runOnlyOnce.forEach(Runnable::run);
-                    runOnlyOnce.clear();
-                    playSoundAtEntityLoc.forEach((a) -> a.accept(entity));
-                    playParticle.forEach((a)->a.accept(entity));
-                    status.forEach((a) -> a.accept(entity));
+                    runWhenEntityHit.forEach(Runnable::run);
+                    runWhenEntityExist.forEach((a)->a.accept(entity));
+
                     if(hitOnlyOne) return this;
                     isBuilt = true;
                 }

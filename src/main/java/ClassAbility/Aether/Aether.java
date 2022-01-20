@@ -688,11 +688,11 @@ public class Aether {
 				.setRadius(1.5)
 				.setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, spellrate));
 
-		if(FRtI == 2) tb.addStatus((e)->EntityStatusManager.getinstance(e).KnockBack(player, 1.5));
+		if(FRtI == 2) tb.addRunWhenEntityExist((e)->EntityStatusManager.getinstance(e).KnockBack(player, 1.5));
 		if(FRtII == 2) dist = 4;
 		if(FRtIII == 2) {
-			tb.addPlayParticle((e)->player.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, e.getLocation(), 1, 0, 0, 0, 0))
-					.addPlaySound((e)->player.getWorld().playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1))
+			tb.addRunWhenEntityExist((e)->player.getWorld().spawnParticle(Particle.EXPLOSION_LARGE, e.getLocation(), 1, 0, 0, 0, 0))
+					.addRunWhenEntityExist((e)->player.getWorld().playSound(e.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1, 1))
 					.setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1));
 		}
 
@@ -919,7 +919,7 @@ public class Aether {
 	}
 
 	public void SR() {
-		Location loc = player.getLocation();
+		Location loc = player.getLocation().add(0, 1, 0);
 
 		targetBuilder tb = targetBuilder.builder(player);
 
@@ -932,7 +932,7 @@ public class Aether {
 		tb.setRadius(8)
 				.setLocation(loc)
 				.setDamage(()->pm.spelldmgcalculate(player, 1.5))
-				.addStatus((e)->EntityStatusManager.getinstance(e).KnockBackVectorPSubE(player, -1)).build();
+				.addRunWhenEntityExist((e)->EntityStatusManager.getinstance(e).KnockBackVectorPSubE(player, -1)).build();
 
 		new BukkitRunnable() {
 			int time = 0;
@@ -945,9 +945,13 @@ public class Aether {
 						v = Rotate.transform(v, Math.toRadians(k+z*30), 0, 0);
 						loc.add(v);
 						loc.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
-						if(time==3)
+						if(time==3) {
 							loc.getWorld().spawnParticle(Particle.FIREWORKS_SPARK, loc,
 									0, -v.getX(), -v.getY(), -v.getZ(), 0.2f);
+							loc.getWorld().spawnParticle(Particle.TOTEM, loc,
+									0,0, 0, 0, 0.2f);
+						}
+
 						loc.subtract(v);
 					}
 				}
@@ -956,11 +960,13 @@ public class Aether {
 			}
 		}.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
 
+		player.getWorld().playSound(player.getLocation(), Sound.ENTITY_BLAZE_AMBIENT, 1.5f, 2f);
+
 		new BukkitRunnable() {
 			int time =0;
 			@Override
 			public void run() {
-				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1, 1f);
+				player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDER_DRAGON_FLAP, 1.5f, 1f);
 				if(time>2) cancel();
 				time++;
 			}

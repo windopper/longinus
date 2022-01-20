@@ -69,6 +69,7 @@ public class HologramIndicator {
 	
 	public void DamageIndicator(final int r, final LivingEntity e) { // 데미지 뜨게 하기
 
+		if(r==0) return;
 		new BukkitRunnable() {
 			int time = 0;
 			ArmorStand as;
@@ -161,7 +162,8 @@ public class HologramIndicator {
 	}
 
 	public void HealIndicator(final int r, final Location loc) {
-		
+
+		if(r==0) return;
 		new BukkitRunnable() {
 
 			int time = 0;
@@ -206,6 +208,8 @@ public class HologramIndicator {
 	}
 
 	public void ManaIndicator(final int r, final Location loc) {
+
+		if(r==0) return;
 		new BukkitRunnable() {
 
 			int time = 0;

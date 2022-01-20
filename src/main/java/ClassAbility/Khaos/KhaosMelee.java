@@ -46,7 +46,7 @@ public class KhaosMelee {
 
         if(pm.getTalent("RR", 3) == 3) {
             if(pm.dummyCount.contains("KHRRtIII3")) {
-                tb.addwhenHit(() -> {
+                tb.addRunWhenEntityExist(() -> {
                     PlayerHealthShield.getinstance(player).HealthAdd((int) ((double)pm.Health / 100), player);
                 });
             }
@@ -137,7 +137,7 @@ public class KhaosMelee {
 
         tb.setRadius(1.5)
                 .setLocation(loc)
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         new BukkitRunnable() {
@@ -221,7 +221,7 @@ public class KhaosMelee {
 
         tb.setRadius(1.5)
                 .setLocation(loc)
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         new BukkitRunnable() {
@@ -283,7 +283,7 @@ public class KhaosMelee {
 
         tb.setRadius(1.5)
                 .setLocation(loc)
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         player.getWorld().playSound(player.getLocation(), Sound.ENTITY_WITHER_SHOOT, 1, 2);
@@ -334,7 +334,7 @@ public class KhaosMelee {
 
         tb.setRadius(2.5)
                 .setLocation(loc)
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1));
 
         Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
@@ -413,8 +413,8 @@ public class KhaosMelee {
         player.getWorld().playSound(loc, Sound.ITEM_TRIDENT_RIPTIDE_2, 1, 1);
 
         tb.setRadius(1.5)
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
-                .addPlaySound((e) -> player.getWorld().playSound(e.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 1))
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(new Vector(0, 0.3, 0)))
+                .addRunWhenEntityExist((e) -> player.getWorld().playSound(e.getLocation(), Sound.ENTITY_ZOMBIE_ATTACK_IRON_DOOR, 1, 1))
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
                 .setHitOnlyOne(true);
 
@@ -646,11 +646,11 @@ public class KhaosMelee {
         targetBuilder tb = targetBuilder.builder(player)
                 .setRadius(1.5)
                 .setDamage(() -> PlayerManager.getinstance(player).meleedmgcalculate(player, 1))
-                .addStatus((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5));
+                .addRunWhenEntityExist((e) -> EntityStatusManager.getinstance(e).KnockBack(player, 0.5));
 
         if(pm.getTalent("RR", 3) == 3) {
             if(pm.dummyCount.contains("KHRRtIII3")) {
-                tb.addwhenHit(() -> {
+                tb.addRunWhenEntityExist(() -> {
                     PlayerHealthShield.getinstance(player).HealthAdd((int) ((double)pm.Health / 100), player);
                 });
             }
