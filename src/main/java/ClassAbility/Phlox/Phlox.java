@@ -57,10 +57,10 @@ public class Phlox {
 	}
 
 	private enum ENUM {
-		RR(3, 10,"§o§l긴급탈출§l§o §3§l-⚡§l"),
-		RL(5, 20,"§o§l정밀치료§l§o §3§l-⚡§l"),
-		FR(2, 20,"§o§lFR§l§o §3§l-⚡§l"),
-		SHIFTR(5, 20,"§o§l섬멸개시§l§o §3§l-⚡§l");
+		RR(4, 10,"§o§l긴급탈출§l§o §3§l-⚡§l"),
+		RL(6, 20,"§o§l정밀치료§l§o §3§l-⚡§l"),
+		FR(6, 20,"§o§lFR§l§o §3§l-⚡§l"),
+		SHIFTR(6, 20,"§o§l섬멸개시§l§o §3§l-⚡§l");
 
 		private int mana;
 		private String title;

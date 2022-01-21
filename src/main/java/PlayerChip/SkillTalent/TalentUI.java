@@ -1,5 +1,6 @@
 package PlayerChip.SkillTalent;
 
+import net.md_5.bungee.api.ChatColor;
 import utils.GUICancelHandler;
 import PlayerChip.Maingui;
 import PlayerManager.PlayerManager;
@@ -154,9 +155,59 @@ public class TalentUI implements Listener {
         File file = new File(Main.getPlugin(Main.class).getDataFolder()+"\\ClassDescription.yml");
         YamlConfiguration yaml = YamlConfiguration.loadConfiguration(file);
 
-        itemMeta.setDisplayName(yaml.getString(currentClass+".Skill."+skill+".Name"));
-        itemMeta.setLore(yaml.getStringList(currentClass+".Skill."+skill+".Lore"));
+        int tI = pm.getTalent(skill, 1);
+        int tII = pm.getTalent(skill, 2);
+        int tIII = pm.getTalent(skill, 3);
+        int tIV = pm.getTalent(skill, 4);
 
+        int size = pm.getTalentList(skill).stream().filter((t)->t!=0).toList().size();
+
+        ChatColor c2 = ChatColor.of("#C26CFF");
+        ChatColor c3 = ChatColor.of("#EBDBCE");
+        ChatColor c4 = ChatColor.BOLD;
+
+        itemMeta.setDisplayName("§r§o"+c2+c4+yaml.getString(currentClass+".Skill."+skill+".Name")+c3+" [Lv. "+(size+1)+"]");
+        List<String> lore = new ArrayList<>(yaml.getStringList(currentClass+".Skill."+skill+".Lore"));
+        lore.add("");
+        lore.add(ChatColor.of("#BFFF00")+"선택한 특성: ");
+        lore.add("");
+        String s = ChatColor.of("#FF6800")+"";
+        String s1 = s+"- 티어I: ";
+        String s2 = s+"- 티어II: ";
+        String s3 = s+"- 티어III: ";
+        String s4 = s+"- 티어IV: ";
+
+        if(tI == 0) s1+=ChatColor.of("#FFC0CB")+"선택하지않음";
+        if(tII == 0) s2+=ChatColor.of("#FFC0CB")+"선택하지않음";
+        if(tIII == 0) s3+=ChatColor.of("#FFC0CB")+"선택하지않음";
+        if(tIV == 0) s4+=ChatColor.of("#FFC0CB")+"선택하지않음";
+
+        lore.add(s1);
+        ChatColor c1 = ChatColor.of("#D9E3EB");
+        if(tI != 0) {
+            lore.addAll(yaml.getStringList(currentClass + ".Talent." + skill + ".1." + tI + ".Lore").stream()
+                    .map((string)-> c1+"   "+string).toList());
+        }
+        lore.add("");
+        lore.add(s2);
+        if(tII != 0) {
+            lore.addAll(yaml.getStringList(currentClass + ".Talent." + skill + ".2." + tII + ".Lore").stream()
+                    .map((string)-> c1+"   "+string).toList());
+        }
+        lore.add("");
+        lore.add(s3);
+        if(tIII != 0) {
+            lore.addAll(yaml.getStringList(currentClass + ".Talent." + skill + ".3." + tIII + ".Lore").stream()
+                    .map((string)-> c1+"  "+string).toList());
+        }
+        lore.add("");
+        lore.add(s4);
+        if(tIV != 0) {
+            lore.addAll(yaml.getStringList(currentClass + ".Talent." + skill + ".4." + tIV + ".Lore").stream()
+                    .map((string)-> c1+"   "+string).toList());
+        }
+
+        itemMeta.setLore(lore);
         itemStack.setItemMeta(itemMeta);
 
         net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);

@@ -12,6 +12,7 @@ public class MobListManager {
 
     public enum MobList {
 
+
         마우스풋("Gliese581c", 5, 20, 10, 10, 20, true, Parasite.description),
         폭스랫("Gliese581c", 5, 3000, 170,10, 20, true),
         폭스랫_알파("Gliese581c", 5, 30000, 10000,1500, 2000, true),
@@ -29,7 +30,8 @@ public class MobListManager {
         패러싯_알파("Gliese581c", 5, 200,10, 10, 20, true),
         edison1304("Gliese581c", 5, 200,10, 10, 20, false),
         감염된_개척자("Gliese581c", 5, 200, 10, 10, 20, true),
-        illusion("Gliese581c", 5, 200, 10, 10, 20, false);
+        illusion("Gliese581c", 5, 200, 10, 10, 20, false),
+        샌드백("Gliese581c, ", 5, 999999, 10, 10, 10, false);
 
 
         private String planet;

@@ -38,7 +38,6 @@ public class FoxRat extends EntityFox {
     @Override
     public void initPathfinder() {
 
-
         this.bP.a(1, new PathfinderGoalFloat(this));
         this.bP.a(0, new PathfinderGoalMeleeAttack(this, 1.5, true));
         this.bP.a(2, new PathfinderGoalRandomStroll(this, 0.6D));

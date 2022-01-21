@@ -2,6 +2,7 @@ package utils;
 
 import PlayerManager.PlayerManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -31,6 +32,10 @@ public class CoolDownAbilityHandler {
         this.onUse = () -> {
             player.sendMessage("사용");
         };
+        this.onReady = () -> {
+          player.sendMessage("§5>> §e"+abilityName+"§6 사용 준비 완료");
+          player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
+        };
 
     }
 
@@ -55,6 +60,10 @@ public class CoolDownAbilityHandler {
 
     public CoolDownAbilityHandler setOnReadyMessage(Runnable runnable) {
         this.onReady = runnable;
+        return this;
+    }
+    public CoolDownAbilityHandler setOnUse(Runnable runnable) {
+        this.onUse = runnable;
         return this;
     }
 

@@ -20,6 +20,8 @@ import org.bukkit.util.Vector;
 import spellinteracttest.Main;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Khaos {
@@ -54,7 +56,7 @@ public class Khaos {
 
     private enum ENUM {
         RL(4, "§o§l반월참§l§o §3§l-⚡§l"),
-        SHIFTR(4, "§o§l공간전이§l§o §3§l-⚡§l"),
+        SHIFTR(4, "§o§l공허개방§l§o §3§l-⚡§l"),
         RR(6, "§o§lRR스킬§l§o §3§l-⚡§l"),
         FR(8, "§o§lFR스킬§l§o §3§l-⚡§l");
 
@@ -95,7 +97,7 @@ public class Khaos {
 
         if(mana <= CurrentMana) {
             PlayerEnergy.getinstance(player).useEnergy(mana);
-            if(combo.equals("SHIFTR")) SHIFTR(player);
+            if(combo.equals("SHIFTR")) SHIFTR();
             if(combo.equals("RL")) HalfMoon();
             if(combo.equals("FR")) FR();
             if(combo.equals("RR")) RR(mana);
@@ -112,77 +114,135 @@ public class Khaos {
         return 0;
     }
 
-    public void SHIFTR(Player player) {
+//    public void SHIFTR(Player player) {
+//
+//        Set<Entity> Hit = new HashSet<>();
+//
+//        if(KhaosMelee.getThrown(player) == null) {
+//
+//        }
+//        /*
+//        단검이 있다면 단검으로 순간이동
+//
+//         */
+//        else if(KhaosMelee.getThrown(player) != null) {
+//
+//            player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation().add(0, 1, 0)
+//                    , 500, 0, 0, 0, 1);
+//            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 2, 1);
+//            player.teleport(KhaosMelee.getThrown(player));
+//
+//            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
+//                    () -> {
+//
+//                        Location loc = player.getLocation();
+//
+//                        targetBuilder tb = targetBuilder.builder(player)
+//                                .setRadius(4)
+//                                .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5))
+//                                .addRunWhenEntityExist(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f ))
+//                                .addRunWhenEntityExist(() -> player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f))
+//                                .addRunWhenEntityExist((aE) -> EntityStatusManager.getinstance(aE).KnockBack(player, 0.5))
+//                                .entityExcept(Hit)
+//                                .setLocation(loc)
+//                                .build();
+//
+//                        Hit.addAll(tb.getHitEntity());
+//
+//                        new BukkitRunnable() {
+//
+//                            double time = 0;
+//                            double r = 0 / 255D;
+//                            double g = 127 / 255D;
+//                            double b = 255 / 255D;
+//
+//                            @Override
+//                            public void run() {
+//
+//                                for(double j=0; j<1; j+=0.2) {
+//                                    for(double i = 0; i<Math.PI*2; i+=Math.PI/16) {
+//                                        double x = Math.cos(i) * (time + j);
+//                                        double y = 0;
+//                                        double z = Math.sin(i) * (time + j);
+//
+//                                        Vector v = new Vector(x, y, z);
+//                                        loc.add(v);
+//                                        player.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
+//                                        loc.subtract(v);
+//                                    }
+//                                }
+//
+//                                if(time >= 4) cancel();
+//                                time++;
+//                            }
+//                        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+//
+//
+//                player.getWorld().spawnParticle(Particle.REVERSE_PORTAL, player.getLocation().add(0, 1, 0)
+//                                , 500, 0, 0, 0, 1);
+//                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+//
+//                    }, 1);
+//
+//        }
+//    }
 
-        Set<Entity> Hit = new HashSet<>();
+    public void SHIFTR() {
+        Location loc = player.getEyeLocation();
+        Location origin = loc.clone();
 
-        if(KhaosMelee.getThrown(player) == null) {
+        BiConsumer<Location, Player> consumer = (l, p) -> {
+            double rpitch = Math.toRadians(p.getLocation().getPitch());
+            double ryaw = Math.toRadians(p.getLocation().getYaw());
+            new BukkitRunnable() {
+                double d = 0;
+                int time = 0;
+                @Override
+                public void run() {
+                    for(int j=0; j<6; j++) {
+                        double x = Math.sin(d);
+                        double y = Math.cos(d);
+                        Vector v = new Vector(x, y, 0);
+                        v = Rotate.transform(v, ryaw, rpitch, 0);
+                        l.add(v);
+                        l.getWorld().spawnParticle(Particle.SPELL_WITCH, l, 1, 0, 0, 0, 0);
+                        l.subtract(v);
+                        d+=Math.PI/16;
+                    }
+                    if(time>120) cancel();
 
-        }
-        /*
-        단검이 있다면 단검으로 순간이동
+                    time++;
 
-         */
-        else if(KhaosMelee.getThrown(player) != null) {
+                }
+            }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
+        };
 
-            player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation().add(0, 1, 0)
-                    , 500, 0, 0, 0, 1);
-            player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 2, 1);
-            player.teleport(KhaosMelee.getThrown(player));
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"),
-                    () -> {
-
-                        Location loc = player.getLocation();
-
-                        targetBuilder tb = targetBuilder.builder(player)
-                                .setRadius(4)
-                                .setDamage(() -> PlayerManager.getinstance(player).spelldmgcalculate(player, 1.5))
-                                .addRunWhenEntityExist(() -> player.playSound(player.getLocation(), Sound.ENTITY_ARROW_HIT_PLAYER, 0.5f, 2f ))
-                                .addRunWhenEntityExist(() -> player.getWorld().playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1f, 1.5f))
-                                .addRunWhenEntityExist((aE) -> EntityStatusManager.getinstance(aE).KnockBack(player, 0.5))
-                                .entityExcept(Hit)
-                                .setLocation(loc)
-                                .build();
-
-                        Hit.addAll(tb.getHitEntity());
-
-                        new BukkitRunnable() {
-
-                            double time = 0;
-                            double r = 0 / 255D;
-                            double g = 127 / 255D;
-                            double b = 255 / 255D;
-
-                            @Override
-                            public void run() {
-
-                                for(double j=0; j<1; j+=0.2) {
-                                    for(double i = 0; i<Math.PI*2; i+=Math.PI/16) {
-                                        double x = Math.cos(i) * (time + j);
-                                        double y = 0;
-                                        double z = Math.sin(i) * (time + j);
-
-                                        Vector v = new Vector(x, y, z);
-                                        loc.add(v);
-                                        player.getWorld().spawnParticle(Particle.SPELL_INSTANT, loc, 1, 0, 0, 0, 0);
-                                        loc.subtract(v);
-                                    }
-                                }
-
-                                if(time >= 4) cancel();
-                                time++;
-                            }
-                        }.runTaskTimer(Bukkit.getPluginManager().getPlugin("spellinteract"), 0, 1);
+        new BukkitRunnable() {
+            int time =0;
+            @Override
+            public void run() {
+                Vector vec = player.getLocation().getDirection().normalize().multiply(0.4);
+                double rpitch = Math.toRadians(player.getLocation().getPitch());
+                double ryaw = Math.toRadians(player.getLocation().getYaw()+45);
+                loc.add(vec);
+                if(!loc.getBlock().isPassable()) loc.subtract(vec.clone().multiply(2));
+                else {
+                    Vector dvec = vec.clone(); // 모서리 텔레포트 방지
+                    dvec = Rotate.transform(dvec, ryaw, rpitch, 0);
+                    if(!loc.clone().add(dvec).getBlock().isPassable()) loc.subtract(vec.clone().multiply(2));
+                }
 
 
-                player.getWorld().spawnParticle(Particle.REVERSE_PORTAL, player.getLocation().add(0, 1, 0)
-                                , 500, 0, 0, 0, 1);
-                player.getWorld().playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
-                    }, 1);
+                player.spawnParticle(Particle.ELECTRIC_SPARK, loc, 1, 0, 0, 0, 0);
 
-        }
+                if(time>40 || !player.isSneaking()) {
+                    consumer.accept(loc, player);
+                    cancel();
+                }
+                time++;
+            }
+        }.runTaskTimer(Main.getPlugin(Main.class), 0, 1);
     }
 
     public void HalfMoon() {

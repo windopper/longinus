@@ -96,6 +96,12 @@ public class Gliese581cEntitySummon implements Listener {
         if(mobName.equals("dm")) {
             DessertMammoth dm = new DessertMammoth(EntityTypes.L, nmsworld, location);
         }
+        else if(mobName.equals("sb")) {
+            SanBag sb = new SanBag(EntityTypes.aB, nmsworld, location);
+        }
+        else if(mobName.equals("wf")) {
+            WolfFang wf = new WolfFang(EntityTypes.bc, nmsworld, location);
+        }
     }
 
 

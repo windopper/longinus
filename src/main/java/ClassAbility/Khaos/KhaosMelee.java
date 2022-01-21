@@ -68,11 +68,6 @@ public class KhaosMelee {
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(5);
             }
-//            if(combo.equals("R")) {
-//
-//            }
-
-
         }
         else if(MeleeCombo == 2) {
 
@@ -81,14 +76,6 @@ public class KhaosMelee {
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-//            else if(combo.equals("R")) {
-//                if(throwns.containsKey(player)) {
-//
-//                }
-//                else ThrowDagger();
-//                playerFunction.addMeleeCombo();
-//                playerFunction.setMeleeDelay(5);
-//            }
             else if(combo.equals("SHIFTL")) {
                 Vertical();
                 playerFunction.addMeleeCombo();
@@ -101,14 +88,6 @@ public class KhaosMelee {
                 playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
             }
-//            else if(combo.equals("R")) {
-//                if(throwns.containsKey(player)) {
-//
-//                }
-//                else ThrowDagger();
-//                playerFunction.addMeleeCombo();
-//                playerFunction.setMeleeDelay(5);
-//            }
             else if(combo.equals("SHIFTL")) {
                 LeapVertical();
                 playerFunction.addMeleeCombo();
@@ -118,8 +97,8 @@ public class KhaosMelee {
         else if(MeleeCombo == 4) {
             if(combo.equals("L")) {
                 SweepAround();
-                playerFunction.addMeleeCombo();
                 playerFunction.setMeleeDelay(10);
+                playerFunction.setMeleeCombo(1);
             }
         }
         else if(MeleeCombo == 5) {
