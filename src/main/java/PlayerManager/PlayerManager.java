@@ -1,7 +1,10 @@
 package PlayerManager;
 
+import CustomScoreboard.SBManager;
 import Exceptions.UndefinedFunctionError;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.scores.ScoreboardObjective;
+import net.minecraft.world.scores.ScoreboardTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -10,6 +13,10 @@ import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.RenderType;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import spellinteracttest.Main;
 import spellinteracttest.RandomRange;
 
@@ -56,6 +63,8 @@ public class PlayerManager {
 	public Set<Function<Integer, Integer>> giveDamageModifier = Collections.synchronizedSet(new HashSet<>());
 
 	public List<String> tabContents = new ArrayList<>();
+
+	public SBManager sbManager;
 
 	public int Str = 0;
 	public int Dex = 0;
@@ -104,9 +113,6 @@ public class PlayerManager {
 	public int ChipAbilityCoolDown = 0;
 
 	private Player p;
-
-	public PlayerManager() {}
-	
 	public PlayerManager(Player p) {
 		this.p = p;
 	}

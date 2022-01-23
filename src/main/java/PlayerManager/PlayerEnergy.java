@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlayerEnergy extends PlayerManager {
+public class PlayerEnergy {
 	
 	private static final HashMap<Player, PlayerEnergy> PlayerEnergy = new HashMap<>();
 	
@@ -29,6 +29,7 @@ public class PlayerEnergy extends PlayerManager {
 		return PlayerEnergy.get(p);
 	}
 
+	public void remove() { PlayerEnergy.remove(p);}
 	public int getEnergy() {
 		return Energy;
 	}

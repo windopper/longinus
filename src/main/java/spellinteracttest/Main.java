@@ -9,6 +9,7 @@ import ClassAbility.Phlox.Phlox;
 import Duel.DuelManager;
 import DynamicData.Damage;
 import PacketRecord.Recording.PacketRecordCommands;
+import Party.PartyFunction;
 import utils.GUICancelHandler;
 import Mob.Gliese581cMobs.Gliese581cEntitySummon;
 import Items.ItemManager;
@@ -127,6 +128,8 @@ public class Main extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new TalentUI(), this);
 
 		getServer().getPluginManager().registerEvents(new FlashLightListener(), this);
+
+		getServer().getPluginManager().registerEvents(PlayerPacketHandler.getInstance(), this);
 
 
 		getCommand("party").setTabCompleter(new TabCompleter());
@@ -311,29 +314,38 @@ public class Main extends JavaPlugin implements Listener {
 			switch (args[0]) {
 
 				case "create": {
-					PartyManager.getinstance().createParty(player);
+					PartyFunction.getInstance().createParty(player);
+					//PartyManager.getinstance().createParty(player);
 					break;
 				}
 				case "invite": {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						if(args[1].equals(p.getName())) {
-							PartyManager.getinstance().inviteParty(player, p);
+							PartyFunction.getInstance().inviteParty(player, p);
+							//PartyManager.getinstance().inviteParty(player, p);
 						}
 					}
 					break;
 				}
 				case "join": {
-					PartyManager.getinstance().JoinParty(player);
+					//PartyManager.getinstance().JoinParty(player);
+					for(Player p : Bukkit.getOnlinePlayers()) {
+						if(args[1].equals(p.getName())) {
+							PartyFunction.getInstance().acceptParty(player, p);
+						}
+					}
 					break;
 				}
 				case "leave": {
-					PartyManager.getinstance().QuitParty(player);
+					PartyFunction.getInstance().quitParty(player);
+					//PartyManager.getinstance().QuitParty(player);
 					break;
 				}
 				case "promote": {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						if(args[1].equals(p.getName())) {
-							PartyManager.getinstance().ChangeMaster(player, p);
+							PartyFunction.getInstance().promoteMaster(player, p);
+							//PartyManager.getinstance().ChangeMaster(player, p);
 						}
 					}
 					break;
@@ -341,7 +353,8 @@ public class Main extends JavaPlugin implements Listener {
 				case "kick": {
 					for(Player p : Bukkit.getOnlinePlayers()) {
 						if(args[1].equals(p.getName())) {
-							PartyManager.getinstance().KickMember(player, p);
+							PartyFunction.getInstance().kickParty(player, p);
+							//PartyManager.getinstance().KickMember(player, p);
 						}
 					}
 					break;
@@ -800,7 +813,7 @@ public class Main extends JavaPlugin implements Listener {
 
 				MobMechManager.getInstance().RunGliese581cMobMech();
 				SpyGlass.SpyGlassManager.watchSpyGlassEnable();
-				PartyManager.getinstance().partyGlowingLoop();
+				//PartyManager.getinstance().partyGlowingLoop();
 				DuelManager.duelLoop();
 				Map.updateMap();
 
@@ -871,7 +884,7 @@ public class Main extends JavaPlugin implements Listener {
 		PlayerManager.getinstance(p).removeinstance();
 		UserQuestManager.Singleton().RemoveQuestsInstances(p);
 		PlayerHealthShield.getinstance(p).removeinstance();
-		PlayerEnergy.getinstance(p).removeinstance();
+		PlayerEnergy.getinstance(p).remove();
 		EntityHealthBossBar.getinstance(p).removeinstance();
 		PlayerCombination.getinstance(p).removeinstance();
 		PlayerFunction.getinstance(p).removeinstance();

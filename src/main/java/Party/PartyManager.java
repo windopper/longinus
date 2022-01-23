@@ -379,9 +379,6 @@ public class PartyManager {
             }
             objectiveString.put(p, getObjectiveString(p));
         }
-
-
-
     }
 
     public void partyGlowingLoop() {
