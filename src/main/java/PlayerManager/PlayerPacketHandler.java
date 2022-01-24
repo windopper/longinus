@@ -34,7 +34,6 @@ public class PlayerPacketHandler implements Listener {
 
     @EventHandler
     public void onEnable(ServerLoadEvent event) {
-        Bukkit.broadcastMessage("enable");
         LoopHandler();
     }
 

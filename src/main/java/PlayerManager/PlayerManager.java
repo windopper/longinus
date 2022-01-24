@@ -1,5 +1,6 @@
 package PlayerManager;
 
+import CustomScoreboard.ObjectiveDisplay;
 import CustomScoreboard.SBManager;
 import Exceptions.UndefinedFunctionError;
 import net.minecraft.nbt.NBTTagCompound;
@@ -65,6 +66,7 @@ public class PlayerManager {
 	public List<String> tabContents = new ArrayList<>();
 
 	public SBManager sbManager;
+	public ObjectiveDisplay objectiveDisplay;
 
 	public int Str = 0;
 	public int Dex = 0;

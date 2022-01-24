@@ -6,6 +6,7 @@ import ClassAbility.Accelerator;
 import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
+import CustomScoreboard.ObjectiveDisplay;
 import Duel.DuelManager;
 import DynamicData.Damage;
 import PacketRecord.Recording.PacketRecordCommands;
@@ -312,52 +313,41 @@ public class Main extends JavaPlugin implements Listener {
 				return true;
 			}
 			switch (args[0]) {
-
-				case "create": {
+				case "create" -> {
 					PartyFunction.getInstance().createParty(player);
-					//PartyManager.getinstance().createParty(player);
-					break;
 				}
-				case "invite": {
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						if(args[1].equals(p.getName())) {
+				case "invite" -> {
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						if (args[1].equals(p.getName())) {
 							PartyFunction.getInstance().inviteParty(player, p);
 							//PartyManager.getinstance().inviteParty(player, p);
 						}
 					}
-					break;
 				}
-				case "join": {
+				case "join" -> {
 					//PartyManager.getinstance().JoinParty(player);
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						if(args[1].equals(p.getName())) {
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						if (args[1].equals(p.getName())) {
 							PartyFunction.getInstance().acceptParty(player, p);
 						}
 					}
-					break;
 				}
-				case "leave": {
-					PartyFunction.getInstance().quitParty(player);
-					//PartyManager.getinstance().QuitParty(player);
-					break;
-				}
-				case "promote": {
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						if(args[1].equals(p.getName())) {
+				case "leave" ->
+						PartyFunction.getInstance().quitParty(player);
+				case "promote" -> {
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						if (args[1].equals(p.getName())) {
 							PartyFunction.getInstance().promoteMaster(player, p);
-							//PartyManager.getinstance().ChangeMaster(player, p);
 						}
 					}
-					break;
 				}
-				case "kick": {
-					for(Player p : Bukkit.getOnlinePlayers()) {
-						if(args[1].equals(p.getName())) {
+				case "kick" -> {
+					for (Player p : Bukkit.getOnlinePlayers()) {
+						if (args[1].equals(p.getName())) {
 							PartyFunction.getInstance().kickParty(player, p);
 							//PartyManager.getinstance().KickMember(player, p);
 						}
 					}
-					break;
 				}
 			}
 		}
@@ -417,6 +407,11 @@ public class Main extends JavaPlugin implements Listener {
 
 		
 		switch (args[0]) {
+
+			case "obj": {
+				ObjectiveDisplay.getBuilder(player).setTitle(args[1]);
+				break;
+			}
 
 			case "font": {
 				String c = "\ue238\ue239";

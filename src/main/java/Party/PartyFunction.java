@@ -1,19 +1,32 @@
 package Party;
 
+import CustomScoreboard.SBManager;
 import PlayerManager.PlayerPacketHandler;
 import net.md_5.bungee.api.chat.*;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import spellinteracttest.Main;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class PartyFunction {
+public class PartyFunction implements Listener {
 
     private static PartyFunction partyfunction;
     private PartyFunction() {}
+
+    @EventHandler
+    public void Quit(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        if(PartyHandler.hasParty(player)) {
+            quitParty(player);
+        }
+    }
 
     public static PartyFunction getInstance() {
         if(partyfunction == null) partyfunction = new PartyFunction();
@@ -22,15 +35,21 @@ public class PartyFunction {
     public void createParty(Player player) {
         if(PartyHandler.hasParty(player)) {
             hasPartyMessage(player);
-            return;
         }
         else {
             PartyHandler.getInstance(player).setUpParty();
+            UUID partyCode = PartyHandler.getInstance(player).getPartyCode();
 
             PlayerPacketHandler playerPacketHandler = PlayerPacketHandler.getInstance();
             PlayerPacketHandler.Handlers handlers = playerPacketHandler.createOrGetQuery(player, "party");
             handlers.setHandlers(PlayerPacketHandler.HandleType.Glowing, PlayerPacketHandler.HandleOption.ON);
             handlers.addShowTo(player);
+
+            SBManager sbManager = SBManager.getInstance(player);
+
+            sbManager.getOrCreateTeam(partyCode.toString());
+            sbManager.setTeamColor(partyCode.toString(), ChatColor.GREEN);
+            sbManager.addPlayerToTeam(partyCode.toString(), player);
 
             player.sendMessage(partyStandardMessage("파티를 성공적으로 만들었습니다"));
         }
@@ -39,9 +58,10 @@ public class PartyFunction {
     public void quitParty(Player player) {
         if(PartyHandler.hasParty(player)) {
             PartyHandler partyHandler = PartyHandler.getInstance(player);
-
             UUID partyCode = partyHandler.getPartyCode();
             sendMessageToAllPartyMember(player, "§6"+player.getName()+"§e님이 파티를 나갔습니다");
+
+            SBManager.getInstance(player).removePlayerFromTeam(partyCode.toString(), player);
 
             if(PartyHandler.isMaster(player) && partyHandler.getCurrentPartySize() > 1) {
                 Player nextMaster = partyHandler.getPartyMembers()
@@ -52,8 +72,11 @@ public class PartyFunction {
 
                 PartyHandler.getInstance(nextMaster).setMaster();
             }
-            partyHandler.remove();
+            else {
+                SBManager.getInstance(player).removeTeam(partyCode.toString());
+            }
 
+            partyHandler.remove();
             PartyHandler.updatePartyPacket(partyCode);
         }
         else {
@@ -104,15 +127,18 @@ public class PartyFunction {
         if(requests.containsKey(player)) {
             List<UUID> lists = PartyHandler.getPlayerRequests(player);
             PartyHandler partyHandler = PartyHandler.getInstance(target);
+            UUID partyCode = partyHandler.getPartyCode();
 
             if(lists.contains(partyHandler.getPartyCode())) {
-                PartyHandler.getInstance(player).setPartyCode(partyHandler.getPartyCode());
+                PartyHandler.getInstance(player).setPartyCode(partyCode);
 
                 PartyHandler.updatePartyPacket(partyHandler.getPartyCode());
 
                 TextComponent textComponent = new TextComponent(partyStandardMessage("§6"+player.getName()+"§e님이 파티에 입장했습니다"));
                 textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("파티식별코드: "+partyHandler.getPartyCode().toString())));
                 sendMessageToAllPartyMember(player, textComponent);
+
+                SBManager.getInstance(target).addPlayerToTeam(partyCode.toString(), player);
 
                 PartyHandler.getRequests().remove(player);
             }
@@ -135,6 +161,9 @@ public class PartyFunction {
                 if(PartyHandler.getInstance(target).getPartyCode().equals(PartyHandler.getInstance(player).getPartyCode())) {
                     UUID partyCode = PartyHandler.getInstance(target).getPartyCode();
                     sendMessageToAllPartyMember(player, "§6"+target.getName()+"§e님이 파티에서 추방당했습니다");
+
+                    PartyHandler partyHandler = PartyHandler.getInstance(player);
+                    SBManager.getInstance(player).removePlayerFromTeam(partyCode.toString(), target);
 
                     PartyHandler.getInstance(target).remove();
                     PartyHandler.updatePartyPacket(partyCode);
