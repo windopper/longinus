@@ -163,7 +163,6 @@ public class PlayerClass {
         pm.setTalent(srlist, "SR");
         pm.setTalent(rllist, "RL");
 
-        //LastClassLocation.getinstance().classchangeteleport(player, className);
         Location location = (new Converter()).stringToCoord(player, className);
         player.teleport(location);
 

@@ -2,6 +2,8 @@ package PlayerChip;
 
 import ClassAbility.entitycheck;
 import CustomEvents.PlayerClassChangeEvent;
+import Party.PartyFunction;
+import Party.PartyHandler;
 import Party.PartyManager;
 import PlayerManager.PlayerManager;
 import ReturnToBase.ReturnMech;
@@ -113,7 +115,8 @@ public class GuiEvent implements Listener {
 			try {
 				if(rawslot == 27) BacktoMain(e);
 				else if(rawslot == 35) {
-					PartyManager.getinstance().QuitParty(player);
+					PartyFunction.getInstance().quitParty(player);
+					//PartyManager.getinstance().QuitParty(player);
 					player.closeInventory();
 				}
 				else partyPlayerClickEvent(e);
@@ -225,11 +228,13 @@ public class GuiEvent implements Listener {
 			e.setCancelled(true);
 			if(content.equals("취소")) {
 				AllowReadingChatPlayerInvite.remove(player);
+				return;
 			}
 			for(Player onlineUser : Bukkit.getOnlinePlayers()) {
 				if(content.equals(onlineUser.getName())) {
+					PartyFunction.getInstance().inviteParty(player, onlineUser);
 					PartyManager.getinstance().inviteParty(player, onlineUser);
-					AllowReadingChatPlayerInvite.remove(player);
+					//AllowReadingChatPlayerInvite.remove(player);
 					return;
 				}
 			}
@@ -595,7 +600,7 @@ public class GuiEvent implements Listener {
 		
 	}
 
-	private final void partyGuiClickEvent(InventoryClickEvent e) {
+	private void partyGuiClickEvent(InventoryClickEvent e) {
 
 		Player player = (Player) e.getView().getPlayer();
 
@@ -605,10 +610,10 @@ public class GuiEvent implements Listener {
 
 	}
 
-	private final void partyPlayerClickEvent(InventoryClickEvent e) {
+
+	private void partyPlayerClickEvent(InventoryClickEvent e) {
 		Player player = (Player) e.getView().getPlayer();
 
-		PartyManager partyManager = PartyManager.getParty(player);
 		ItemStack clickedItem = e.getCurrentItem();
 
 		// 플레이어 초대
@@ -622,16 +627,18 @@ public class GuiEvent implements Listener {
 			return;
 		}
 
-		if(partyManager != null)
-			if(!partyManager.getMaster().getName().equals(player.getName())) {
+		if(PartyHandler.hasParty(player)) {
+			PartyHandler partyHandler = PartyHandler.getInstance(player);
+
+			if(!partyHandler.isMaster()) {
 				player.playSound(player.getLocation(), Sound.BLOCK_ANVIL_PLACE, 0.5f, 1);
 				player.sendMessage("§c파티장만 사용 할 수 있는 기능입니다");
 				player.closeInventory();
 				return;
 			}
+		}
 
 		// 플레이어 설정
-
 		if(clickedItem.getItemMeta() == null) return;
 
 		Player target = (Player) ((SkullMeta) clickedItem.getItemMeta()).getOwningPlayer();
@@ -642,23 +649,25 @@ public class GuiEvent implements Listener {
 
 	}
 
-	private final void partyPlayerOptionClickEvent(InventoryClickEvent e) {
+	private void partyPlayerOptionClickEvent(InventoryClickEvent e) {
 		Player player = (Player) e.getWhoClicked();
 		Inventory inventory = e.getInventory();
 		Player target = (Player) (((SkullMeta) (inventory.getItem(13).getItemMeta())).getOwningPlayer());
 
 		int clickedSlot = e.getRawSlot();
 		if(clickedSlot == 21) {
-			PartyManager.getinstance().ChangeMaster(player, target);
+			PartyFunction.getInstance().promoteMaster(player, target);
+			//PartyManager.getinstance().ChangeMaster(player, target);
 		}
 		else if(clickedSlot == 23) {
-			PartyManager.getinstance().KickMember(player, target);
+			PartyFunction.getInstance().kickParty(player, target);
+			//PartyManager.getinstance().KickMember(player, target);
 		}
 
 		(new partyGui()).openPartyGui(player);
 	}
 
-	private final void openCollectingGui(InventoryClickEvent e) {
+	private void openCollectingGui(InventoryClickEvent e) {
 
 		Player player = (Player) e.getWhoClicked();
 		player.playSound(player.getLocation(), Sound.BLOCK_DISPENSER_DISPENSE, 1, 2);

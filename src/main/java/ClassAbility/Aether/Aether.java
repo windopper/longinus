@@ -212,7 +212,7 @@ public class Aether {
 
 		for(LivingEntity lE : player.getWorld().getLivingEntities()) {
 			Location lloc = lE.getLocation();
-			if(lloc.distance(player.getLocation()) < radius && lE instanceof Player pl && !entitycheck.duelcheck(lE, player)) {
+			if(lloc.distance(player.getLocation()) < radius && lE instanceof Player pl && !entitycheck.duelcheck(lE, player) && player != lE) {
 				if(!pl.isOnline()) continue;
 				PlayerHealthShield.getinstance(pl).ShieldAdd(finalshield, player);
 				summonCircle4(pl.getLocation(), 1);

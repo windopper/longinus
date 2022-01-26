@@ -1,30 +1,32 @@
 package CustomScoreboard;
 
 import PlayerManager.PlayerManager;
-import com.mojang.brigadier.Message;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.network.chat.ChatBaseComponent;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutScoreboardDisplayObjective;
 import net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective;
+import net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore;
+import net.minecraft.server.ScoreboardServer;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.scores.ScoreboardObjective;
 import net.minecraft.world.scores.ScoreboardScore;
 import net.minecraft.world.scores.criteria.IScoreboardCriteria;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_17_R1.scoreboard.CraftScoreboard;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.RenderType;
-import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.*;
+import spellinteracttest.Main;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObjectiveDisplay {
 
     private Player player;
     private PlayerManager pm;
+
+    private String title;
+    private final List<String> lines = new ArrayList<>();
 
     private ObjectiveDisplay(Player player) {
         this.player = player;
@@ -45,44 +47,45 @@ public class ObjectiveDisplay {
         return ((CraftPlayer) player).getHandle().b;
     }
 
-    public ObjectiveDisplay setTitle(String var) {
-
-        //Objective objective = getScoreboard().registerNewObjective(var, var, "dummy", RenderType.INTEGER);
-        ScoreboardObjective scoreboardObjective = ((CraftScoreboard) getScoreboard()).getHandle()
-                .registerObjective(var, IScoreboardCriteria.a
-                , IChatBaseComponent.ChatSerializer.b(var),
-                        IScoreboardCriteria.EnumScoreboardHealthDisplay.a);
-
-        scoreboardObjective.a().setDisplaySlot(1, scoreboardObjective);
-
-//        for (ScoreboardScore score : scoreboardObjective.a().getScoresForObjective(scoreboardObjective)) {
-//            score.c();
-//            scoreboardObjective.a().handleScoreChanged(score);
-//        }
-
-        //scoreboardObjective.a().setDisplaySlot(1, scoreboardObjective);
-//        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-//        objective.setDisplayName(var);
-//        objective.getScore("Nice").setScore(1);
-//
-//        //ScoreboardObjective scoreboardObjective = ((CraftScoreboard) getScoreboard()).getHandle().getObjective(var);
-//        objective.unregister();
-
-        PacketPlayOutScoreboardObjective packetPlayOutScoreboardObjective =
-                new PacketPlayOutScoreboardObjective(scoreboardObjective, 0);
-
-        PacketPlayOutScoreboardDisplayObjective packetPlayOutScoreboardDisplayObjective =
-                new PacketPlayOutScoreboardDisplayObjective(1, scoreboardObjective);
-
-
-
-//        PacketPlayOutScoreboardObjective packetPlayOutScoreboardObjective =
-//                new PacketPlayOutScoreboardObjective(scoreboardObjective, 0);
-
-        //getConnection().sendPacket(packetPlayOutScoreboardDisplayObjective);
-        getConnection().sendPacket(packetPlayOutScoreboardObjective);
-
+    public ObjectiveDisplay setTitle(String title) {
+        if(title.length()>16) title = title.substring(0, 15);
+        this.title = title;
         return this;
+    }
+    public ObjectiveDisplay addLine(String line) {
+        if(line.length()>40) line = line.substring(0, 39);
+        lines.add(line);
+        return this;
+    }
+
+    public void build() {
+        net.minecraft.world.scores.Scoreboard scoreboard = new net.minecraft.world.scores.Scoreboard();
+        ScoreboardObjective obj = scoreboard.registerObjective(title, IScoreboardCriteria.a
+                , IChatBaseComponent.ChatSerializer.b(title),
+                IScoreboardCriteria.EnumScoreboardHealthDisplay.a);
+
+        obj.a().setDisplaySlot(1, obj);
+
+        PacketPlayOutScoreboardObjective removePacket =
+                new PacketPlayOutScoreboardObjective(obj, 1);
+
+        PacketPlayOutScoreboardObjective createPacket =
+                new PacketPlayOutScoreboardObjective(obj, 0);
+
+        PacketPlayOutScoreboardObjective updatePacket =
+                new PacketPlayOutScoreboardObjective(obj, 2);
+
+        PacketPlayOutScoreboardDisplayObjective display =
+                new PacketPlayOutScoreboardDisplayObjective(1, obj);
+
+        getConnection().sendPacket(removePacket);
+        getConnection().sendPacket(createPacket);
+        getConnection().sendPacket(updatePacket);
+        for(int i=0; i<lines.size(); i++) {
+            getConnection().sendPacket(new PacketPlayOutScoreboardScore(ScoreboardServer.Action.a, title, lines.get(i), (lines.size())-i-1));
+        }
+        lines.clear();
+        getConnection().sendPacket(display);
     }
 
 

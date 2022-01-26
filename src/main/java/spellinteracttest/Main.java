@@ -7,6 +7,7 @@ import ClassAbility.Aether.Aether;
 import ClassAbility.Cheiron.CheironArrowEvent;
 import ClassAbility.Phlox.Phlox;
 import CustomScoreboard.ObjectiveDisplay;
+import CustomScoreboard.ObjectiveDisplayLoop;
 import Duel.DuelManager;
 import DynamicData.Damage;
 import PacketRecord.Recording.PacketRecordCommands;
@@ -152,7 +153,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 		}
 
-		Bukkit.getScheduler().scheduleSyncDelayedTask(Bukkit.getPluginManager().getPlugin("spellinteract"), () -> {
+		Bukkit.getScheduler().scheduleSyncDelayedTask(Main.getPlugin(Main.class), () -> {
 			if(!Bukkit.getOnlinePlayers().isEmpty()) {
 				for(Player player : Bukkit.getOnlinePlayers()) {
 
@@ -162,10 +163,15 @@ public class Main extends JavaPlugin implements Listener {
 
 			mainLoop();
 
+			ObjectiveDisplayLoop.getInstance().mainLoop();
+
 			QuestNPCManager.getinstance().addnpctolist();
 			ShopNPCManager.getinstance().addnpctolist(); // NPC 목록 서버에 추가
 			(new AuctionNPC()).Register();
 		}, 20);
+
+
+
 
 	}
 	

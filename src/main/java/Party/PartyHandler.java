@@ -59,6 +59,8 @@ public class PartyHandler {
         isMaster = false;
     }
 
+    public boolean isMaster() { return isMaster; }
+
     public void setPartyCode(UUID partyCode) {
         this.partyCode = partyCode;
     }
